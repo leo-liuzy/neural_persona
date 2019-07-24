@@ -1,0 +1,11 @@
+.mypy_cache/
+.pytest_cache/
+__pycache__/
+.vscode/
+model_logs/
+.coverage*
+.ipynb_checkpoints/
+datasets/
+examples/
+s3/
+.hyperparameter_search_results
