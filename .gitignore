@@ -5,7 +5,7 @@ __pycache__/
 model_logs/
 .coverage*
 .ipynb_checkpoints/
-datasets/
+dataset/
 examples/
 s3/
 .hyperparameter_search_results
