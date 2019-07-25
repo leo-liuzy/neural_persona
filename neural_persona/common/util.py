@@ -226,8 +226,18 @@ def save_named_sparse(named_sparse_matrices: Dict[str, sparse.spmatrix], output_
     assert all(sparse.issparse(matrix) for matrix in named_sparse_matrices.values())
     coo = {name: sparse_matrix if sparse.isspmatrix_coo(sparse_matrix) else sparse_matrix.tocoo()
            for name, sparse_matrix in named_sparse_matrices.items()}
-
+    coo = {name: {"data": matrix.data,
+                  "col": matrix.col,
+                  "row": matrix.row,
+                  "shape": matrix.shape}
+           for name, matrix in coo.items()}
     np.savez(output_filename, **coo)
+
+
+def load_named_sparse(input_filename, key):
+    npy = np.load(input_filename)[key]
+    coo_matrix = sparse.coo_matrix((npy['data'], (npy['row'], npy['col'])), shape=npy['shape'])
+    return coo_matrix.tocsc()
 
 
 def load_sparse(input_filename):

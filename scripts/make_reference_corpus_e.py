@@ -13,7 +13,8 @@ from tqdm import tqdm
 from neural_persona.common.util import (read_jsonlist,
                                         read_text,
                                         save_sparse,
-                                        write_to_json)
+                                        write_to_json,
+                                        read_json)
 
 # compile some regexes
 PUNCT_CHARS = list(set(string.punctuation) - set("'"))
@@ -50,6 +51,8 @@ def main(args):
                       help='Size of the vocabulary (by most common, following above exclusions): default=%default')
     parser.add_option('--seed', dest='seed', default=42,
                       help='Random integer seed (only relevant for choosing test set): default=%default')
+    parser.add_option('--token-field-name', type=str, dest='token_field_name', default="text",
+                      help='Name of the field that we construct the reference corpus from: default=%default')
 
     (options, args) = parser.parse_args(args)
 
@@ -69,6 +72,7 @@ def main(args):
     lower = not options.no_lower
     min_length = int(options.min_length)
     seed = options.seed
+    token_field_name = options.token_field_name
 
     if seed is not None:
         np.random.seed(int(seed))
@@ -102,7 +106,8 @@ def preprocess_data(train_infile,
                     keep_alphanum=False,
                     strip_html=False,
                     lower=True,
-                    min_length=3):
+                    min_length=3,
+                    token_field_name='text'):
 
     if stopwords == 'mallet':
         print("Using Mallet stopwords")
@@ -131,7 +136,8 @@ def preprocess_data(train_infile,
         n_test = 0
 
     all_items = train_items + test_items
-    n_items = n_train + n_test
+    all_texts = set([item[token_field_name] for item in all_items])
+    n_items = len(all_texts)
 
     # make vocabulary
     train_parsed = []
@@ -143,11 +149,9 @@ def preprocess_data(train_infile,
     count = 0
 
     vocab = None
-    for i, item in tqdm(enumerate(all_items), total=n_items):
+    for i, text in tqdm(enumerate(all_texts), total=n_items):
         if i % 1000 == 0 and count > 0:
             print(i)
-
-        text = item['text']
         tokens, _ = tokenize(text,
                              strip_html=strip_html,
                              lower=lower,

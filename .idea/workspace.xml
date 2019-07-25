@@ -2,12 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="94f513c9-f1aa-40e4-93a8-627d78320eaf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/scripts/converters/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/lzy.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/lzy.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/neural_persona/models/partial-gen.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/neural_persona/modules/vae/ladder.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/make_reference_corpus_e.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/neural_persona/common/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/common/util.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/preprocess_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/preprocess_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neural_persona/data/dataset_readers/partialgen_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/data/dataset_readers/partialgen_reader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/make_reference_corpus.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/make_reference_corpus.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/preprocess_data_e.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/preprocess_data_e.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" beforeDir="false" afterPath="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" afterDir="false" />
     </list>
@@ -22,8 +24,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/neural_persona/data/dataset_readers/vampire_reader.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="22" column="7" selection-start-line="22" selection-start-column="7" selection-end-line="22" selection-end-column="7" />
+            <state relative-caret-position="304">
+              <caret line="43" column="38" selection-start-line="43" selection-start-column="38" selection-end-line="43" selection-end-column="38" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -32,43 +34,55 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/neural_persona/data/dataset_readers/partialgen_reader.py">
+        <entry file="file://$PROJECT_DIR$/scripts/preprocess_data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="744">
-              <caret line="46" column="30" selection-start-line="46" selection-start-column="30" selection-end-line="46" selection-end-column="30" />
+            <state relative-caret-position="203">
+              <caret line="65" column="24" selection-start-line="65" selection-start-column="24" selection-end-line="65" selection-end-column="24" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/preprocess_data.py">
+        <entry file="file://$PROJECT_DIR$/scripts/preprocess_data_e.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="299">
-              <caret line="18" column="36" selection-start-line="18" selection-start-column="36" selection-end-line="18" selection-end-column="36" />
+            <state relative-caret-position="155">
+              <caret line="129" selection-start-line="129" selection-end-line="129" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/scripts/make_reference_corpus.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="360">
+              <caret line="149" column="25" selection-start-line="149" selection-start-column="25" selection-end-line="149" selection-end-column="25" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/scripts/preprocess_data_e.py">
+        <entry file="file://$PROJECT_DIR$/scripts/make_reference_corpus_e.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="419">
-              <caret line="97" lean-forward="true" selection-start-line="97" selection-end-line="97" />
+            <state relative-caret-position="243">
+              <caret line="139" column="28" selection-start-line="139" selection-start-column="28" selection-end-line="139" selection-end-column="28" />
               <folding>
-                <element signature="e#0#15#0" expanded="true" />
+                <element signature="e#78#87#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py">
+        <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/optparse.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="508">
-              <caret line="50" column="54" selection-start-line="50" selection-start-column="54" selection-end-line="50" selection-end-column="54" />
+            <state relative-caret-position="285">
+              <caret line="434" column="28" selection-start-line="434" selection-start-column="28" selection-end-line="434" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -76,17 +90,29 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/neural_persona/common/util.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="24">
-              <caret line="213" column="44" selection-start-line="213" selection-start-column="44" selection-end-line="213" selection-end-column="44" />
+            <state relative-caret-position="371">
+              <caret line="166" column="17" selection-start-line="166" selection-start-column="4" selection-end-line="166" selection-end-column="17" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/allennlp/data/fields/array_field.py">
+        <entry file="file://$PROJECT_DIR$/neural_persona/models/partial-gen.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="15" column="8" selection-start-line="15" selection-start-column="8" selection-end-line="15" selection-end-column="8" />
+            <state relative-caret-position="184">
+              <caret line="75" column="39" selection-start-line="75" selection-start-column="39" selection-end-line="75" selection-end-column="39" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/neural_persona/modules/vae/ladder.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="456">
+              <caret line="32" column="46" selection-start-line="32" selection-start-column="46" selection-end-line="32" selection-end-column="46" />
             </state>
           </provider>
         </entry>
@@ -103,6 +129,13 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>-s</find>
+      <find>token_field_names</find>
+      <find>global_repr</find>
+      <find>stopword</find>
+      <find>token_field_name</find>
+      <find>text</find>
+      <find>text'</find>
+      <find>'text'</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -113,13 +146,17 @@
       <list>
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/neural_persona/data/dataset_readers/vampire_reader.py" />
-        <option value="$PROJECT_DIR$/neural_persona/data/dataset_readers/partialgen_reader.py" />
         <option value="$PROJECT_DIR$/neural_persona/__init__.py" />
-        <option value="$PROJECT_DIR$/neural_persona/common/util.py" />
         <option value="$PROJECT_DIR$/scripts/preprocess_data.py" />
         <option value="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" />
         <option value="$PROJECT_DIR$/scripts/preprocess_data_e.py" />
+        <option value="$PROJECT_DIR$/neural_persona/data/dataset_readers/partialgen_reader.py" />
+        <option value="$PROJECT_DIR$/neural_persona/models/partial-gen.py" />
+        <option value="$PROJECT_DIR$/neural_persona/modules/vae/ladder.py" />
         <option value="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" />
+        <option value="$PROJECT_DIR$/neural_persona/common/util.py" />
+        <option value="$PROJECT_DIR$/scripts/make_reference_corpus.py" />
+        <option value="$PROJECT_DIR$/scripts/make_reference_corpus_e.py" />
       </list>
     </option>
   </component>
@@ -146,23 +183,13 @@
             <path>
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
-              <item name="dataset" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
-              <item name="dataset" type="462c0819:PsiDirectoryNode" />
-              <item name="nyt" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
-              <item name="environments" type="462c0819:PsiDirectoryNode" />
+              <item name="examples" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
               <item name="examples" type="462c0819:PsiDirectoryNode" />
+              <item name="ag" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
@@ -180,79 +207,287 @@
             <path>
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="examples" type="462c0819:PsiDirectoryNode" />
+              <item name="nyt" type="462c0819:PsiDirectoryNode" />
+              <item name="d+e" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
-              <item name="scripts" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
-              <item name="scripts" type="462c0819:PsiDirectoryNode" />
-              <item name="converters" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="neural_persona_old" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="neural_persona_old" type="462c0819:PsiDirectoryNode" />
-              <item name="scripts" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-            </path>
-            <path>
-              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
-            </path>
-            <path>
-              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
-              <item name="proj" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
-              <item name="proj" type="462c0819:PsiDirectoryNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
+              <item name="dataset_readers" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
-              <item name="proj" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+              <item name="vae" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
               <item name="scripts" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
-              <item name="proj" type="462c0819:PsiDirectoryNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
               <item name="scripts" type="462c0819:PsiDirectoryNode" />
               <item name="converters" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="neural_persona_old" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="neural_persona_old" type="462c0819:PsiDirectoryNode" />
+              <item name="scripts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="anaconda3" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="anaconda3" type="462c0819:PsiDirectoryNode" />
+              <item name="envs" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="anaconda3" type="462c0819:PsiDirectoryNode" />
+              <item name="envs" type="462c0819:PsiDirectoryNode" />
+              <item name="py3" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="anaconda3" type="462c0819:PsiDirectoryNode" />
+              <item name="envs" type="462c0819:PsiDirectoryNode" />
+              <item name="py3" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="anaconda3" type="462c0819:PsiDirectoryNode" />
+              <item name="envs" type="462c0819:PsiDirectoryNode" />
+              <item name="py3" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
+              <item name="python3.6" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="anaconda3" type="462c0819:PsiDirectoryNode" />
+              <item name="envs" type="462c0819:PsiDirectoryNode" />
+              <item name="py3" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
+              <item name="python3.6" type="462c0819:PsiDirectoryNode" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="anaconda3" type="462c0819:PsiDirectoryNode" />
+              <item name="envs" type="462c0819:PsiDirectoryNode" />
+              <item name="py3" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
+              <item name="python3.6" type="462c0819:PsiDirectoryNode" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+              <item name="allennlp" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="anaconda3" type="462c0819:PsiDirectoryNode" />
+              <item name="envs" type="462c0819:PsiDirectoryNode" />
+              <item name="py3" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
+              <item name="python3.6" type="462c0819:PsiDirectoryNode" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+              <item name="allennlp" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="anaconda3" type="462c0819:PsiDirectoryNode" />
+              <item name="envs" type="462c0819:PsiDirectoryNode" />
+              <item name="py3" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
+              <item name="python3.6" type="462c0819:PsiDirectoryNode" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+              <item name="allennlp" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+              <item name="token_embedders" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="proj" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="proj" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="proj" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="examples" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="proj" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="examples" type="462c0819:PsiDirectoryNode" />
+              <item name="nyt" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="proj" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="examples" type="462c0819:PsiDirectoryNode" />
+              <item name="nyt" type="462c0819:PsiDirectoryNode" />
+              <item name="d+e" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="proj" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="proj" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="proj" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="proj" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+              <item name="vae" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="proj" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="scripts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="proj" type="462c0819:PsiDirectoryNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="scripts" type="462c0819:PsiDirectoryNode" />
+              <item name="converters" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
               <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
               <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
@@ -267,6 +502,76 @@
               <item name="proj" type="462c0819:PsiDirectoryNode" />
               <item name="neural_persona_old" type="462c0819:PsiDirectoryNode" />
               <item name="scripts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="python3.6" type="b5f07198:RTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="python3.6" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="python3.6" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+              <item name="allennlp" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="python3.6" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+              <item name="allennlp" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="python3.6" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+              <item name="allennlp" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+              <item name="token_embedders" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="site-packages" type="b5f07198:RTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="site-packages" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="allennlp" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="site-packages" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="allennlp" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="site-packages" type="b5f07198:RTreeStructureProvider$1" />
+              <item name="allennlp" type="462c0819:PsiDirectoryNode" />
+              <item name="modules" type="462c0819:PsiDirectoryNode" />
+              <item name="token_embedders" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -280,11 +585,21 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/scripts" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="PyConsoleConfigurable.Python Console" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="neural_persona" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="neural_persona" />
+      </console-settings>
+    </option>
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/scripts" />
+      <recent name="$PROJECT_DIR$/neural_persona/modules/vae" />
+      <recent name="$PROJECT_DIR$/neural_persona/models" />
       <recent name="$PROJECT_DIR$/../neural_persona_old/scripts" />
       <recent name="$PROJECT_DIR$/neural_persona/data/dataset_readers" />
     </key>
@@ -305,7 +620,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.create_json_from_e2m (1)">
+  <component name="RunManager" selected="Python.make_reference_corpus_e">
     <configuration name="create_json_from_e2m (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="neural_persona" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -350,7 +665,51 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="preprocess_data" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="make_reference_corpus" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="neural_persona" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/make_reference_corpus.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="make_reference_corpus_e" type="PythonConfigurationType" factoryName="Python">
+      <module name="neural_persona" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/make_reference_corpus_e.py" />
+      <option name="PARAMETERS" value="examples/nyt/d+e/dev.jsonl examples/nyt/d+e/reference --token-field-name doc_text" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="preprocess_data" type="PythonConfigurationType" factoryName="Python">
       <module name="neural_persona" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -372,16 +731,41 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="preprocess_data_e" type="PythonConfigurationType" factoryName="Python">
+      <module name="neural_persona" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/preprocess_data_e.py" />
+      <option name="PARAMETERS" value="--train-path examples/nyt/d+e/train.jsonl --dev-path examples/nyt/d+e/dev.jsonl --train-mentions-path examples/nyt/d+e/train_mentions.jsonl --dev-mentions-path examples/nyt/d+e/dev_mentions.jsonl --serialization-dir examples/nyt/d+e --data-type d+e --vocab-namespace partial-gen --vocab-size 3000 --tokenizer-type just_space --token-field-names doc_text entity_text" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Python.preprocess_data" />
+      <item itemvalue="Python.preprocess_data_e" />
+      <item itemvalue="Python.make_reference_corpus_e" />
       <item itemvalue="Python.create_json_from_e2m" />
       <item itemvalue="Python.create_json_from_e2m (1)" />
+      <item itemvalue="Python.make_reference_corpus" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.make_reference_corpus" />
         <item itemvalue="Python.create_json_from_e2m (1)" />
         <item itemvalue="Python.create_json_from_e2m" />
-        <item itemvalue="Python.preprocess_data" />
       </list>
     </recent_temporary>
   </component>
@@ -396,29 +780,28 @@
       <option name="presentableId" value="Default" />
       <updated>1564004741853</updated>
       <workItem from="1564004743249" duration="11909000" />
-      <workItem from="1564018209329" duration="3192000" />
+      <workItem from="1564018209329" duration="14082000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="15101000" />
+    <option name="totallyTimeSpent" value="25991000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="10" y="10" width="2540" height="1388" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25261885" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25261885" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32984716" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32984716" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32984716" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3998391" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" />
+      <window_info anchor="bottom" id="Version Control" order="8" weight="0.32984716" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="11" />
@@ -445,21 +828,39 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py</url>
-          <line>62</line>
+          <line>68</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/scripts/preprocess_data_e.py</url>
-          <line>96</line>
-          <option name="timeStamp" value="13" />
+          <url>file://$PROJECT_DIR$/neural_persona/data/dataset_readers/partialgen_reader.py</url>
+          <line>48</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/scripts/make_reference_corpus.py</url>
+          <line>169</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/optparse.py</url>
+          <line>440</line>
+          <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/scripts/make_reference_corpus_e.py</url>
+          <line>173</line>
+          <option name="timeStamp" value="32" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/neural_persona$preprocess_data_e.coverage" NAME="preprocess_data_e Coverage Results" MODIFIED="1564084263643" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/neural_persona$make_reference_corpus.coverage" NAME="make_reference_corpus Coverage Results" MODIFIED="1564088008802" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
     <SUITE FILE_PATH="coverage/neural_persona$preprocess_data.coverage" NAME="preprocess_data Coverage Results" MODIFIED="1564016660947" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
     <SUITE FILE_PATH="coverage/neural_persona$create_json_from_e2m.coverage" NAME="create_json_from_e2m Coverage Results" MODIFIED="1564018994500" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../neural_persona_old/scripts" />
-    <SUITE FILE_PATH="coverage/neural_persona$create_json_from_e2m__1_.coverage" NAME="create_json_from_e2m (1) Coverage Results" MODIFIED="1564078496967" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts/converters" />
+    <SUITE FILE_PATH="coverage/neural_persona$make_reference_corpus_e.coverage" NAME="make_reference_corpus_e Coverage Results" MODIFIED="1564097403349" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/neural_persona$create_json_from_e2m__1_.coverage" NAME="create_json_from_e2m (1) Coverage Results" MODIFIED="1564081156617" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts/converters" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/requirements.txt">
@@ -527,23 +928,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/neural_persona/data/dataset_readers/vampire_reader.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="22" column="7" selection-start-line="22" selection-start-column="7" selection-end-line="22" selection-end-column="7" />
-          <folding>
-            <element signature="e#0#16#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/neural_persona/data/dataset_readers/partialgen_reader.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="744">
-          <caret line="46" column="30" selection-start-line="46" selection-start-column="30" selection-end-line="46" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/os.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5208">
@@ -555,30 +939,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret column="9168" selection-start-column="9160" selection-end-column="9168" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/allennlp/data/fields/array_field.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="15" column="8" selection-start-line="15" selection-start-column="8" selection-end-line="15" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/neural_persona/common/util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="24">
-          <caret line="213" column="44" selection-start-line="213" selection-start-column="44" selection-end-line="213" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/preprocess_data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="18" column="36" selection-start-line="18" selection-start-column="36" selection-end-line="18" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -608,10 +968,6 @@
     <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/train.jsonl">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/dev.jsonl">
-      <provider editor-type-id="LargeFileEditor" />
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/test.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="432">
@@ -619,19 +975,177 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/dev_mentions.jsonl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3024" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/sklearn/feature_extraction/text.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-339">
+          <caret line="255" selection-start-line="255" selection-end-line="255" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/scipy/sparse/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="908" column="8" selection-start-line="908" selection-start-column="8" selection-end-line="908" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/preprocess_data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="65" column="24" selection-start-line="65" selection-start-column="24" selection-end-line="65" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neural_persona/data/dataset_readers/vampire_reader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="43" column="38" selection-start-line="43" selection-start-column="38" selection-end-line="43" selection-end-column="38" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neural_persona/data/dataset_readers/partialgen_reader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="70" column="31" lean-forward="true" selection-start-line="70" selection-start-column="31" selection-end-line="70" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/partial-gen.bgfreq">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-35424" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/allennlp/data/fields/array_field.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="15" column="8" selection-start-line="15" selection-start-column="8" selection-end-line="15" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neural_persona/modules/vae/vae.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="508">
-          <caret line="50" column="54" selection-start-line="50" selection-start-column="54" selection-end-line="50" selection-end-column="54" />
+        <state relative-caret-position="484">
+          <caret line="39" column="38" lean-forward="true" selection-start-line="39" selection-start-column="38" selection-end-line="39" selection-end-column="38" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/scripts/preprocess_data_e.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="97" lean-forward="true" selection-start-line="97" selection-end-line="97" />
+        <state relative-caret-position="155">
+          <caret line="129" selection-start-line="129" selection-end-line="129" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neural_persona/modules/vae/ladder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="32" column="46" selection-start-line="32" selection-start-column="46" selection-end-line="32" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/allennlp/modules/token_embedders/bag_of_word_counts_token_embedder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="552">
+          <caret line="53" column="31" selection-start-line="53" selection-start-column="31" selection-end-line="53" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/allennlp/modules/token_embedders/token_embedder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="384">
+          <caret line="18" column="40" lean-forward="true" selection-start-line="18" selection-start-column="40" selection-end-line="18" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neural_persona/models/partial-gen.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="75" column="39" selection-start-line="75" selection-start-column="39" selection-end-line="75" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/dev.jsonl">
+      <provider selected="true" editor-type-id="LargeFileEditor">
+        <state relative-caret-position="-864" />
+      </provider>
+      <provider editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/json/decoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="237">
+          <caret line="341" column="50" lean-forward="true" selection-start-line="341" selection-start-column="50" selection-end-line="341" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neural_persona/common/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="371">
+          <caret line="166" column="17" selection-start-line="166" selection-start-column="4" selection-end-line="166" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/sklearn/utils/linear_assignment_.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="237">
+          <caret line="20" selection-start-line="20" selection-end-line="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/make_reference_corpus.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="149" column="25" selection-start-line="149" selection-start-column="25" selection-end-line="149" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/optparse.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="434" column="28" selection-start-line="434" selection-start-column="28" selection-end-line="434" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/make_reference_corpus_e.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="243">
+          <caret line="139" column="28" selection-start-line="139" selection-start-column="28" selection-end-line="139" selection-end-column="28" />
+          <folding>
+            <element signature="e#78#87#0" expanded="true" />
           </folding>
         </state>
       </provider>

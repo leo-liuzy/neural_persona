@@ -13,7 +13,7 @@ from allennlp.data.fields import (ArrayField, Field, LabelField, ListField,
 from allennlp.data.instance import Instance
 from overrides import overrides
 
-from neural_persona.common.util import load_sparse
+from neural_persona.common.util import load_sparse, load_named_sparse
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -39,22 +39,24 @@ class PartialGen_reader(DatasetReader):
 
     @overrides
     def _read(self, file_path):
-        mat = load_sparse(file_path)
-        mat = mat.tolil()
-        for ix in range(mat.shape[0]):
-            instance = self.text_to_instance(vec=mat[ix].toarray().squeeze())
+        doc_mat = load_named_sparse(file_path, "doc_text")
+        entity_mat = load_named_sparse(file_path, "entity_text")
+        doc_mat = doc_mat.tolil()
+        entity_mat = entity_mat.tolil()
+        assert doc_mat.shape == entity_mat.shape
+        for ix in range(entity_mat.shape[0]):
+            vec = np.concatenate([doc_mat[ix].toarray().squeeze(), entity_mat[ix].toarray().squeeze()])
+            instance = self.text_to_instance(vec)
             if instance is not None:
                 yield instance
 
     @overrides
-    def text_to_instance(self, vec: str=None) -> Instance:  # type: ignore
+    def text_to_instance(self, vec: np.array) -> Instance:  # type: ignore
         """
         Parameters
         ----------
-        text : ``str``, required.
+        vec : ``np.array``, required.
             The text to classify
-        label ``str``, optional, (default = None).
-            The label for this text.
 
         Returns
         -------

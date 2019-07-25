@@ -49,6 +49,10 @@ def main():
                         help="Path to the train jsonl file.")
     parser.add_argument("--dev-path", type=str, required=True,
                         help="Path to the dev jsonl file.")
+    parser.add_argument("--train-mentions-path", type=str, required=False,
+                        help="Path to the train mentions jsonl file.")
+    parser.add_argument("--dev-mentions-path", type=str, required=False,
+                        help="Path to the dev mentions jsonl file.")
     parser.add_argument("--serialization-dir", "-s", type=str, required=True,
                         help="Path to store the preprocessed output.")
     parser.add_argument("--data-type", type=str, required=False, default="d",
@@ -66,12 +70,14 @@ def main():
                         help="token field names separable by space like, \"doc\", \"entity_mentions\". "
                              "Naming Convention: if you want a field called \"doc text\","
                              " you should name it \"doc_text\"")
-    # parser.add_argument("--global", action='store_true',
-    #                     help="Whether use document level information")
+    parser.add_argument("--global-repr", action='store_true',
+                        help="Whether use document level information")
 
     args = parser.parse_args()
     assert args.data_type in ["d", "d+e"]
 
+    global_repr = args.vocab_namespace in ["partial-gen"]
+    print("Using document information" if global_repr else "Discarding document information")
     if not os.path.isdir(args.serialization_dir):
         os.mkdir(args.serialization_dir)
     
@@ -82,29 +88,36 @@ def main():
 
     # {token_field_name1: [ sentencen0-1, sentencen1-1, ...] ,
     #  token_field_name2: [ sentencen0-2, sentencen1-2, ...] }
+    token_field_names = args.token_field_names
+    if not global_repr and args.data_type == "d+e":
+        token_field_names = list(filter(lambda a: a != "doc_text", token_field_names))
     named_tokenized_train_examples = load_data(args.train_path, args.tokenize, args.tokenizer_type,
-                                               args.token_field_names)
-    named_tokenized_dev_examples = load_data(args.dev_path, args.tokenize, args.token_field_names,
-                                             args.token_field_names)
+                                               token_field_names)
+    named_tokenized_dev_examples = load_data(args.dev_path, args.tokenize, args.tokenizer_type,
+                                             token_field_names)
 
     print("fitting count vectorizer...")
     count_vectorizer = CountVectorizer(stop_words='english', max_features=args.vocab_size,
                                        token_pattern=r'\b[^\d\W]{3,30}\b')
-    
-    text = list(set(named_tokenized_train_examples["doc_text"])) + list(set(named_tokenized_dev_examples["doc_text"]))
+    if global_repr:
+        text = list(set(named_tokenized_train_examples["doc_text"])) + list(set(named_tokenized_dev_examples["doc_text"]))
+    else:
+        train_mentions = json.load(open(args.train_mentions_path))
+        dev_mentions = json.load(open(args.dev_mentions_path))
+        text = train_mentions + dev_mentions
 
     # master is simply vectorized of the document corpus(no duplicate documents)
     master = count_vectorizer.fit_transform(text)
 
     named_vectorized_train_examples = {token_field_name:
                                            count_vectorizer.transform(named_tokenized_train_examples[token_field_name])
-                                       for token_field_name in args.token_field_names}
+                                       for token_field_name in token_field_names}
     named_vectorized_dev_examples = {token_field_name:
-                                         count_vectorizer.transform(named_tokenized_dev_examples[token_field_name])
-                                     for token_field_name in args.token_field_names}
+                                           count_vectorizer.transform(named_tokenized_dev_examples[token_field_name])
+                                     for token_field_name in token_field_names}
     # add @@unknown@@ token vector for both doc and entity representation
     # this decision is for code simplicity
-    for token_field_name in args.token_field_names:
+    for token_field_name in token_field_names:
         named_vectorized_train_examples[token_field_name] = sparse.hstack(
             (np.array([0] * len(named_tokenized_train_examples[token_field_name]))[:, None],
              named_vectorized_train_examples[token_field_name])
@@ -114,17 +127,13 @@ def main():
              named_vectorized_dev_examples[token_field_name])
         )
     # add @@unknown@@ token vector
-    master = sparse.hstack(
-        (np.array([0] * len(master))[:, None],
-         master)
-    )
+    master = sparse.hstack((np.array([0] * len(text))[:, None], master))
 
-    all_data = master.toarray()
     vocab = ["@@UNKNOWN@@"] + count_vectorizer.get_feature_names()
     # generate background frequency
     print("generating background frequency...")
     # bgfreq = dict(zip(count_vectorizer.get_feature_names(), master.toarray().sum(1) / args.vocab_size))
-    bgfreq = dict(zip(vocab, all_data.sum(0) / all_data.sum()))
+    bgfreq = dict(zip(vocab, np.array(master.sum(0))[0] / master.sum()))
 
     print("saving data...")
     save_named_sparse(named_vectorized_train_examples, os.path.join(args.serialization_dir, "train.npz"))
@@ -149,6 +158,7 @@ def write_list_to_file(ls, save_path):
     for example in ls:
         out_file.write(example)
         out_file.write('\n')
+
 
 if __name__ == '__main__':
     main()
