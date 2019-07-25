@@ -209,7 +209,7 @@ def write_list_to_text(lines, output_filename, add_newlines=True, add_final_newl
         output_file.writelines(lines)
 
 
-def save_sparse(sparse_matrix, output_filename):
+def save_sparse(sparse_matrix: sparse.spmatrix, output_filename: str):
     assert sparse.issparse(sparse_matrix)
     if sparse.isspmatrix_coo(sparse_matrix):
         coo = sparse_matrix
@@ -220,6 +220,14 @@ def save_sparse(sparse_matrix, output_filename):
     data = coo.data
     shape = coo.shape
     np.savez(output_filename, row=row, col=col, data=data, shape=shape)
+
+
+def save_named_sparse(named_sparse_matrices: Dict[str, sparse.spmatrix], output_filename: str):
+    assert all(sparse.issparse(matrix) for matrix in named_sparse_matrices.values())
+    coo = {name: sparse_matrix if sparse.isspmatrix_coo(sparse_matrix) else sparse_matrix.tocoo()
+           for name, sparse_matrix in named_sparse_matrices.items()}
+
+    np.savez(output_filename, **coo)
 
 
 def load_sparse(input_filename):

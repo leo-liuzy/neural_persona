@@ -13,7 +13,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from spacy.tokenizer import Tokenizer
 from tqdm import tqdm
 
-from vampire.common.util import read_text, save_sparse, write_to_json
+from neural_persona.common.util import read_text, save_sparse, write_to_json
 
 
 def load_data(data_path: str, tokenize: bool = False, tokenizer_type: str = "just_spaces") -> List[str]:
@@ -50,6 +50,8 @@ def main():
                         help="Path to store the preprocessed output.")
     parser.add_argument("--vocab-size", type=int, required=False, default=10000,
                         help="Path to store the preprocessed corpus vocabulary (output file name).")
+    parser.add_argument("--vocab-namespace", type=str, required=False, default="vampire",
+                        help="Path to store the preprocessed output.")
     parser.add_argument("--tokenize", action='store_true',
                         help="Path to store the preprocessed corpus vocabulary (output file name).") 
     parser.add_argument("--tokenizer-type", type=str, default="just_spaces",
@@ -108,10 +110,13 @@ def main():
         os.mkdir(os.path.join(args.serialization_dir, "reference"))
     save_sparse(reference_matrix, os.path.join(args.serialization_dir, "reference", "ref.npz"))
     write_to_json(reference_vocabulary, os.path.join(args.serialization_dir, "reference", "ref.vocab.json"))
-    write_to_json(bgfreq, os.path.join(args.serialization_dir, "vampire.bgfreq"))
+    write_to_json(bgfreq, os.path.join(args.serialization_dir, f"{args.vocab_namespace}.bgfreq"))
     
-    write_list_to_file(['@@UNKNOWN@@'] + count_vectorizer.get_feature_names(), os.path.join(vocabulary_dir, "vampire.txt"))
-    write_list_to_file(['*tags', '*labels', 'vampire'], os.path.join(vocabulary_dir, "non_padded_namespaces.txt"))
+    write_list_to_file(['@@UNKNOWN@@'] + count_vectorizer.get_feature_names(),
+                       os.path.join(vocabulary_dir, f"{args.vocab_namespace}.txt"))
+    write_list_to_file(['*tags', '*labels', f'{args.vocab_namespace}'],
+                       os.path.join(vocabulary_dir, "non_padded_namespaces.txt"))
+
 
 def write_list_to_file(ls, save_path):
     """

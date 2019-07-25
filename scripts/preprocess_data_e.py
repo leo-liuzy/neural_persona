@@ -13,7 +13,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from spacy.tokenizer import Tokenizer
 from tqdm import tqdm
 
-from neural_persona.common.util import read_text, save_sparse, write_to_json
+from neural_persona.common.util import read_text, save_sparse, write_to_json, save_named_sparse
 
 
 def load_data(data_path: str, tokenize: bool = False, tokenizer_type: str = "just_spaces",
@@ -30,6 +30,7 @@ def load_data(data_path: str, tokenize: bool = False, tokenizer_type: str = "jus
         for line in f:
             for token_field_name in token_field_names:
                 example = json.loads(line)
+                assert token_field_name in example
                 if tokenize:
                     if tokenizer_type == 'just_spaces':
                         tokens = list(map(str, tokenizer.split_words(example[token_field_name])))
@@ -50,6 +51,8 @@ def main():
                         help="Path to the dev jsonl file.")
     parser.add_argument("--serialization-dir", "-s", type=str, required=True,
                         help="Path to store the preprocessed output.")
+    parser.add_argument("--data-type", type=str, required=False, default="d",
+                        help="Path to store the preprocessed output.")
     parser.add_argument("--vocab-namespace", type=str, required=False, default="vampire",
                         help="Path to store the preprocessed output.")
     parser.add_argument("--vocab-size", type=int, required=False, default=10000,
@@ -59,16 +62,15 @@ def main():
     parser.add_argument("--tokenizer-type", type=str, default="just_spaces",
                         help="Tokenizer type: just_spaces | spacy")
     # naming convention: if you want a field called "doc text", you should name it "doc_text"
-    parser.add_argument("--train-token-field-names", type=str, nargs="*", default=["text"],
-                        help="(For training) token field names separable by space like, \"doc_text\", \"entity_text\". "
+    parser.add_argument("--token-field-names", type=str, nargs="*", default=["text"],
+                        help="token field names separable by space like, \"doc\", \"entity_mentions\". "
                              "Naming Convention: if you want a field called \"doc text\","
                              " you should name it \"doc_text\"")
-    parser.add_argument("--dev-token-field-name", type=str, nargs=1, default="text",
-                        help="(For cross-validation) token field name separable by space like, "
-                             "\"doc_text\", \"entity_text\". "
-                             "Naming Convention: if you want a field called \"doc text\","
-                             " you should name it \"doc_text\"")
+    # parser.add_argument("--global", action='store_true',
+    #                     help="Whether use document level information")
+
     args = parser.parse_args()
+    assert args.data_type in ["d", "d+e"]
 
     if not os.path.isdir(args.serialization_dir):
         os.mkdir(args.serialization_dir)
@@ -78,33 +80,45 @@ def main():
     if not os.path.isdir(vocabulary_dir):
         os.mkdir(vocabulary_dir)
 
-    tokenized_train_examples = load_data(args.train_path, args.tokenize, args.tokenizer_type,
-                                         args.train_token_field_names)
     # {token_field_name1: [ sentencen0-1, sentencen1-1, ...] ,
     #  token_field_name2: [ sentencen0-2, sentencen1-2, ...] }
-    tokenized_dev_examples = load_data(args.dev_path, args.tokenize, args.token_field_names, [args.dev_token_field_name])
+    named_tokenized_train_examples = load_data(args.train_path, args.tokenize, args.tokenizer_type,
+                                               args.token_field_names)
+    named_tokenized_dev_examples = load_data(args.dev_path, args.tokenize, args.token_field_names,
+                                             args.token_field_names)
 
     print("fitting count vectorizer...")
-
     count_vectorizer = CountVectorizer(stop_words='english', max_features=args.vocab_size,
                                        token_pattern=r'\b[^\d\W]{3,30}\b')
     
-    text = tokenized_train_examples + tokenized_dev_examples
-    
-    count_vectorizer.fit(text)
+    text = list(set(named_tokenized_train_examples["doc_text"])) + list(set(named_tokenized_dev_examples["doc_text"]))
 
-    vectorized_train_examples = count_vectorizer.transform(tokenized_train_examples)
-    vectorized_dev_examples = count_vectorizer.transform(tokenized_dev_examples)
+    # master is simply vectorized of the document corpus(no duplicate documents)
+    master = count_vectorizer.fit_transform(text)
 
-    # dev_count_vectorizer = CountVectorizer(stop_words='english', max_features=args.vocab_size,
-    #                                        token_pattern=r'\b[^\d\W]{3,30}\b')
-    # reference_matrix = dev_count_vectorizer.fit_transform(tokenized_dev_examples)
-    # reference_vocabulary = dev_count_vectorizer.get_feature_names()
-
+    named_vectorized_train_examples = {token_field_name:
+                                           count_vectorizer.transform(named_tokenized_train_examples[token_field_name])
+                                       for token_field_name in args.token_field_names}
+    named_vectorized_dev_examples = {token_field_name:
+                                         count_vectorizer.transform(named_tokenized_dev_examples[token_field_name])
+                                     for token_field_name in args.token_field_names}
+    # add @@unknown@@ token vector for both doc and entity representation
+    # this decision is for code simplicity
+    for token_field_name in args.token_field_names:
+        named_vectorized_train_examples[token_field_name] = sparse.hstack(
+            (np.array([0] * len(named_tokenized_train_examples[token_field_name]))[:, None],
+             named_vectorized_train_examples[token_field_name])
+        )
+        named_vectorized_dev_examples[token_field_name] = sparse.hstack(
+            (np.array([0] * len(named_tokenized_dev_examples[token_field_name]))[:, None],
+             named_vectorized_dev_examples[token_field_name])
+        )
     # add @@unknown@@ token vector
-    vectorized_train_examples = sparse.hstack((np.array([0] * len(tokenized_train_examples))[:, None], vectorized_train_examples))
-    vectorized_dev_examples = sparse.hstack((np.array([0] * len(tokenized_dev_examples))[:, None], vectorized_dev_examples))
-    master = sparse.vstack([vectorized_train_examples, vectorized_dev_examples])
+    master = sparse.hstack(
+        (np.array([0] * len(master))[:, None],
+         master)
+    )
+
     all_data = master.toarray()
     vocab = ["@@UNKNOWN@@"] + count_vectorizer.get_feature_names()
     # generate background frequency
@@ -113,15 +127,16 @@ def main():
     bgfreq = dict(zip(vocab, all_data.sum(0) / all_data.sum()))
 
     print("saving data...")
-    save_sparse(vectorized_train_examples, os.path.join(args.serialization_dir, "train.npz"))
-    save_sparse(vectorized_dev_examples, os.path.join(args.serialization_dir, "dev.npz"))
+    save_named_sparse(named_vectorized_train_examples, os.path.join(args.serialization_dir, "train.npz"))
+    save_named_sparse(named_vectorized_dev_examples, os.path.join(args.serialization_dir, "dev.npz"))
 
     write_to_json(bgfreq, os.path.join(args.serialization_dir, f"{args.vocab_namespace}.bgfreq"))
     
     write_list_to_file(['@@UNKNOWN@@'] + count_vectorizer.get_feature_names(),
-                       os.path.join(vocabulary_dir, "neural_persona.txt"))
+                       os.path.join(vocabulary_dir, f"{args.vocab_namespace}.txt"))
     write_list_to_file(['*tags', '*labels', args.vocab_namespace],
                        os.path.join(vocabulary_dir, "non_padded_namespaces.txt"))
+
 
 def write_list_to_file(ls, save_path):
     """
