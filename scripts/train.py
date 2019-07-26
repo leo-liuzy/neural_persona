@@ -70,5 +70,6 @@ def main():
     subprocess.run(" ".join(allennlp_command), shell=True, check=True)
     pdb.pm()
 
+
 if __name__ == '__main__':
     main()

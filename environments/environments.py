@@ -44,7 +44,6 @@ VAMPIRE = {
         "BATCHNORM_ON_RECON": 0,
         "BATCHNORM_WEIGHT_LEANABLE": 0,
         "BATCHNORM_BIAS_LEANABLE": 1,
-        "PRIOR": {"type": "laplace-approx", "alpha": 1},
         "APPLY_BATCHNORM_ON_NORMAL": 1,
         "APPLY_BATCHNORM_ON_DECODER": 1,
         "STOCHASTIC_BETA": 1,
@@ -81,6 +80,7 @@ VAMPIRE = {
 AVITM = {
         "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
         "KL_ANNEALING": "linear",
+        "PRIOR": {"type": "laplace-approx", "alpha": 1},
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
         "LINEAR_SCALING": 1000,
