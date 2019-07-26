@@ -8,7 +8,7 @@ from neural_persona.common.util import normal_kl, create_trainable_BatchNorm1d
 from neural_persona.modules.vae.vae import VAE
 
 
-@VAE.register("normal")
+@VAE.register("ladder")
 class LadderVAE(VAE):
     """
     A Variational Autoencoder with 1 hidden layer and a Normal prior. This is a generalization of LogitNormal

@@ -1,7 +1,11 @@
 <component name="ProjectDictionaryState">
   <dictionary name="lzy">
     <words>
+      <w>batchnorm</w>
+      <w>elbo</w>
+      <w>nkld</w>
       <w>partialgen</w>
+      <w>perp</w>
       <w>spacy</w>
       <w>tokenized</w>
     </words>

@@ -85,6 +85,7 @@ class PartialGen(Model):
                  sigmoid_weight_2: float = 15,
                  reference_counts: str = None,
                  reference_vocabulary: str = None,
+                 use_doc_info: str = False,
                  use_background: str = False,
                  background_data_path: str = None,
                  update_background_freq: bool = False,
@@ -100,16 +101,20 @@ class PartialGen(Model):
         self.vae = vae
         self.track_topics = track_topics
         self.track_npmi = track_npmi
-        self.vocab_namespace = "avitm"
+        self.vocab_namespace = "partial-gen"
         self._update_background_freq = update_background_freq
 
-        avitm_vocab_size = self.vocab.get_vocab_size(self.vocab_namespace)
+        vocab_size = self.vocab.get_vocab_size(self.vocab_namespace)
+        self.use_doc_info = use_doc_info
+        if use_doc_info:
+            self.interpolation = torch.nn.Parameter(torch.zeros(2, requires_grad=True))
         if use_background:
             self._background_freq = self.initialize_bg_from_file(file_=background_data_path)
         else:
-            self._background_freq = torch.zeros(avitm_vocab_size)
+            self._background_freq = torch.zeros(vocab_size)
         self._ref_counts = reference_counts
         self.lda_type = lda_type
+
         if lda_type == "nvlda":
             assert self.vae._stochastic_beta
 
@@ -149,7 +154,7 @@ class PartialGen(Model):
         # setup batchnorm
         self._batchnorm_on_recon = batchnorm_on_recon
         if batchnorm_on_recon:
-            self.bow_bn = create_trainable_BatchNorm1d(avitm_vocab_size,
+            self.bow_bn = create_trainable_BatchNorm1d(vocab_size,
                                                        weight_learnable=batchnorm_weight_learnable,
                                                        bias_learnable=batchnorm_bias_learnable,
                                                        eps=0.001, momentum=0.001, affine=True)
@@ -308,7 +313,6 @@ class PartialGen(Model):
             Matrix of size number of docs x reference vocab size, where
             cell [i][j] indicates how many times word i occur in documents
             in the corpus
-        TODO(suchin): update this documentation
         """
         interaction_rows, interaction_cols = interactions.nonzero()
         logger.info("generating doc sums...")
@@ -400,6 +404,13 @@ class PartialGen(Model):
         else:
             embedded_tokens = tokens
 
+        weights = torch.softmax(self.interpolation, dim=0)
+        _, x_dim = embedded_tokens.shape
+        if self.use_doc_info:
+            embedded_global_tokens, embedded_local_tokens = embedded_tokens.split(x_dim // 2, dim=1)
+            embedded_tokens = weights[0] * embedded_global_tokens + weights[1] * embedded_local_tokens
+        else:
+            assert x_dim == self.vocab.get_vocab_size(self.vocab_namespace)
         # Encode the text into a shared representation for both the VAE
         encoder_output = self.vae.encoder(embedded_tokens)
 
@@ -440,8 +451,11 @@ class PartialGen(Model):
         output_dict['activations'] = activations
 
         # Update metrics
-        self.metrics['nkld'](-torch.mean(negative_kl_divergence))
-        self.metrics['nll'](-torch.mean(reconstruction_loss))
+        nkld = -torch.mean(negative_kl_divergence)
+        nll = -torch.mean(reconstruction_loss)
+        self.metrics['nkld'](nkld)
+        self.metrics['nll'](nll)
+        self.metrics['nll'](loss)
 
         # batch_num is tracked for kl weight annealing
         self.batch_num += 1
