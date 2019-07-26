@@ -407,8 +407,8 @@ class PartialGen(Model):
         weights = torch.softmax(self.interpolation, dim=0)
         _, x_dim = embedded_tokens.shape
         if self.use_doc_info:
-            embedded_global_tokens, embedded_local_tokens = embedded_tokens.split(x_dim // 2, dim=1)
-            embedded_tokens = weights[0] * embedded_global_tokens + weights[1] * embedded_local_tokens
+            embedded_doc_tokens, embedded_entity_tokens = embedded_tokens.split(x_dim // 2, dim=1)
+            embedded_tokens = weights[0] * embedded_doc_tokens + weights[1] * embedded_entity_tokens
         else:
             assert x_dim == self.vocab.get_vocab_size(self.vocab_namespace)
         # Encode the text into a shared representation for both the VAE
@@ -426,7 +426,10 @@ class PartialGen(Model):
         reconstructed_bow = self.bow_bn(reconstructed_bow) if self._batchnorm_on_recon else reconstructed_bow
 
         # Reconstruction log likelihood: log P(x | z) = log softmax(z beta + b)
-        reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_tokens)
+        if self.use_doc_info:
+            reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_entity_tokens)
+        else:
+            reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_tokens)
 
         # KL-divergence that is returned is the mean of the batch by default.
         negative_kl_divergence = variational_output['negative_kl_divergence']
@@ -455,7 +458,7 @@ class PartialGen(Model):
         nll = -torch.mean(reconstruction_loss)
         self.metrics['nkld'](nkld)
         self.metrics['nll'](nll)
-        self.metrics['nll'](loss)
+        self.metrics['perp'](loss)
 
         # batch_num is tracked for kl weight annealing
         self.batch_num += 1
