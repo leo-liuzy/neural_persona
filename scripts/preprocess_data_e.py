@@ -55,8 +55,6 @@ def main():
                         help="Path to the dev mentions jsonl file.")
     parser.add_argument("--serialization-dir", "-s", type=str, required=True,
                         help="Path to store the preprocessed output.")
-    parser.add_argument("--data-type", type=str, required=False, default="d",
-                        help="Path to store the preprocessed output.")
     parser.add_argument("--vocab-namespace", type=str, required=False, default="vampire",
                         help="Path to store the preprocessed output.")
     parser.add_argument("--vocab-size", type=int, required=False, default=10000,
@@ -74,9 +72,8 @@ def main():
                         help="Whether use document level information")
 
     args = parser.parse_args()
-    assert args.data_type in ["d", "d+e"]
 
-    global_repr = args.vocab_namespace in ["partial-gen"]
+    global_repr = args.global_repr
     print("Using document information" if global_repr else "Discarding document information")
     if not os.path.isdir(args.serialization_dir):
         os.mkdir(args.serialization_dir)
@@ -89,7 +86,7 @@ def main():
     # {token_field_name1: [ sentencen0-1, sentencen1-1, ...] ,
     #  token_field_name2: [ sentencen0-2, sentencen1-2, ...] }
     token_field_names = args.token_field_names
-    if not global_repr and args.data_type == "d+e":
+    if not global_repr:
         token_field_names = list(filter(lambda a: a != "doc_text", token_field_names))
     named_tokenized_train_examples = load_data(args.train_path, args.tokenize, args.tokenizer_type,
                                                token_field_names)

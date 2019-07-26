@@ -124,6 +124,7 @@ PARTIALGEN = {
         "REFERENCE_COUNTS": os.environ["DATA_DIR"] + "/reference/ref.npz",
         "REFERENCE_VOCAB": os.environ["DATA_DIR"] + "/reference/ref.vocab.json",
         "VOCABULARY_DIRECTORY": os.environ["DATA_DIR"] + "/vocabulary/",
+        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "parital",
         "NUM_ENCODER_LAYERS": 2,
         "ENCODER_ACTIVATION": "relu",
         "MEAN_PROJECTION_ACTIVATION": "linear",

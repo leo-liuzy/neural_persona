@@ -2,12 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="94f513c9-f1aa-40e4-93a8-627d78320eaf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/search_spaces/partialgen_nyt_de_search.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/search_spaces/partialgen_nyt_e_search.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/training_config/partial-gen.jsonnet" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/lzy.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/lzy.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/environments/environments.py" beforeDir="false" afterPath="$PROJECT_DIR$/environments/environments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neural_persona/models/partial-gen.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/models/partial-gen.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/preprocess_data_e.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/preprocess_data_e.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training_config/avitm.jsonnet" beforeDir="false" afterPath="$PROJECT_DIR$/training_config/avitm.jsonnet" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training_config/partial-gen.jsonnet" beforeDir="false" afterPath="$PROJECT_DIR$/training_config/partial-gen.jsonnet" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" beforeDir="false" afterPath="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,41 +20,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/preprocess_data_e.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="155">
-              <caret line="129" selection-start-line="129" selection-end-line="129" />
-              <folding>
-                <element signature="e#0#15#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/training_config/avitm.jsonnet">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/training_config/vampire.jsonnet">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="16" column="34" selection-start-line="16" selection-start-column="15" selection-end-line="16" selection-end-column="34" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/search_spaces/partialgen_nyt_e_search.json">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/search_spaces/partialgen_nyt_de_search.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="648">
-              <caret line="27" column="38" selection-start-line="27" selection-start-column="38" selection-end-line="27" selection-end-column="38" />
+            <state relative-caret-position="360">
+              <caret line="36" column="65" selection-start-line="36" selection-start-column="65" selection-end-line="36" selection-end-column="65" />
             </state>
           </provider>
         </entry>
@@ -61,8 +31,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/training_config/partial-gen.jsonnet">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="720">
-              <caret line="30" column="56" selection-start-line="30" selection-start-column="56" selection-end-line="30" selection-end-column="56" />
+            <state relative-caret-position="576">
+              <caret line="36" column="62" selection-start-line="36" selection-start-column="42" selection-end-line="36" selection-end-column="62" />
             </state>
           </provider>
         </entry>
@@ -72,6 +42,42 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="576">
               <caret line="87" column="29" selection-start-line="87" selection-start-column="17" selection-end-line="87" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/scripts/preprocess_data.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="232">
+              <caret line="73" column="40" selection-start-line="73" selection-start-column="40" selection-end-line="73" selection-end-column="40" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/scripts/preprocess_data_e.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="288">
+              <caret line="80" column="71" lean-forward="true" selection-start-line="80" selection-start-column="71" selection-end-line="80" selection-end-column="71" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="362">
+              <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -90,19 +96,12 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/environments/environments.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="532">
-              <caret line="118" column="26" selection-start-line="118" selection-start-column="26" selection-end-line="118" selection-end-column="26" />
+            <state relative-caret-position="700">
+              <caret line="126" column="65" selection-start-line="126" selection-start-column="65" selection-end-line="126" selection-end-column="65" />
               <folding>
                 <element signature="e#0#51#0" expanded="true" />
               </folding>
             </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/search_spaces/classifier_ag_search.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-806" />
           </provider>
         </entry>
       </file>
@@ -119,7 +118,6 @@
     <findStrings>
       <find>-s</find>
       <find>token_field_names</find>
-      <find>global_repr</find>
       <find>stopword</find>
       <find>token_field_name</find>
       <find>text</find>
@@ -131,6 +129,7 @@
       <find>metrics</find>
       <find>vocab_size</find>
       <find>n_items</find>
+      <find>global_repr</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -144,16 +143,17 @@
         <option value="$PROJECT_DIR$/neural_persona/__init__.py" />
         <option value="$PROJECT_DIR$/scripts/preprocess_data.py" />
         <option value="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" />
-        <option value="$PROJECT_DIR$/scripts/preprocess_data_e.py" />
         <option value="$PROJECT_DIR$/neural_persona/data/dataset_readers/partialgen_reader.py" />
-        <option value="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" />
         <option value="$PROJECT_DIR$/neural_persona/common/util.py" />
         <option value="$PROJECT_DIR$/scripts/make_reference_corpus.py" />
         <option value="$PROJECT_DIR$/scripts/make_reference_corpus_e.py" />
         <option value="$PROJECT_DIR$/neural_persona/modules/vae/ladder.py" />
         <option value="$PROJECT_DIR$/neural_persona/models/partial-gen.py" />
+        <option value="$PROJECT_DIR$/training_config/avitm.jsonnet" />
         <option value="$PROJECT_DIR$/training_config/partial-gen.jsonnet" />
         <option value="$PROJECT_DIR$/environments/environments.py" />
+        <option value="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" />
+        <option value="$PROJECT_DIR$/scripts/preprocess_data_e.py" />
       </list>
     </option>
   </component>
@@ -181,6 +181,24 @@
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
               <item name="environments" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="examples" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="examples" type="462c0819:PsiDirectoryNode" />
+              <item name="nyt" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="examples" type="462c0819:PsiDirectoryNode" />
+              <item name="nyt" type="462c0819:PsiDirectoryNode" />
+              <item name="partial-gen" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
@@ -218,6 +236,17 @@
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
               <item name="modules" type="462c0819:PsiDirectoryNode" />
               <item name="vae" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="scripts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
+              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
+              <item name="scripts" type="462c0819:PsiDirectoryNode" />
+              <item name="converters" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
@@ -619,7 +648,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.make_reference_corpus_e">
+  <component name="RunManager" selected="Python.preprocess_data_e">
     <configuration name="create_json_from_e2m (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="neural_persona" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -744,7 +773,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/preprocess_data_e.py" />
-      <option name="PARAMETERS" value="--train-path examples/nyt/d+e/train.jsonl --dev-path examples/nyt/d+e/dev.jsonl --train-mentions-path examples/nyt/d+e/train_mentions.jsonl --dev-mentions-path examples/nyt/d+e/dev_mentions.jsonl --serialization-dir examples/nyt/d+e --data-type d+e --vocab-namespace partial-gen --vocab-size 3000 --tokenizer-type just_space --token-field-names doc_text entity_text" />
+      <option name="PARAMETERS" value="--train-path examples/nyt/partial-gen/train.jsonl --dev-path examples/nyt/partial-gen/dev.jsonl --train-mentions-path examples/nyt/partial-gen/train_mentions.jsonl --dev-mentions-path examples/nyt/partial-gen/dev_mentions.jsonl --serialization-dir examples/nyt/partial-gen-global --vocab-namespace partial-gen --vocab-size 3000 --tokenizer-type just_space --token-field-names doc_text entity_text --global-repr" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -762,8 +791,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.make_reference_corpus" />
         <item itemvalue="Python.create_json_from_e2m (1)" />
+        <item itemvalue="Python.make_reference_corpus" />
         <item itemvalue="Python.create_json_from_e2m" />
       </list>
     </recent_temporary>
@@ -779,23 +808,24 @@
       <option name="presentableId" value="Default" />
       <updated>1564004741853</updated>
       <workItem from="1564004743249" duration="11909000" />
-      <workItem from="1564018209329" duration="17598000" />
+      <workItem from="1564018209329" duration="18719000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="29507000" />
+    <option name="totallyTimeSpent" value="30628000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="10" y="10" width="2540" height="1388" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25261885" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25261885" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32984716" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32984716" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.3998391" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.3998391" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -826,11 +856,6 @@
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py</url>
-          <line>68</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/neural_persona/data/dataset_readers/partialgen_reader.py</url>
           <line>48</line>
           <option name="timeStamp" value="23" />
@@ -850,25 +875,23 @@
           <line>173</line>
           <option name="timeStamp" value="32" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/scripts/preprocess_data_e.py</url>
+          <line>73</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/neural_persona$preprocess_data_e.coverage" NAME="preprocess_data_e Coverage Results" MODIFIED="1564084263643" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/neural_persona$preprocess_data_e.coverage" NAME="preprocess_data_e Coverage Results" MODIFIED="1564106784498" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/neural_persona$make_reference_corpus.coverage" NAME="make_reference_corpus Coverage Results" MODIFIED="1564088008802" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
-    <SUITE FILE_PATH="coverage/neural_persona$preprocess_data.coverage" NAME="preprocess_data Coverage Results" MODIFIED="1564016660947" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
     <SUITE FILE_PATH="coverage/neural_persona$create_json_from_e2m.coverage" NAME="create_json_from_e2m Coverage Results" MODIFIED="1564018994500" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../neural_persona_old/scripts" />
+    <SUITE FILE_PATH="coverage/neural_persona$preprocess_data.coverage" NAME="preprocess_data Coverage Results" MODIFIED="1564106029731" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
     <SUITE FILE_PATH="coverage/neural_persona$make_reference_corpus_e.coverage" NAME="make_reference_corpus_e Coverage Results" MODIFIED="1564097403349" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/neural_persona$create_json_from_e2m__1_.coverage" NAME="create_json_from_e2m (1) Coverage Results" MODIFIED="1564081156617" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts/converters" />
+    <SUITE FILE_PATH="coverage/neural_persona$create_json_from_e2m__1_.coverage" NAME="create_json_from_e2m (1) Coverage Results" MODIFIED="1564106586764" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts/converters" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/requirements.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="8" column="11" lean-forward="true" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dataset/nyt_d_e/dev.jsonl" />
     <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/allennlp/data/fields/field.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -993,16 +1016,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/preprocess_data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="203">
-          <caret line="65" column="24" selection-start-line="65" selection-start-column="24" selection-end-line="65" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/partial-gen.bgfreq">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-35424" />
@@ -1020,16 +1033,6 @@
         <state>
           <folding>
             <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
-          <caret line="39" column="38" lean-forward="true" selection-start-line="39" selection-start-column="38" selection-end-line="39" selection-end-column="38" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1150,26 +1153,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/preprocess_data_e.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="155">
-          <caret line="129" selection-start-line="129" selection-end-line="129" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environments/environments.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="532">
-          <caret line="118" column="26" selection-start-line="118" selection-start-column="26" selection-end-line="118" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#51#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/make_reference_corpus_e.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="243">
@@ -1194,35 +1177,86 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training_config/partial-gen.jsonnet">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="720">
-          <caret line="30" column="56" selection-start-line="30" selection-start-column="56" selection-end-line="30" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training_config/avitm.jsonnet">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/search_spaces/vampire_imdb_search.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-236" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training_config/vampire.jsonnet">
+    <entry file="file://$PROJECT_DIR$/search_spaces/avitm_nyt_search.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="34" selection-start-line="16" selection-start-column="15" selection-end-line="16" selection-end-column="34" />
+        <state relative-caret-position="792">
+          <caret line="33" column="13" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/search_spaces/partialgen_nyt_de_search.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="648">
+          <caret line="27" column="38" selection-start-line="27" selection-start-column="38" selection-end-line="27" selection-end-column="38" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/search_spaces/partialgen_nyt_e_search.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/search_spaces/partialgen_nyt_de_search.json">
+    <entry file="file://$PROJECT_DIR$/training_config/vampire.jsonnet">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="648">
-          <caret line="27" column="38" selection-start-line="27" selection-start-column="38" selection-end-line="27" selection-end-column="38" />
+        <state relative-caret-position="48">
+          <caret line="35" column="46" lean-forward="true" selection-start-line="35" selection-start-column="46" selection-end-line="35" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/training_config/partial-gen.jsonnet">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="576">
+          <caret line="36" column="62" selection-start-line="36" selection-start-column="42" selection-end-line="36" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/training_config/avitm.jsonnet">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="36" column="65" selection-start-line="36" selection-start-column="65" selection-end-line="36" selection-end-column="65" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environments/environments.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="700">
+          <caret line="126" column="65" selection-start-line="126" selection-start-column="65" selection-end-line="126" selection-end-column="65" />
+          <folding>
+            <element signature="e#0#51#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/preprocess_data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="232">
+          <caret line="73" column="40" selection-start-line="73" selection-start-column="40" selection-end-line="73" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/preprocess_data_e.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="80" column="71" lean-forward="true" selection-start-line="80" selection-start-column="71" selection-end-line="80" selection-end-column="71" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="362">
+          <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

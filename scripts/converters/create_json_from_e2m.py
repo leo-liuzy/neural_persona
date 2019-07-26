@@ -20,10 +20,10 @@ dev_files = filenames[80 * portion: 87 * portion]
 test_files = filenames[87 * portion:]
 
 
-def write_json_from_e2m_file(files: List[str], data_set: str = "train", data_type: str = "d"):
-    if not os.path.exists(f"{new_data_home}/{data_type}/"):
-        os.makedirs(f"{new_data_home}/{data_type}/")
-    assert data_type in ["d", "d+e"]
+def write_json_from_e2m_file(files: List[str], data_set: str = "train", model_type: str = "avitm"):
+    if not os.path.exists(f"{new_data_home}/{model_type}/"):
+        os.makedirs(f"{new_data_home}/{model_type}/")
+    assert model_type in ["avitm", "partial-gen"]
     assert data_set in ["train", "dev", "test"]
     data = []  # {"docs": [], "entities": [], "doc_reindex_table": {i: i for i in range(len(files))}}
     mentions = []
@@ -37,10 +37,9 @@ def write_json_from_e2m_file(files: List[str], data_set: str = "train", data_typ
 
         doc_sentences = [" ".join(tokens) for tokens in content["content"]]
         doc_text = " ".join(doc_sentences)
-        datum = {"doc_text": doc_text}
         # doc_idx = len(data["docs"])
-        if data_type == "d":
-            data.append(datum)
+        if model_type == "avitm":
+            data.append({'text': doc_text})
             continue
 
         entities = content["entities"]
@@ -51,21 +50,22 @@ def write_json_from_e2m_file(files: List[str], data_set: str = "train", data_typ
             entity_text = " ".join([doc_sentences[i] for i in entity["mentions"]])
             datum = {"doc_text": doc_text, "entity_label": entity_label, "entity_text": entity_text}
             data.append(datum)
-    with open(f"{new_data_home}/{data_type}/{data_set}.jsonl", "w") as f:
+    with open(f"{new_data_home}/{model_type}/{data_set}.jsonl", "w") as f:
         for datum in data:
             json.dump(datum, f)
             f.write("\n")
-    if data_type == "d+e":
-        with open(f"{new_data_home}/{data_type}/{data_set}_mentions.jsonl", "w") as f:
-            json.dump(mentions, f)
+    if model_type == "avitm":
+        return
+    with open(f"{new_data_home}/{model_type}/{data_set}_mentions.jsonl", "w") as f:
+        json.dump(mentions, f)
 
 
 # for d_e and d type of data feed
-write_json_from_e2m_file(train_files, "train", "d")
-write_json_from_e2m_file(dev_files, "dev", "d")
-write_json_from_e2m_file(test_files, "test", "d")
+write_json_from_e2m_file(train_files, "train", "avitm")
+write_json_from_e2m_file(dev_files, "dev", "avitm")
+write_json_from_e2m_file(test_files, "test", "avitm")
 
 
-write_json_from_e2m_file(train_files, "train", "d+e")
-write_json_from_e2m_file(dev_files, "dev", "d+e")
-write_json_from_e2m_file(test_files, "test", "d+e")
+write_json_from_e2m_file(train_files, "train", "partial-gen")
+write_json_from_e2m_file(dev_files, "dev", "partial-gen")
+write_json_from_e2m_file(test_files, "test", "partial-gen")
