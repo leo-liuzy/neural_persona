@@ -2,13 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="94f513c9-f1aa-40e4-93a8-627d78320eaf" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/lzy.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/lzy.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/environments/environments.py" beforeDir="false" afterPath="$PROJECT_DIR$/environments/environments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/preprocess_data_e.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/preprocess_data_e.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training_config/avitm.jsonnet" beforeDir="false" afterPath="$PROJECT_DIR$/training_config/avitm.jsonnet" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training_config/partial-gen.jsonnet" beforeDir="false" afterPath="$PROJECT_DIR$/training_config/partial-gen.jsonnet" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" beforeDir="false" afterPath="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -22,7 +15,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/training_config/avitm.jsonnet">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
+            <state relative-caret-position="864">
               <caret line="36" column="65" selection-start-line="36" selection-start-column="65" selection-end-line="36" selection-end-column="65" />
             </state>
           </provider>
@@ -31,7 +24,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/training_config/partial-gen.jsonnet">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="576">
+            <state relative-caret-position="864">
               <caret line="36" column="62" selection-start-line="36" selection-start-column="42" selection-end-line="36" selection-end-column="62" />
             </state>
           </provider>
@@ -40,7 +33,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/neural_persona/models/partial-gen.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="576">
+            <state relative-caret-position="1440">
               <caret line="87" column="29" selection-start-line="87" selection-start-column="17" selection-end-line="87" selection-end-column="29" />
             </state>
           </provider>
@@ -49,7 +42,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/preprocess_data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="232">
+            <state relative-caret-position="1752">
               <caret line="73" column="40" selection-start-line="73" selection-start-column="40" selection-end-line="73" selection-end-column="40" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
@@ -61,8 +54,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/preprocess_data_e.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="80" column="71" lean-forward="true" selection-start-line="80" selection-start-column="71" selection-end-line="80" selection-end-column="71" />
+            <state relative-caret-position="1920">
+              <caret line="80" column="71" selection-start-line="80" selection-start-column="71" selection-end-line="80" selection-end-column="71" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -73,8 +66,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="362">
-              <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
+            <state relative-caret-position="893">
+              <caret line="65" column="53" lean-forward="true" selection-start-line="65" selection-start-column="53" selection-end-line="65" selection-end-column="53" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -85,7 +78,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/neural_persona/models/avitm.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-8784">
+            <state>
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -96,7 +89,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/environments/environments.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="700">
+            <state relative-caret-position="3024">
               <caret line="126" column="65" selection-start-line="126" selection-start-column="65" selection-end-line="126" selection-end-column="65" />
               <folding>
                 <element signature="e#0#51#0" expanded="true" />
@@ -169,7 +162,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -433,17 +425,6 @@
               <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
               <item name="proj" type="462c0819:PsiDirectoryNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
-              <item name="examples" type="462c0819:PsiDirectoryNode" />
-              <item name="nyt" type="462c0819:PsiDirectoryNode" />
-              <item name="d+e" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="neural_persona" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.6 (py3) &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="lzy" type="b5f07198:RTreeStructureProvider$1" />
-              <item name="proj" type="462c0819:PsiDirectoryNode" />
-              <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
               <item name="neural_persona" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -605,6 +586,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -809,17 +791,18 @@
       <updated>1564004741853</updated>
       <workItem from="1564004743249" duration="11909000" />
       <workItem from="1564018209329" duration="18719000" />
+      <workItem from="1564107701802" duration="9000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="30628000" />
+    <option name="totallyTimeSpent" value="30637000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="10" y="10" width="2540" height="1388" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25261885" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25543916" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -957,16 +940,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dataset/data/nyt/e2m/2007/02/02/1823132.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="9168" selection-start-column="9160" selection-end-column="9168" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/test.jsonl">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/dataset/data/nyt/e2m/2007/02/02/1823132.json" />
+    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/test.jsonl" />
     <entry file="file://$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="237">
@@ -984,24 +959,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/nyt/d/train.jsonl">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/train.jsonl">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/test.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret column="4036" selection-start-column="4036" selection-end-column="4036" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/dev_mentions.jsonl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3024" />
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/nyt/d/train.jsonl" />
+    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/train.jsonl" />
+    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/test.json" />
+    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/dev_mentions.jsonl" />
     <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/sklearn/feature_extraction/text.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-339">
@@ -1016,11 +977,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/partial-gen.bgfreq">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-35424" />
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/partial-gen.bgfreq" />
     <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/allennlp/data/fields/array_field.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="216">
@@ -1054,12 +1011,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/dev.jsonl">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-864" />
-      </provider>
-      <provider editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/nyt/d+e/dev.jsonl" />
     <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/json/decoder.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="237">
@@ -1144,15 +1096,6 @@
         <state relative-caret-position="-806" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/neural_persona/models/avitm.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-8784">
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/make_reference_corpus_e.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="243">
@@ -1167,13 +1110,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
           <caret line="7" column="53" lean-forward="true" selection-start-line="7" selection-start-column="53" selection-end-line="7" selection-end-column="53" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/neural_persona/models/partial-gen.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="87" column="29" selection-start-line="87" selection-start-column="17" selection-end-line="87" selection-end-column="29" />
         </state>
       </provider>
     </entry>
@@ -1206,33 +1142,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training_config/partial-gen.jsonnet">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="36" column="62" selection-start-line="36" selection-start-column="42" selection-end-line="36" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/training_config/avitm.jsonnet">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
+        <state relative-caret-position="864">
           <caret line="36" column="65" selection-start-line="36" selection-start-column="65" selection-end-line="36" selection-end-column="65" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/environments/environments.py">
+    <entry file="file://$PROJECT_DIR$/training_config/partial-gen.jsonnet">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="700">
-          <caret line="126" column="65" selection-start-line="126" selection-start-column="65" selection-end-line="126" selection-end-column="65" />
-          <folding>
-            <element signature="e#0#51#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="864">
+          <caret line="36" column="62" selection-start-line="36" selection-start-column="42" selection-end-line="36" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neural_persona/models/partial-gen.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1440">
+          <caret line="87" column="29" selection-start-line="87" selection-start-column="17" selection-end-line="87" selection-end-column="29" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/scripts/preprocess_data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="232">
+        <state relative-caret-position="1752">
           <caret line="73" column="40" selection-start-line="73" selection-start-column="40" selection-end-line="73" selection-end-column="40" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
@@ -1242,18 +1175,37 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/scripts/preprocess_data_e.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="80" column="71" lean-forward="true" selection-start-line="80" selection-start-column="71" selection-end-line="80" selection-end-column="71" />
+        <state relative-caret-position="1920">
+          <caret line="80" column="71" selection-start-line="80" selection-start-column="71" selection-end-line="80" selection-end-column="71" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/neural_persona/models/avitm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environments/environments.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3024">
+          <caret line="126" column="65" selection-start-line="126" selection-start-column="65" selection-end-line="126" selection-end-column="65" />
+          <folding>
+            <element signature="e#0#51#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="362">
-          <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
+        <state relative-caret-position="893">
+          <caret line="65" column="53" lean-forward="true" selection-start-line="65" selection-start-column="53" selection-end-line="65" selection-end-column="53" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
