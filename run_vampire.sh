@@ -1,4 +1,5 @@
-export DATA_DIR="$(pwd)/examples/nyt_d"
+#!/usr/bin/env bash
+export DATA_DIR="$(pwd)/examples/nyt/"
 export VOCAB_SIZE=30000
 export LAZY=1   
 

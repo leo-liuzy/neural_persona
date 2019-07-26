@@ -62,7 +62,7 @@ def main():
 
     if not os.path.isdir(args.serialization_dir):
         os.mkdir(args.serialization_dir)
-    
+
     vocabulary_dir = os.path.join(args.serialization_dir, "vocabulary")
 
     if not os.path.isdir(vocabulary_dir):
@@ -73,49 +73,36 @@ def main():
 
     print("fitting count vectorizer...")
 
-    count_vectorizer = CountVectorizer(stop_words='english', max_features=args.vocab_size, token_pattern=r'\b[^\d\W]{3,30}\b')
-    
+    count_vectorizer = CountVectorizer(stop_words='english', max_features=args.vocab_size,
+                                       token_pattern=r'\b[^\d\W]{3,30}\b')
+
     text = tokenized_train_examples + tokenized_dev_examples
-    
-    count_vectorizer.fit(tqdm(text))
 
-    vectorized_train_examples = count_vectorizer.transform(tqdm(tokenized_train_examples))
-    vectorized_dev_examples = count_vectorizer.transform(tqdm(tokenized_dev_examples))
+    count_vectorizer.fit(text)
 
-    reference_vectorizer = CountVectorizer(stop_words='english', token_pattern=r'\b[^\d\W]{3,30}\b')
-    if args.reference_corpus_path:
-        print("fitting reference corpus using development data...")
-        reference_matrix = reference_vectorizer.fit_transform(tqdm(tokenized_dev_examples))
-    else:
-        print(f"loading reference corpus at {args.reference_corpus_path}...")
-        reference_examples = load_data(args.reference_corpus_path, args.tokenize_reference, args.reference_tokenizer_type)
-        print("fitting reference corpus...")
-        reference_matrix = reference_vectorizer.fit_transform(tqdm(reference_examples))
-
-    reference_vocabulary = reference_vectorizer.get_feature_names()
+    vectorized_train_examples = count_vectorizer.transform(tokenized_train_examples)
+    vectorized_dev_examples = count_vectorizer.transform(tokenized_dev_examples)
 
     # add @@unknown@@ token vector
-    vectorized_train_examples = sparse.hstack((np.array([0] * len(tokenized_train_examples))[:,None], vectorized_train_examples))
-    vectorized_dev_examples = sparse.hstack((np.array([0] * len(tokenized_dev_examples))[:,None], vectorized_dev_examples))
+    vectorized_train_examples = sparse.hstack(
+        (np.array([0] * len(tokenized_train_examples))[:, None], vectorized_train_examples))
+    vectorized_dev_examples = sparse.hstack(
+        (np.array([0] * len(tokenized_dev_examples))[:, None], vectorized_dev_examples))
     master = sparse.vstack([vectorized_train_examples, vectorized_dev_examples])
 
     # generate background frequency
     print("generating background frequency...")
-    bgfreq = dict(zip(count_vectorizer.get_feature_names(), [x[0] for x in np.array(master.sum(0)) / args.vocab_size]))
+    bgfreq = dict(zip(count_vectorizer.get_feature_names(), master.toarray().sum(1) / args.vocab_size))
 
     print("saving data...")
     save_sparse(vectorized_train_examples, os.path.join(args.serialization_dir, "train.npz"))
     save_sparse(vectorized_dev_examples, os.path.join(args.serialization_dir, "dev.npz"))
-    if not os.path.isdir(os.path.join(args.serialization_dir, "reference")):
-        os.mkdir(os.path.join(args.serialization_dir, "reference"))
-    save_sparse(reference_matrix, os.path.join(args.serialization_dir, "reference", "ref.npz"))
-    write_to_json(reference_vocabulary, os.path.join(args.serialization_dir, "reference", "ref.vocab.json"))
+
     write_to_json(bgfreq, os.path.join(args.serialization_dir, f"{args.vocab_namespace}.bgfreq"))
-    
+
     write_list_to_file(['@@UNKNOWN@@'] + count_vectorizer.get_feature_names(),
                        os.path.join(vocabulary_dir, f"{args.vocab_namespace}.txt"))
-    write_list_to_file(['*tags', '*labels', f'{args.vocab_namespace}'],
-                       os.path.join(vocabulary_dir, "non_padded_namespaces.txt"))
+    write_list_to_file(['*tags', '*labels', f"{args.vocab_namespace}"], os.path.join(vocabulary_dir, "non_padded_namespaces.txt"))
 
 
 def write_list_to_file(ls, save_path):
@@ -129,6 +116,7 @@ def write_list_to_file(ls, save_path):
     for example in ls:
         out_file.write(example)
         out_file.write('\n')
+
 
 if __name__ == '__main__':
     main()

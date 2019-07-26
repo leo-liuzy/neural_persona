@@ -116,7 +116,41 @@ PARTIALGEN = {
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
         "LINEAR_SCALING": 1000,
-        "USE_DOC_INFO": 1,
+        "USE_DOC_INFO": 1,  #
+        "VAE_HIDDEN_DIM":  81,
+        "ADDITIONAL_UNLABELED_DATA_PATH": None,
+        "TRAIN_PATH": os.environ["DATA_DIR"] + "/train.npz",
+        "DEV_PATH": os.environ["DATA_DIR"] + "/dev.npz",
+        "REFERENCE_COUNTS": os.environ["DATA_DIR"] + "/reference/ref.npz",
+        "REFERENCE_VOCAB": os.environ["DATA_DIR"] + "/reference/ref.vocab.json",
+        "VOCABULARY_DIRECTORY": os.environ["DATA_DIR"] + "/vocabulary/",
+        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "parital",
+        "NUM_ENCODER_LAYERS": 2,
+        "ENCODER_ACTIVATION": "relu",
+        "MEAN_PROJECTION_ACTIVATION": "linear",
+        "NUM_MEAN_PROJECTION_LAYERS": 1,
+        "LOG_VAR_PROJECTION_ACTIVATION": "linear",
+        "NUM_LOG_VAR_PROJECTION_LAYERS": 1,
+        "SEED": 34543,
+        "Z_DROPOUT": 0.49,
+        "LEARNING_RATE": 0.00021,
+        "TRACK_NPMI": True,
+        "CUDA_DEVICE": 0,
+        "UPDATE_BACKGROUND_FREQUENCY": 0,
+        "VOCAB_SIZE": os.environ.get("VOCAB_SIZE", 30000),
+        "APPLY_BATCHNORM": 1,
+        "APPLY_BATCHNORM_1": 0,
+        "BATCH_SIZE": 64,
+        "VALIDATION_METRIC": "+npmi"
+}
+
+PARTIALGEN_GLOB = {
+        "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
+        "KL_ANNEALING": "linear",
+        "SIGMOID_WEIGHT_1": 0.25,
+        "SIGMOID_WEIGHT_2": 15,
+        "LINEAR_SCALING": 1000,
+        "USE_DOC_INFO": 0,  #
         "VAE_HIDDEN_DIM":  81,
         "ADDITIONAL_UNLABELED_DATA_PATH": None,
         "TRAIN_PATH": os.environ["DATA_DIR"] + "/train.npz",
@@ -147,8 +181,10 @@ PARTIALGEN = {
 
 ENVIRONMENTS = {
         'VAMPIRE': VAMPIRE,
-        "CLASSIFIER": CLASSIFIER,
-        'AVITM': AVITM
+        'CLASSIFIER': CLASSIFIER,
+        'AVITM': AVITM,
+        'PARTIALGEN': PARTIALGEN,
+        'PARTIALGEN_GLOB': PARTIALGEN_GLOB
 }
 
 

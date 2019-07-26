@@ -64,10 +64,10 @@ def main():
     parser.add_argument("--tokenizer-type", type=str, default="just_spaces",
                         help="Tokenizer type: just_spaces | spacy")
     # naming convention: if you want a field called "doc text", you should name it "doc_text"
-    parser.add_argument("--token-field-names", type=str, nargs="*", default=["text"],
-                        help="token field names separable by space like, \"doc\", \"entity_mentions\". "
-                             "Naming Convention: if you want a field called \"doc text\","
-                             " you should name it \"doc_text\"")
+    # parser.add_argument("--token-field-names", type=str, nargs="*", default=["text"],
+    #                     help="token field names separable by space like, \"doc\", \"entity_mentions\". "
+    #                          "Naming Convention: if you want a field called \"doc text\","
+    #                          " you should name it \"doc_text\"")
     parser.add_argument("--global-repr", action='store_true',
                         help="Whether use document level information")
 
@@ -85,9 +85,7 @@ def main():
 
     # {token_field_name1: [ sentencen0-1, sentencen1-1, ...] ,
     #  token_field_name2: [ sentencen0-2, sentencen1-2, ...] }
-    token_field_names = args.token_field_names
-    if not global_repr:
-        token_field_names = list(filter(lambda a: a != "doc_text", token_field_names))
+    token_field_names = ["entity_text", "doc_text"] if global_repr else ["entity_text"]
     named_tokenized_train_examples = load_data(args.train_path, args.tokenize, args.tokenizer_type,
                                                token_field_names)
     named_tokenized_dev_examples = load_data(args.dev_path, args.tokenize, args.tokenizer_type,

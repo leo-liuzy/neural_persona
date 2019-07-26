@@ -87,8 +87,7 @@ def main(args):
                     keep_alphanum,
                     strip_html,
                     lower,
-                    min_length,
-                    token_field_name)
+                    min_length)
 
 
 def preprocess_data(train_infile,
