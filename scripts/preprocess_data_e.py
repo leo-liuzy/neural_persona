@@ -85,7 +85,7 @@ def main():
 
     # {token_field_name1: [ sentencen0-1, sentencen1-1, ...] ,
     #  token_field_name2: [ sentencen0-2, sentencen1-2, ...] }
-    token_field_names = ["entity_text", "doc_text"] if global_repr else ["entity_text"]
+    token_field_names = ["entity_text", "doc_text"]
     named_tokenized_train_examples = load_data(args.train_path, args.tokenize, args.tokenizer_type,
                                                token_field_names)
     named_tokenized_dev_examples = load_data(args.dev_path, args.tokenize, args.tokenizer_type,
@@ -131,8 +131,10 @@ def main():
     bgfreq = dict(zip(vocab, np.array(master.sum(0))[0] / master.sum()))
 
     print("saving data...")
-    save_named_sparse(named_vectorized_train_examples, os.path.join(args.serialization_dir, "train.npz"))
-    save_named_sparse(named_vectorized_dev_examples, os.path.join(args.serialization_dir, "dev.npz"))
+    np.savez(os.path.join(args.serialization_dir, "train.npz"), **named_vectorized_train_examples)
+    np.savez(os.path.join(args.serialization_dir, "dev.npz"), **named_vectorized_dev_examples)
+    # save_named_sparse(named_vectorized_train_examples, os.path.join(args.serialization_dir, "train.npz"))
+    # save_named_sparse(named_vectorized_dev_examples, os.path.join(args.serialization_dir, "dev.npz"))
 
     write_to_json(bgfreq, os.path.join(args.serialization_dir, f"{args.vocab_namespace}.bgfreq"))
     

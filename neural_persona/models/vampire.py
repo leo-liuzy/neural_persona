@@ -3,8 +3,8 @@ import os
 from functools import partial
 from itertools import combinations
 from operator import is_not
-from typing import Any, Dict, List, Optional, Tuple, Union
-
+from typing import Dict, List, Optional, Tuple, Union
+from ipdb import set_trace as bp
 import numpy as np
 import torch
 
@@ -12,27 +12,38 @@ from allennlp.common.checks import ConfigurationError
 from allennlp.common.file_utils import cached_path
 from allennlp.data.vocabulary import Vocabulary
 from allennlp.models.model import Model
-from allennlp.modules import TextFieldEmbedder, TokenEmbedder
+from allennlp.modules import TokenEmbedder
 from allennlp.nn import InitializerApplicator, RegularizerApplicator
-from allennlp.nn.util import get_text_field_mask
-from allennlp.training.metrics import Average, CategoricalAccuracy
+from allennlp.training.metrics import Average
 from overrides import overrides
 from scipy import sparse
 from tabulate import tabulate
 from torch.nn.functional import log_softmax
 
 from neural_persona.common.util import (compute_background_log_frequency, load_sparse,
-                                        read_json)
+                                 read_json)
 from neural_persona.modules import VAE
-from neural_persona.modules.encoder import Encoder
 
 logger = logging.getLogger(__name__)
 
+def print_param_for_check(model: torch.nn.Module):
+    for name, param in model.named_parameters():
+        print(f"name: {name}")
+        print(f"param sum: {param.sum()}")
+        print(f"param abs sum: {param.abs().sum()}")
+        print(f"param abs max: {param.abs().max()}")
+        if param.grad is not None:
+            print(f"param grad sum: {param.grad.sum()}")
+            print(f"param grad abs sum: {param.grad.abs().sum()}")
+            print(f"param grad abs max: {param.grad.abs().max()}")
+        print()
+    print("-" * 80)
 
-@Model.register("neural_persona")
+
+@Model.register("vampire")
 class VAMPIRE(Model):
     """
-    VAMPIRE is a variational document model for pretraining under low 
+    VAMPIRE is a variational document model for pretraining under low
     resource environments.
 
     Parameters
@@ -94,11 +105,15 @@ class VAMPIRE(Model):
         self.vae = vae
         self.track_topics = track_topics
         self.track_npmi = track_npmi
-        self.vocab_namespace = "neural_persona"
+        self.vocab_namespace = "vampire"
         self._update_background_freq = update_background_freq
+        # bp()
         self._background_freq = self.initialize_bg_from_file(file_=background_data_path)
+        # bp()
         self._ref_counts = reference_counts
-        
+
+        self._npmi_updated = False
+
         if reference_vocabulary is not None:
             # Compute data necessary to compute NPMI every epoch
             logger.info("Loading reference vocabulary.")
@@ -115,12 +130,12 @@ class VAMPIRE(Model):
              self._npmi_denominator) = self.generate_npmi_vals(self._ref_interaction,
                                                                self._ref_doc_sum)
             self.n_docs = self._ref_count_mat.shape[0]
-        
+
         vampire_vocab_size = self.vocab.get_vocab_size(self.vocab_namespace)
         self._bag_of_words_embedder = bow_embedder
-        
+
         self._kl_weight_annealing = kl_weight_annealing
-        
+
         self._linear_scaling = float(linear_scaling)
         self._sigmoid_weight_1 = float(sigmoid_weight_1)
         self._sigmoid_weight_2 = float(sigmoid_weight_2)
@@ -150,7 +165,7 @@ class VAMPIRE(Model):
     def initialize_bg_from_file(self, file_: Optional[str] = None) -> torch.Tensor:
         """
         Initialize the background frequency parameter from a file
-        
+
         Parameters
         ----------
         ``file`` : str
@@ -164,14 +179,14 @@ class VAMPIRE(Model):
                                 target_bow: torch.Tensor) -> torch.Tensor:
         """
         Initialize the background frequency parameter from a file
-        
+
         Parameters
         ----------
         ``reconstructed_bow`` : torch.Tensor
             reconstructed bag of words from VAE
         ``target_bow`` : torch.Tensor
             target bag of words tensor
-       
+
         Returns
         -------
         ``reconstruction_loss``
@@ -184,7 +199,7 @@ class VAMPIRE(Model):
     def update_kld_weight(self, epoch_num: Optional[List[int]]) -> None:
         """
         KL weight annealing scheduler
-        
+
         Parameters
         ----------
         ``epoch_num`` : List[int]
@@ -207,7 +222,7 @@ class VAMPIRE(Model):
                 else:
                     raise ConfigurationError("anneal type {} not found".format(self._kl_weight_annealing))
 
-    def compute_custom_metrics_once_per_epoch(self, epoch_num: Optional[List[int]]) -> None:
+    def update_topics(self, epoch_num: Optional[List[int]]) -> None:
         """
         Update topics and NPMI once per epoch
 
@@ -226,15 +241,31 @@ class VAMPIRE(Model):
                 if not os.path.exists(topic_dir):
                     os.mkdir(topic_dir)
                 ser_dir = os.path.dirname(self.vocab.serialization_dir)
-                topic_filepath = os.path.join(ser_dir, "topics", "topics_{}.txt".format(epoch_num[0]))
+
+                # Topics are saved for the previous epoch.
+                topic_filepath = os.path.join(ser_dir, "topics", "topics_{}.txt".format(self._metric_epoch_tracker))
                 with open(topic_filepath, 'w+') as file_:
                     file_.write(topic_table)
 
-            if self.track_npmi:
-                if self._ref_vocab:
-                    topics = self.extract_topics(self.vae.get_beta())
-                    self._cur_npmi = self.compute_npmi(topics[1:])
-            self._metric_epoch_tracker = epoch_num[0]        
+            self._metric_epoch_tracker = epoch_num[0]
+
+    def update_npmi(self) -> None:
+        """
+        Update topics and NPMI at the beginning of validation.
+
+        Parameters
+        ----------
+        ``epoch_num`` : List[int]
+            epoch tracker output (containing current epoch number)
+        """
+
+        if self.track_npmi and self._ref_vocab and not self.training and not self._npmi_updated:
+            topics = self.extract_topics(self.vae.get_beta())
+            self._cur_npmi = self.compute_npmi(topics[1:])
+            self._npmi_updated = True
+        elif self.training:
+            self._npmi_updated = False
+
 
     def extract_topics(self, weights: torch.Tensor, k: int = 20) -> List[Tuple[str, List[int]]]:
         """
@@ -247,7 +278,7 @@ class VAMPIRE(Model):
             The weight matrix whose second dimension equals the vocabulary size.
         k: ``int``
             The number of words per topic to display.
-        
+
         Returns
         -------
         topics: ``List[Tuple[str, List[int]]]``
@@ -318,7 +349,7 @@ class VAMPIRE(Model):
             number of words to compute npmi over
         """
         topics_idx = [[self._ref_vocab_index.get(word)
-                      for word in topic[1][:num_words]] for topic in topics]
+                       for word in topic[1][:num_words]] for topic in topics]
         rows = []
         cols = []
         res_rows = []
@@ -358,19 +389,23 @@ class VAMPIRE(Model):
         ----------
         tokens: ``Union[Dict[str, torch.IntTensor], torch.IntTensor]``
             A batch of tokens. We expect tokens to be represented in one of two ways:
-                1. As token IDs. This representation will be used with downstream models, where bag-of-word count embedding 
+                1. As token IDs. This representation will be used with downstream models, where bag-of-word count embedding
                 must be done on the fly. If token IDs are provided, we use the bag-of-word-counts embedder to embed these
                 tokens during training.
                 2. As pre-computed bag of words vectors. This representation will be used during pretraining, where we can
-                precompute bag-of-word counts and train much faster. 
+                precompute bag-of-word counts and train much faster.
         epoch_num: ``List[int]``
             Output of epoch tracker
         """
-        
+        if self.batch_num in []:
+            bp()
         # For easy transfer to the GPU.
         self.device = self.vae.get_beta().device  # pylint: disable=W0201
 
         output_dict = {}
+
+        self.update_npmi()
+        self.update_topics(epoch_num)
 
         if not self.training:
             self._kld_weight = 1.0  # pylint: disable=W0201
@@ -386,6 +421,7 @@ class VAMPIRE(Model):
 
         # Encode the text into a shared representation for both the VAE
         # and downstream classifiers to use.
+        # bp()
         encoder_output = self.vae.encoder(embedded_tokens)
 
         # Perform variational inference.
@@ -407,8 +443,10 @@ class VAMPIRE(Model):
         # Compute ELBO
         elbo = negative_kl_divergence * self._kld_weight + reconstruction_loss
 
-        loss = -torch.mean(elbo) 
-
+        loss = -torch.mean(elbo)
+        open(f"{self.vae._get_name()}_loss.txt", "a+").write(f"{loss} \n")
+        if torch.isnan(loss):
+            bp()
         output_dict['loss'] = loss
         theta = variational_output['theta']
 
@@ -418,19 +456,17 @@ class VAMPIRE(Model):
         for layer_index, layer in enumerate(self.vae.encoder._linear_layers):  # pylint: disable=protected-access
             intermediate_input = layer(intermediate_input)
             activations.append((f"encoder_layer_{layer_index}", intermediate_input))
-        
-        activations.append(('theta', theta))
-        
-        output_dict['activations'] = activations
 
+        activations.append(('theta', theta))
+
+        output_dict['activations'] = activations
+        # bp()
         # Update metrics
         self.metrics['nkld'](-torch.mean(negative_kl_divergence))
         self.metrics['nll'](-torch.mean(reconstruction_loss))
 
         # batch_num is tracked for kl weight annealing
         self.batch_num += 1
-
-        self.compute_custom_metrics_once_per_epoch(epoch_num)
 
         self.metrics['npmi'] = self._cur_npmi
 

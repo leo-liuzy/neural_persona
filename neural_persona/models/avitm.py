@@ -4,6 +4,7 @@ from functools import partial
 from itertools import combinations
 from operator import is_not
 from typing import Any, Dict, List, Optional, Tuple, Union
+from ipdb import set_trace as bp
 
 import numpy as np
 import torch
@@ -75,8 +76,7 @@ class AVITM(Model):
                  vocab: Vocabulary,
                  bow_embedder: TokenEmbedder,
                  vae: VAE,
-                 lda_type: str = "nvlda",
-                 batchnorm_on_recon: bool = False,
+                 apply_batchnorm_on_recon: bool = False,
                  batchnorm_weight_learnable: bool = False,
                  batchnorm_bias_learnable: bool = True,
                  kl_weight_annealing: str = "constant",
@@ -104,14 +104,8 @@ class AVITM(Model):
         self._update_background_freq = update_background_freq
 
         avitm_vocab_size = self.vocab.get_vocab_size(self.vocab_namespace)
-        if use_background:
-            self._background_freq = self.initialize_bg_from_file(file_=background_data_path)
-        else:
-            self._background_freq = torch.zeros(avitm_vocab_size)
+        self._background_freq = self.initialize_bg_from_file(file_=background_data_path) if use_background else 0
         self._ref_counts = reference_counts
-        self.lda_type = lda_type
-        if lda_type == "nvlda":
-            assert self.vae._stochastic_beta
 
         if reference_vocabulary is not None:
             # Compute data necessary to compute NPMI every epoch
@@ -147,8 +141,8 @@ class AVITM(Model):
             raise ConfigurationError("anneal type {} not found".format(kl_weight_annealing))
 
         # setup batchnorm
-        self._batchnorm_on_recon = batchnorm_on_recon
-        if batchnorm_on_recon:
+        self._apply_batchnorm_on_recon = apply_batchnorm_on_recon
+        if apply_batchnorm_on_recon:
             self.bow_bn = create_trainable_BatchNorm1d(avitm_vocab_size,
                                                        weight_learnable=batchnorm_weight_learnable,
                                                        bias_learnable=batchnorm_bias_learnable,
@@ -162,6 +156,7 @@ class AVITM(Model):
         self.batch_num = 0
 
         initializer(self)
+        bp()
 
     def initialize_bg_from_file(self, file_: Optional[str] = None) -> torch.Tensor:
         """
@@ -412,7 +407,7 @@ class AVITM(Model):
         # Apply batchnorm to the reconstructed bag of words.
         # Helps with word variety in topic space.
 
-        reconstructed_bow = self.bow_bn(reconstructed_bow) if self._batchnorm_on_recon else reconstructed_bow
+        reconstructed_bow = self.bow_bn(reconstructed_bow) if self._apply_batchnorm_on_recon else reconstructed_bow
 
         # Reconstruction log likelihood: log P(x | z) = log softmax(z beta + b)
         reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_tokens)
@@ -424,6 +419,8 @@ class AVITM(Model):
         elbo = negative_kl_divergence * self._kld_weight + reconstruction_loss
 
         loss = -torch.mean(elbo)
+        if torch.isnan(loss):
+            bp()
 
         output_dict['loss'] = loss
         theta = variational_output['theta']

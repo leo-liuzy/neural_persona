@@ -3,8 +3,24 @@ import os
 import torch
 from allennlp.modules import FeedForward
 from overrides import overrides
+from ipdb import set_trace as bp
 
 from neural_persona.modules.vae.vae import VAE
+from neural_persona.common.util import normal_kl, create_trainable_BatchNorm1d
+
+
+def print_param_for_check(model: torch.nn.Module):
+        for name, param in model.named_parameters():
+            print(f"name: {name}")
+            print(f"param sum: {param.sum()}")
+            print(f"param abs sum: {param.abs().sum()}")
+            print(f"param abs max: {param.abs().max()}")
+            if param.grad is not None:
+                print(f"param grad sum: {param.grad.sum()}")
+                print(f"param grad abs sum: {param.grad.abs().sum()}")
+                print(f"param grad abs max: {param.grad.abs().max()}")
+            print()
+        print("-" * 80)
 
 
 @VAE.register("logistic_normal")
@@ -18,6 +34,12 @@ class LogisticNormal(VAE):
                  mean_projection: FeedForward,
                  log_variance_projection: FeedForward,
                  decoder: FeedForward,
+                 # prior: Dict = {"type": "normal", "mu": 0, "var": 1},
+                 # apply_batchnorm_on_normal: bool = False,
+                 # apply_batchnorm_on_decoder: bool = False,
+                 # batchnorm_weight_learnable: bool = False,
+                 # batchnorm_bias_learnable: bool = True,
+                 # stochastic_beta: bool = False,
                  apply_batchnorm: bool = False,
                  z_dropout: float = 0.2) -> None:
         super(LogisticNormal, self).__init__(vocab)
@@ -29,19 +51,48 @@ class LogisticNormal(VAE):
         self._z_dropout = torch.nn.Dropout(z_dropout)
 
         self.latent_dim = mean_projection.get_output_dim()
-
+        
+        # self.prior = prior
+        # if prior['type'] == "normal":
+        #    if 'mu' not in prior or 'var' not in prior:
+        #          raise Exception("MU, VAR undefined for normal")
+        #     p_mu = torch.zeros(1, self.latent_dim).fill_(prior['mu'])
+        #     p_var = torch.zeros(1, self.latent_dim).fill_(prior['var'])
+        #     p_log_var = p_var.log()
+        # elif prior['type'] == "laplace-approx":
+        #     a = torch.zeros(1, self.latent_dim).fill_(prior['alpha'])
+        #     p_mu = a.log() - torch.mean(a.log(), 1)
+        #     p_var = 1.0 / a * (1 - 2.0 / self.latent_dim) + 1.0 / self.latent_dim * torch.mean(1 / a)
+        #     p_log_var = p_var.log()
+        # else:
+        #     raise Exception("Invalid/Undefined prior!")
+       
+        # parameters of prior distribution are not trainable
+        # self.register_buffer("p_mu", p_mu)
+        # self.register_buffer("p_log_var", p_log_var)
+        
         # If specified, established batchnorm for both mean and log variance.
         self._apply_batchnorm = apply_batchnorm
         if apply_batchnorm:
 
-            self.mean_bn = torch.nn.BatchNorm1d(self.latent_dim, eps=0.001, momentum=0.001, affine=True)
-            self.mean_bn.weight.data.copy_(torch.ones(self.latent_dim))
-            self.mean_bn.weight.requires_grad = False
-
-            self.log_var_bn = torch.nn.BatchNorm1d(self.latent_dim, eps=0.001, momentum=0.001, affine=True)
-            self.log_var_bn.weight.data.copy_(torch.ones(self.latent_dim))
-            self.log_var_bn.weight.requires_grad = False
-
+            self.mean_bn = create_trainable_BatchNorm1d(self.latent_dim,
+                                                        weight_learnable=batchnorm_weight_learnable,
+                                                        bias_learnable=batchnorm_bias_learnable,
+                                                        eps=0.001, momentum=0.001, affine=True)
+            self.log_var_bn = create_trainable_BatchNorm1d(self.latent_dim,
+                                                        weight_learnable=batchnorm_weight_learnable,
+                                                        bias_learnable=batchnorm_bias_learnable,
+                                                        eps=0.001, momentum=0.001, affine=True)
+        # If specified, established batchnorm for reconstruction matrix, applying batch norm across vocabulary
+        # self._apply_batchnorm_on_decoder = apply_batchnorm_on_decoder
+        # if apply_batchnorm_on_decoder:
+        #     self.decoder_bn = create_trainable_BatchNorm1d(decoder.get_output_dim(),
+        #                                                    weight_learnable=batchnorm_weight_learnable,
+        #                                                    bias_learnable=batchnorm_bias_learnable,
+        #                                                    eps=0.001, momentum=0.001, affine=True)
+        
+        # If specified, constrain each topic to be a distribution over vocabulary
+        # self._stochastic_beta = stochastic_beta
     @overrides
     def forward(self, input_repr: torch.FloatTensor):  # pylint: disable = W0221
         """
@@ -49,8 +100,15 @@ class LogisticNormal(VAE):
         as well as the negative KL-divergence, theta itself, and the parameters
         of the distribution.
         """
+        # bp()
         output = self.generate_latent_code(input_repr)
         theta = output["theta"]
+        # beta = self._decoder.weight.t()
+        # if self._apply_batchnorm_on_decoder:
+        #     beta = self.decoder_bn(beta)
+        # if self._stochastic_beta:
+        #     beta = torch.softmax(beta, dim=1)
+        # reconstruction = theta @ beta
         reconstruction = self._decoder(theta)
         output["reconstruction"] = reconstruction
 
@@ -81,9 +139,13 @@ class LogisticNormal(VAE):
         """
         Compute the closed-form solution for negative KL-divergence for Gaussians.
         """
+        # mu, log_var = params["mean"], params["log_variance"]  # pylint: disable=C0103
         mu, sigma = params["mean"], params["sigma"]  # pylint: disable=C0103
+        # bp()
+        # negative_kl_divergence = -normal_kl((mu, log_var), (self.p_mu, self.p_log_var))
         negative_kl_divergence = 1 + torch.log(sigma ** 2) - mu ** 2 - sigma ** 2
         negative_kl_divergence = 0.5 * negative_kl_divergence.sum(dim=-1)  # Shape: (batch, )
+        # bp()
         return negative_kl_divergence
 
     @overrides

@@ -3,6 +3,7 @@ import json
 import logging
 from io import TextIOWrapper
 from typing import Dict
+from ipdb import set_trace as bp
 
 import numpy as np
 from allennlp.common.checks import ConfigurationError
@@ -34,18 +35,29 @@ class PartialGen_reader(DatasetReader):
     lazy : ``bool``, optional, (default = ``False``)
         Whether or not instances can be read lazily.
     """
-    def __init__(self, lazy: bool = False) -> None:
+    def __init__(self, lazy: bool = False, use_doc_info: bool = False) -> None:
         super().__init__(lazy=lazy)
+        # bp()
+        self._use_doc_info = use_doc_info
 
     @overrides
     def _read(self, file_path):
-        doc_mat = load_named_sparse(file_path, "doc_text")
-        entity_mat = load_named_sparse(file_path, "entity_text")
-        doc_mat = doc_mat.tolil()
-        entity_mat = entity_mat.tolil()
-        assert doc_mat.shape == entity_mat.shape
+        named_mat = np.load(file_path)
+        named_mat.allow_pickle = True
+        named_mat = dict(named_mat)
+        if self._use_doc_info:
+            doc_mat = named_mat["doc_text"]
+            doc_mat = doc_mat.sum().tolil()
+        
+        entity_mat = named_mat["entity_text"]
+        entity_mat = entity_mat.sum().tolil()
+        if self._use_doc_info:
+            assert doc_mat.shape == entity_mat.shape
         for ix in range(entity_mat.shape[0]):
-            vec = np.concatenate([doc_mat[ix].toarray().squeeze(), entity_mat[ix].toarray().squeeze()])
+            if self._use_doc_info:
+                vec = np.concatenate([doc_mat[ix].toarray().squeeze(), entity_mat[ix].toarray().squeeze()])
+            else:
+                vec = entity_mat[ix].toarray().squeeze()
             instance = self.text_to_instance(vec)
             if instance is not None:
                 yield instance

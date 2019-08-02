@@ -4,6 +4,7 @@ from functools import partial
 from itertools import combinations
 from operator import is_not
 from typing import Any, Dict, List, Optional, Tuple, Union
+from ipdb import set_trace as bp
 
 import numpy as np
 import torch
@@ -75,8 +76,7 @@ class PartialGen(Model):
                  vocab: Vocabulary,
                  bow_embedder: TokenEmbedder,
                  vae: VAE,
-                 lda_type: str = "nvlda",
-                 batchnorm_on_recon: bool = False,
+                 apply_batchnorm_on_recon: bool = False,
                  batchnorm_weight_learnable: bool = False,
                  batchnorm_bias_learnable: bool = True,
                  kl_weight_annealing: str = "constant",
@@ -105,18 +105,12 @@ class PartialGen(Model):
         self._update_background_freq = update_background_freq
 
         vocab_size = self.vocab.get_vocab_size(self.vocab_namespace)
-        self.use_doc_info = use_doc_info
+        self._use_doc_info = use_doc_info
+        # bp()
         if use_doc_info:
             self.interpolation = torch.nn.Parameter(torch.zeros(2, requires_grad=True))
-        if use_background:
-            self._background_freq = self.initialize_bg_from_file(file_=background_data_path)
-        else:
-            self._background_freq = torch.zeros(vocab_size)
+        self._background_freq = self.initialize_bg_from_file(file_=background_data_path) if use_background else 0
         self._ref_counts = reference_counts
-        self.lda_type = lda_type
-
-        if lda_type == "nvlda":
-            assert self.vae._stochastic_beta
 
         if reference_vocabulary is not None:
             # Compute data necessary to compute NPMI every epoch
@@ -152,8 +146,8 @@ class PartialGen(Model):
             raise ConfigurationError("anneal type {} not found".format(kl_weight_annealing))
 
         # setup batchnorm
-        self._batchnorm_on_recon = batchnorm_on_recon
-        if batchnorm_on_recon:
+        self._apply_batchnorm_on_recon = apply_batchnorm_on_recon
+        if apply_batchnorm_on_recon:
             self.bow_bn = create_trainable_BatchNorm1d(vocab_size,
                                                        weight_learnable=batchnorm_weight_learnable,
                                                        bias_learnable=batchnorm_bias_learnable,
@@ -404,13 +398,15 @@ class PartialGen(Model):
         else:
             embedded_tokens = tokens
 
-        weights = torch.softmax(self.interpolation, dim=0)
         _, x_dim = embedded_tokens.shape
-        if self.use_doc_info:
+        if self._use_doc_info:
+            # bp()
             embedded_doc_tokens, embedded_entity_tokens = embedded_tokens.split(x_dim // 2, dim=1)
+            weights = torch.softmax(self.interpolation, dim=0)
             embedded_tokens = weights[0] * embedded_doc_tokens + weights[1] * embedded_entity_tokens
         else:
-            assert x_dim == self.vocab.get_vocab_size(self.vocab_namespace)
+            # bp()
+            assert x_dim == self.vocab.get_vocab_size(self.vocab_namespace) 
         # Encode the text into a shared representation for both the VAE
         encoder_output = self.vae.encoder(embedded_tokens)
 
@@ -423,10 +419,10 @@ class PartialGen(Model):
         # Apply batchnorm to the reconstructed bag of words.
         # Helps with word variety in topic space.
 
-        reconstructed_bow = self.bow_bn(reconstructed_bow) if self._batchnorm_on_recon else reconstructed_bow
+        reconstructed_bow = self.bow_bn(reconstructed_bow) if self._apply_batchnorm_on_recon else reconstructed_bow
 
         # Reconstruction log likelihood: log P(x | z) = log softmax(z beta + b)
-        if self.use_doc_info:
+        if self._use_doc_info:
             reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_entity_tokens)
         else:
             reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_tokens)

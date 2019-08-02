@@ -46,29 +46,51 @@ def main():
     if args.seed:
         os.environ['SEED'] = args.seed
 
+    data_dir = os.environ["DATA_DIR"]
+    fail_message = ""
+    # priors = {0: '{"type": "normal", "mu": 0, "var": 1}', 1: '{"type": "laplace-approx", "alpha": 1}'}
+    num_repeat = 5
 
-    allennlp_command = [
+    # for use_doc_info in [0, 1]:
+    #     env["USE_DOC_INFO"] = use_doc_info
+    #     if use_doc_info == 1:
+    #         os.environ["DATA_DIR"] = data_dir + "-global"
+    #     else:
+    #         os.environ["DATA_DIR"] = data_dir
+    for i in range(num_repeat):
+        serialization_dir = f"{args.serialization_dir}." \
+            f"DocInfo{env['USE_DOC_INFO']}." \
+            f"NoRepeat{i}"
+
+        if args.seed:
+            os.environ['SEED'] = str(int(args.seed) + i)
+
+        allennlp_command = [
             "allennlp",
             "train",
             "--include-package",
             "neural_persona",
             args.config,
             "-s",
-            args.serialization_dir
+            serialization_dir
             ]
-    
-    if args.seed:
-        allennlp_command[-1] = allennlp_command[-1] + "_" + args.seed
 
-    if args.recover:
-        allennlp_command.append("--recover")
-    
-    if os.path.exists(allennlp_command[-1]) and args.override:
-        print(f"overriding {allennlp_command[-1]}")
-        shutil.rmtree(allennlp_command[-1])
+        if args.seed:
+            allennlp_command[-1] = allennlp_command[-1] + "_" + args.seed
 
-    subprocess.run(" ".join(allennlp_command), shell=True, check=True)
-    pdb.pm()
+        if args.recover:
+            allennlp_command.append("--recover")
+
+        if os.path.exists(allennlp_command[-1]) and args.override:
+            print(f"overriding {allennlp_command[-1]}")
+            shutil.rmtree(allennlp_command[-1])
+        try:
+            subprocess.run(" ".join(allennlp_command), shell=True, check=True)
+        except:
+            fail_message += serialization_dir + "\n"
+            continue
+
+    open("failed_settings.txt", "w+").write(fail_message)
 
 
 if __name__ == '__main__':

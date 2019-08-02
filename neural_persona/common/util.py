@@ -3,6 +3,7 @@ import json
 import os
 import pickle
 from typing import Any, Dict, List
+from ipdb import set_trace as bp
 
 import numpy as np
 import torch
@@ -55,12 +56,13 @@ def normal_kl(N0, N1, eps=1e-12):
     var_1 = log_var_1.exp()
 
     d = mu_1 - mu_0
-    det_var_0 = var_0.prod(dim=1)
-    det_var_1 = var_1.prod(dim=1)
+    tmp_0 = log_var_0.sum(dim=1)
+    tmp_0[tmp_0 == 0] = eps
+    tmp_1 = log_var_1.sum(dim=1)
 
     first_term = torch.sum(var_0 / var_1, dim=1)
     second_term = torch.sum(d ** 2 / var_1, dim=1)
-    result = 0.5 * (first_term + second_term - k + torch.log(det_var_1 / det_var_0 + eps))
+    result = 0.5 * (first_term + second_term - k + tmp_1 - tmp_0)
 
     return result
 
@@ -71,7 +73,9 @@ def compute_background_log_frequency(vocab: Vocabulary, vocab_namespace: str, pr
     background log term frequency w.r.t this vocabulary.
     """
     # precomputed_word_counts = json.load(open(precomputed_word_counts, "r"))
-    log_term_frequency = torch.FloatTensor(vocab.get_vocab_size(vocab_namespace))
+    # bp()
+    # sample a probability tensor from a symmetric dirichlet
+    log_term_frequency =  torch.distributions.dirichlet.Dirichlet(torch.ones(vocab.get_vocab_size(vocab_namespace))).sample()
     if precomputed_bg_file is not None:
         with open(precomputed_bg_file, "r") as file_:
             precomputed_bg = json.load(file_)
@@ -85,6 +89,7 @@ def compute_background_log_frequency(vocab: Vocabulary, vocab_namespace: str, pr
             log_term_frequency[i] = 1e-12
         elif token in precomputed_bg:
             log_term_frequency[i] = precomputed_bg[token]
+    assert log_term_frequency.sum().allclose(torch.ones(1))
     log_term_frequency = torch.log(log_term_frequency)
     return log_term_frequency
 
@@ -235,6 +240,8 @@ def save_named_sparse(named_sparse_matrices: Dict[str, sparse.spmatrix], output_
 
 
 def load_named_sparse(input_filename, key):
+    from ipdb import set_trace as bp
+    bp()
     npy = np.load(input_filename)[key]
     coo_matrix = sparse.coo_matrix((npy['data'], (npy['row'], npy['col'])), shape=npy['shape'])
     return coo_matrix.tocsc()

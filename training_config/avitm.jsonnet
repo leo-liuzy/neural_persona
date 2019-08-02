@@ -24,26 +24,26 @@ local BASE_READER(LAZY) = {
          "vocab_namespace": "avitm",
          "ignore_oov": true
       },
-      "lda_type": std.extVar("LDA_TYPE"),
-      "batchnorm_on_recon": std.extVar("BATCHNORM_ON_RECON") == 1,
-      "batchnorm_weight_learnable": std.extVar("BATCHNORM_WEIGHT_LEANABLE") == 1,
-      "batchnorm_bias_learnable": std.extVar("BATCHNORM_BIAS_LEANABLE") == 1,
+      "apply_batchnorm_on_recon": std.extVar("APPLY_BATCHNORM_ON_RECON") == 1,
+      "batchnorm_weight_learnable": std.extVar("BATCHNORM_WEIGHT_LEARNABLE") == 1,
+      "batchnorm_bias_learnable": std.extVar("BATCHNORM_BIAS_LEARNABLE") == 1,
       "kl_weight_annealing": std.extVar("KL_ANNEALING"),
       "sigmoid_weight_1": std.extVar("SIGMOID_WEIGHT_1"),
       "sigmoid_weight_2": std.extVar("SIGMOID_WEIGHT_2"),
       "linear_scaling": std.extVar("LINEAR_SCALING"),
       "reference_counts": std.extVar("REFERENCE_COUNTS"),
       "reference_vocabulary": std.extVar("REFERENCE_VOCAB"),
+      "use_background": std.parseInt(std.extVar("USE_BACKGROUND")) == 1,
       "background_data_path": std.extVar("BACKGROUND_DATA_PATH"),
       "update_background_freq": std.parseInt(std.extVar("UPDATE_BACKGROUND_FREQUENCY")) == 1,
       "track_npmi": std.parseInt(std.extVar("TRACK_NPMI")) == 1,
       "vae": {
          "z_dropout": std.extVar("Z_DROPOUT"),
-         "prior": std.parseInt(std.extVar("PRIOR")),
+         "prior": std.parseJson(std.extVar("PRIOR")),
          "apply_batchnorm_on_normal": std.parseInt(std.extVar("APPLY_BATCHNORM_ON_NORMAL")) == 1,
          "apply_batchnorm_on_decoder": std.parseInt(std.extVar("APPLY_BATCHNORM_ON_DECODER")) == 1,
-         "batchnorm_weight_learnable": std.parseInt(std.extVar("BATCHNORM_WEIGHT_LEANABLE")) == 1,
-         "batchnorm_bias_learnable": std.parseInt(std.extVar("BATCHNORM_BIAS_LEANABLE")) == 1,
+         "batchnorm_weight_learnable": std.parseInt(std.extVar("BATCHNORM_WEIGHT_LEARNABLE")) == 1,
+         "batchnorm_bias_learnable": std.parseInt(std.extVar("BATCHNORM_BIAS_LEARNABLE")) == 1,
          "stochastic_beta": std.parseInt(std.extVar("STOCHASTIC_BETA")) == 1,
          "encoder": {
             "activations": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.extVar("ENCODER_ACTIVATION")),
@@ -69,7 +69,7 @@ local BASE_READER(LAZY) = {
             "input_dim": std.parseInt(std.extVar("VAE_HIDDEN_DIM")),
             "num_layers": 1
          },
-         "type": "logistic_normal"
+         "type": "normal"
       }
    },
     "iterator": {

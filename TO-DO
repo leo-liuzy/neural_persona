@@ -1,1 +1,7 @@
-run avitm and partial-gen model
+run avitm and partial-gen model x 
+debug mini-doc model
+run evaluation metric on nyt-dataset
+run david's model on nyt-dataset
+try with david model but with more 2 hops in dependency tree
+get ladder vae model working on nyt-dataset
+

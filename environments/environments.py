@@ -40,14 +40,19 @@ CLASSIFIER = {
 
 VAMPIRE = {
         "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
-        "LDA_TYPE": "nvlda",
-        "BATCHNORM_ON_RECON": 0,
-        "BATCHNORM_WEIGHT_LEANABLE": 0,
-        "BATCHNORM_BIAS_LEANABLE": 1,
-        "APPLY_BATCHNORM_ON_NORMAL": 1,
-        "APPLY_BATCHNORM_ON_DECODER": 1,
-        "STOCHASTIC_BETA": 1,
         "KL_ANNEALING": "linear",
+        ##############################################################
+        "STOCHASTIC_BETA": 0,
+        "BATCHNORM_WEIGHT_LEARNABLE": 0,
+        "BATCHNORM_BIAS_LEARNABLE": 0,
+        "APPLY_BATCHNORM_ON_NORMAL": 0,
+        "APPLY_BATCHNORM_ON_DECODER": 0,
+        "APPLY_BATCHNORM_ON_RECON": 1,
+        "USE_BACKGROUND": 1,
+        # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
+        "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
+        ""
+        ##############################################################
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
         "LINEAR_SCALING": 1000,
@@ -58,6 +63,7 @@ VAMPIRE = {
         "REFERENCE_COUNTS": os.environ["DATA_DIR"] + "/reference/ref.npz",
         "REFERENCE_VOCAB": os.environ["DATA_DIR"] + "/reference/ref.vocab.json",
         "VOCABULARY_DIRECTORY": os.environ["DATA_DIR"] + "/vocabulary/",
+        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "/vampire.bgfreq",
         "NUM_ENCODER_LAYERS": 2,
         "ENCODER_ACTIVATION": "relu",
         "MEAN_PROJECTION_ACTIVATION": "linear",
@@ -80,7 +86,18 @@ VAMPIRE = {
 AVITM = {
         "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
         "KL_ANNEALING": "linear",
-        "PRIOR": {"type": "laplace-approx", "alpha": 1},
+        ##############################################################
+        "STOCHASTIC_BETA": 0,
+        "BATCHNORM_WEIGHT_LEARNABLE": 0,
+        "BATCHNORM_BIAS_LEARNABLE": 0,
+        "APPLY_BATCHNORM_ON_NORMAL": 0,
+        "APPLY_BATCHNORM_ON_DECODER": 0,
+        "APPLY_BATCHNORM_ON_RECON": 1,
+        "USE_BACKGROUND": 1,
+        # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
+        "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
+        ""
+        ##############################################################
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
         "LINEAR_SCALING": 1000,
@@ -91,6 +108,7 @@ AVITM = {
         "REFERENCE_COUNTS": os.environ["DATA_DIR"] + "/reference/ref.npz",
         "REFERENCE_VOCAB": os.environ["DATA_DIR"] + "/reference/ref.vocab.json",
         "VOCABULARY_DIRECTORY": os.environ["DATA_DIR"] + "/vocabulary/",
+        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "avitm.bgfreq",
         "NUM_ENCODER_LAYERS": 2,
         "ENCODER_ACTIVATION": "relu",
         "MEAN_PROJECTION_ACTIVATION": "linear",
@@ -113,10 +131,21 @@ AVITM = {
 PARTIALGEN = {
         "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
         "KL_ANNEALING": "linear",
+        ##############################################################
+        "STOCHASTIC_BETA": 0,
+        "BATCHNORM_WEIGHT_LEARNABLE": 0,
+        "BATCHNORM_BIAS_LEARNABLE": 1,
+        "APPLY_BATCHNORM_ON_NORMAL": 0,
+        "APPLY_BATCHNORM_ON_DECODER": 0,
+        "APPLY_BATCHNORM_ON_RECON": 1,
+        "USE_BACKGROUND": 1,
+        "USE_DOC_INFO": 0,
+        # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
+        "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
+        ##############################################################
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
         "LINEAR_SCALING": 1000,
-        "USE_DOC_INFO": 1,  #
         "VAE_HIDDEN_DIM":  81,
         "ADDITIONAL_UNLABELED_DATA_PATH": None,
         "TRAIN_PATH": os.environ["DATA_DIR"] + "/train.npz",
@@ -124,7 +153,7 @@ PARTIALGEN = {
         "REFERENCE_COUNTS": os.environ["DATA_DIR"] + "/reference/ref.npz",
         "REFERENCE_VOCAB": os.environ["DATA_DIR"] + "/reference/ref.vocab.json",
         "VOCABULARY_DIRECTORY": os.environ["DATA_DIR"] + "/vocabulary/",
-        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "parital",
+        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "/partial-gen.bgfreq",
         "NUM_ENCODER_LAYERS": 2,
         "ENCODER_ACTIVATION": "relu",
         "MEAN_PROJECTION_ACTIVATION": "linear",
@@ -143,14 +172,27 @@ PARTIALGEN = {
         "BATCH_SIZE": 64,
         "VALIDATION_METRIC": "+npmi"
 }
+
+
 
 PARTIALGEN_GLOB = {
         "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
         "KL_ANNEALING": "linear",
+        ##############################################################
+        "STOCHASTIC_BETA": 0,
+        "BATCHNORM_WEIGHT_LEARNABLE": 0,
+        "BATCHNORM_BIAS_LEARNABLE": 1,
+        "APPLY_BATCHNORM_ON_NORMAL": 0,
+        "APPLY_BATCHNORM_ON_DECODER": 0,
+        "APPLY_BATCHNORM_ON_RECON": 1,
+        "USE_BACKGROUND": 1,
+        "USE_DOC_INFO": 1,
+        # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
+        "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
+        ##############################################################
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
         "LINEAR_SCALING": 1000,
-        "USE_DOC_INFO": 0,  #
         "VAE_HIDDEN_DIM":  81,
         "ADDITIONAL_UNLABELED_DATA_PATH": None,
         "TRAIN_PATH": os.environ["DATA_DIR"] + "/train.npz",
@@ -158,7 +200,7 @@ PARTIALGEN_GLOB = {
         "REFERENCE_COUNTS": os.environ["DATA_DIR"] + "/reference/ref.npz",
         "REFERENCE_VOCAB": os.environ["DATA_DIR"] + "/reference/ref.vocab.json",
         "VOCABULARY_DIRECTORY": os.environ["DATA_DIR"] + "/vocabulary/",
-        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "parital",
+        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "/partial-gen.bgfreq",
         "NUM_ENCODER_LAYERS": 2,
         "ENCODER_ACTIVATION": "relu",
         "MEAN_PROJECTION_ACTIVATION": "linear",
@@ -177,7 +219,6 @@ PARTIALGEN_GLOB = {
         "BATCH_SIZE": 64,
         "VALIDATION_METRIC": "+npmi"
 }
-
 
 ENVIRONMENTS = {
         'VAMPIRE': VAMPIRE,
