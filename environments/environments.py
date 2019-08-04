@@ -162,7 +162,7 @@ PARTIALGEN = {
         "NUM_LOG_VAR_PROJECTION_LAYERS": 1,
         "SEED": 34543,
         "Z_DROPOUT": 0.49,
-        "LEARNING_RATE": 0.00021,
+        "LEARNING_RATE": 0.00002,
         "TRACK_NPMI": True,
         "CUDA_DEVICE": 0,
         "UPDATE_BACKGROUND_FREQUENCY": 0,

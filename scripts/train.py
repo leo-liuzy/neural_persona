@@ -59,7 +59,8 @@ def main():
     #         os.environ["DATA_DIR"] = data_dir
     for i in range(num_repeat):
         serialization_dir = f"{args.serialization_dir}." \
-            f"DocInfo{env['USE_DOC_INFO']}." \
+            f"DocInfo{env['USE_DOC_INFO']}.lr{env['LEARNING_RATE']}." \
+            f"BNonNormal{env['APPLY_BATCHNORM_ON_NORMAL']}.BNonDecoder{env['APPLY_BATCHNORM_ON_DECODER']}/" \
             f"NoRepeat{i}"
 
         if args.seed:
@@ -78,6 +79,9 @@ def main():
         if args.seed:
             allennlp_command[-1] = allennlp_command[-1] + "_" + args.seed
 
+        if not os.path.exists(allennlp_command[-1]):
+            os.makedirs(allennlp_command[-1])
+
         if args.recover:
             allennlp_command.append("--recover")
 
@@ -90,7 +94,7 @@ def main():
             fail_message += serialization_dir + "\n"
             continue
 
-    open("failed_settings.txt", "w+").write(fail_message)
+    # open("failed_settings.txt", "w+").write(fail_message)
 
 
 if __name__ == '__main__':

@@ -210,7 +210,6 @@ class PartialGen(Model):
         else:
             _epoch_num = epoch_num[0]
             if _epoch_num != self._kl_epoch_tracker:
-                print(self._kld_weight)
                 self._kl_epoch_tracker = _epoch_num
                 self._cur_epoch += 1
                 if self._kl_weight_annealing == "linear":
