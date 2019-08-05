@@ -1,7 +1,8 @@
 run avitm and partial-gen model  x 
 draw the average of the metrics  x
 debug mini-doc model    x
-run mini-doc model and observe   
+run mini-doc model and observe   x
+observe entity coverage     x
 run evaluation metric on nyt-dataset
 run david's model on nyt-dataset
 get ladder vae model working on nyt-dataset

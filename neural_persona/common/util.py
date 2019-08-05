@@ -75,7 +75,7 @@ def compute_background_log_frequency(vocab: Vocabulary, vocab_namespace: str, pr
     # precomputed_word_counts = json.load(open(precomputed_word_counts, "r"))
     # bp()
     # sample a probability tensor from a symmetric dirichlet
-    log_term_frequency =  torch.distributions.dirichlet.Dirichlet(torch.ones(vocab.get_vocab_size(vocab_namespace))).sample()
+    log_term_frequency = torch.distributions.dirichlet.Dirichlet(torch.ones(vocab.get_vocab_size(vocab_namespace))).sample()
     if precomputed_bg_file is not None:
         with open(precomputed_bg_file, "r") as file_:
             precomputed_bg = json.load(file_)

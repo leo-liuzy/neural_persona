@@ -94,7 +94,7 @@ class PartialGen(Model):
                  initializer: InitializerApplicator = InitializerApplicator(),
                  regularizer: Optional[RegularizerApplicator] = None) -> None:
         super().__init__(vocab, regularizer)
-
+        
         self.metrics = {'nkld': Average(), 'nll': Average(), 'perp': Average()}
 
         self.vocab = vocab

@@ -21,6 +21,7 @@ test_files = filenames[87 * portion:]
 
 
 def write_json_from_e2m_file(files: List[str], data_set: str = "train", model_type: str = "avitm"):
+    doc_cover_pairs = []
     if not os.path.exists(f"{new_data_home}/{model_type}/"):
         os.makedirs(f"{new_data_home}/{model_type}/")
     assert model_type in ["avitm", "partial-gen"]
@@ -36,6 +37,7 @@ def write_json_from_e2m_file(files: List[str], data_set: str = "train", model_ty
             continue
 
         doc_sentences = [" ".join(tokens) for tokens in content["content"]]
+        doc_len = len(doc_sentences)
         doc_text = " ".join(doc_sentences)
         # doc_idx = len(data["docs"])
         if model_type == "avitm":
@@ -44,6 +46,7 @@ def write_json_from_e2m_file(files: List[str], data_set: str = "train", model_ty
 
         entities = content["entities"]
         all_mentions_idx = list(itertools.chain(*[entity["mentions"] for entity in entities]))
+        doc_cover_pairs.append((doc_len, len(set(all_mentions_idx))))
         mentions.append(" ".join([doc_sentences[i] for i in all_mentions_idx]))
         for entity in entities:
             entity_label = entity["MID"]
@@ -54,10 +57,13 @@ def write_json_from_e2m_file(files: List[str], data_set: str = "train", model_ty
         for datum in data:
             json.dump(datum, f)
             f.write("\n")
+
     if model_type == "avitm":
         return
     with open(f"{new_data_home}/{model_type}/{data_set}_mentions.jsonl", "w") as f:
         json.dump(mentions, f)
+    with open(f"{new_data_home}/{model_type}/{data_set}_doc_cover_pairs.json", "w") as f:
+        json.dump(doc_cover_pairs, f)
 
 
 # for d_e and d type of data feed
