@@ -3,11 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="94f513c9-f1aa-40e4-93a8-627d78320eaf" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TO-DO" beforeDir="false" afterPath="$PROJECT_DIR$/TO-DO" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neural_persona/common/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/common/util.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neural_persona/models/partial-gen.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/models/partial-gen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/converters/create_json_from_e2m.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visual/plot.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/visual/plot.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" beforeDir="false" afterPath="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -57,8 +52,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/neural_persona/tests/models/vampire_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="23" column="57" selection-start-line="23" selection-start-column="57" selection-end-line="23" selection-end-column="57" />
+            <state relative-caret-position="576">
+              <caret line="27" column="55" selection-start-line="27" selection-start-column="55" selection-end-line="27" selection-end-column="55" />
               <folding>
                 <element signature="e#57#75#0" expanded="true" />
               </folding>
@@ -882,12 +877,12 @@
       <workItem from="1564372768002" duration="3423000" />
       <workItem from="1564383349535" duration="5920000" />
       <workItem from="1564726493298" duration="1572000" />
-      <workItem from="1564773950625" duration="24453000" />
+      <workItem from="1564773950625" duration="24639000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="70307000" />
+    <option name="totallyTimeSpent" value="70493000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="10" y="-12" width="2540" height="1410" extended-state="0" />
@@ -1351,8 +1346,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/neural_persona/tests/models/vampire_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="23" column="57" selection-start-line="23" selection-start-column="57" selection-end-line="23" selection-end-column="57" />
+        <state relative-caret-position="576">
+          <caret line="27" column="55" selection-start-line="27" selection-start-column="55" selection-end-line="27" selection-end-column="55" />
           <folding>
             <element signature="e#57#75#0" expanded="true" />
           </folding>
