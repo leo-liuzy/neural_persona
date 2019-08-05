@@ -10,6 +10,7 @@ import torch
 from allennlp.data import Vocabulary
 from scipy import sparse
 
+EPSILON = 1e-12
 
 def create_trainable_BatchNorm1d(num_features: int,
                                  weight_learnable: bool = False,
@@ -37,7 +38,7 @@ def create_trainable_BatchNorm1d(num_features: int,
     return bn
 
 
-def normal_kl(N0, N1, eps=1e-12):
+def normal_kl(N0, N1, eps=EPSILON):
     """
     (Roughly) A pragmatic translation of:
      https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence#Multivariate_normal_distributions
