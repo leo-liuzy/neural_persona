@@ -1,3 +1,5 @@
+.*
+!/.gitignore
 .mypy_cache/
 visual/*.png
 .idea/
