@@ -3,16 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="94f513c9-f1aa-40e4-93a8-627d78320eaf" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TO-DO" beforeDir="false" afterPath="$PROJECT_DIR$/TO-DO" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/environments/environments.py" beforeDir="false" afterPath="$PROJECT_DIR$/environments/environments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neural_persona/models/ladder.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/models/ladder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neural_persona/models/partial-gen.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/models/partial-gen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neural_persona/modules/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/modules/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neural_persona/modules/vae/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/modules/vae/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neural_persona/modules/vae/ladder.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/modules/vae/ladder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neural_persona/modules/vae/logistic_normal.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/modules/vae/logistic_normal.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/neural_persona/modules/vae/normal.py" beforeDir="false" afterPath="$PROJECT_DIR$/neural_persona/modules/vae/normal.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visual/plot.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/visual/plot.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training_config/ladder.jsonnet" beforeDir="false" afterPath="$PROJECT_DIR$/training_config/ladder.jsonnet" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" beforeDir="false" afterPath="$PROJECT_DIR$/../neural_persona_old/scripts/create_json_from_e2m.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -25,20 +16,18 @@
     <splitter split-orientation="horizontal" split-proportion="0.5015987">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/training_config/ladder.jsonnet">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="192">
-                  <caret line="83" column="83" selection-start-line="83" selection-start-column="83" selection-end-line="83" selection-end-column="83" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/../LVAE/run_models_origin.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="527">
-                  <caret line="618" column="78" selection-start-line="618" selection-start-column="78" selection-end-line="618" selection-end-column="78" />
+                <state relative-caret-position="675">
+                  <caret line="144" column="43" lean-forward="true" selection-start-line="144" selection-start-column="43" selection-end-line="144" selection-end-column="43" />
+                  <folding>
+                    <element signature="e#2570#2993#2" />
+                    <element signature="e#3026#3371#2" />
+                    <element signature="e#3412#3780#2" />
+                    <element signature="e#4248#4593#2" />
+                    <element signature="e#4634#5002#2" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -52,23 +41,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/neural_persona/models/ladder.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="645">
-                  <caret line="166" column="83" lean-forward="true" selection-start-line="166" selection-start-column="83" selection-end-line="166" selection-end-column="83" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/environments/environments.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-360">
-                  <caret line="221" selection-start-line="221" selection-end-line="221" />
-                  <folding>
-                    <element signature="e#0#51#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="261">
+                  <caret line="150" column="43" selection-start-line="150" selection-start-column="43" selection-end-line="150" selection-end-column="43" />
                 </state>
               </provider>
             </entry>
@@ -89,8 +66,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/neural_persona/modules/vae/ladder.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="532">
-                  <caret line="26" column="23" selection-start-line="26" selection-start-column="23" selection-end-line="26" selection-end-column="23" />
+                <state relative-caret-position="268">
+                  <caret line="36" column="32" selection-start-line="36" selection-start-column="32" selection-end-line="36" selection-end-column="32" />
                   <folding>
                     <element signature="e#0#23#0" expanded="true" />
                   </folding>
@@ -167,7 +144,6 @@
         <option value="$PROJECT_DIR$/.git/tbd.py" />
         <option value="$PROJECT_DIR$/neural_persona/modules/vae/__init__.py" />
         <option value="$PROJECT_DIR$/neural_persona/modules/__init__.py" />
-        <option value="$PROJECT_DIR$/training_config/ladder.jsonnet" />
         <option value="$PROJECT_DIR$/neural_persona/modules/vae/logistic_normal.py" />
         <option value="$PROJECT_DIR$/neural_persona/common/util.py" />
         <option value="$PROJECT_DIR$/scripts/preprocess_data_e.py" />
@@ -175,6 +151,7 @@
         <option value="$PROJECT_DIR$/neural_persona/modules/vae/normal.py" />
         <option value="$PROJECT_DIR$/neural_persona/models/ladder.py" />
         <option value="$PROJECT_DIR$/neural_persona/modules/vae/ladder.py" />
+        <option value="$PROJECT_DIR$/training_config/ladder.jsonnet" />
       </list>
     </option>
   </component>
@@ -891,18 +868,18 @@
       <workItem from="1564726493298" duration="1572000" />
       <workItem from="1564773950625" duration="28621000" />
       <workItem from="1565036263351" duration="21138000" />
-      <workItem from="1565133937128" duration="11760000" />
+      <workItem from="1565133937128" duration="12428000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="107373000" />
+    <option name="totallyTimeSpent" value="108041000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="-22" width="2560" height="1462" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.15507594" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.15347722" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -1280,16 +1257,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/environments/environments.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-360">
-          <caret line="221" selection-start-line="221" selection-end-line="221" />
-          <folding>
-            <element signature="e#0#51#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/envs/py3/lib/python3.6/site-packages/overrides/overrides.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-17">
@@ -1304,13 +1271,6 @@
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../LVAE/run_models_origin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="618" column="78" selection-start-line="618" selection-start-column="78" selection-end-line="618" selection-end-column="78" />
         </state>
       </provider>
     </entry>
@@ -1334,20 +1294,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training_config/ladder.jsonnet">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="83" column="83" selection-start-line="83" selection-start-column="83" selection-end-line="83" selection-end-column="83" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/neural_persona/models/partial-gen.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="256" column="64" selection-start-line="256" selection-start-column="64" selection-end-line="256" selection-end-column="64" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/neural_persona/modules/vae/normal.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="532">
@@ -1358,19 +1304,57 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/environments/environments.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-360">
+          <caret line="221" selection-start-line="221" selection-end-line="221" />
+          <folding>
+            <element signature="e#0#51#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/neural_persona/models/ladder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="645">
-          <caret line="166" column="83" lean-forward="true" selection-start-line="166" selection-start-column="83" selection-end-line="166" selection-end-column="83" />
+        <state relative-caret-position="261">
+          <caret line="150" column="43" selection-start-line="150" selection-start-column="43" selection-end-line="150" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/neural_persona/models/partial-gen.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="457">
+          <caret line="423" column="41" selection-start-line="423" selection-start-column="41" selection-end-line="423" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../LVAE/run_models_origin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="618" column="78" selection-start-line="618" selection-start-column="78" selection-end-line="618" selection-end-column="78" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/neural_persona/modules/vae/ladder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="532">
-          <caret line="26" column="23" selection-start-line="26" selection-start-column="23" selection-end-line="26" selection-end-column="23" />
+        <state relative-caret-position="268">
+          <caret line="36" column="32" selection-start-line="36" selection-start-column="32" selection-end-line="36" selection-end-column="32" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/training_config/ladder.jsonnet">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="675">
+          <caret line="144" column="43" lean-forward="true" selection-start-line="144" selection-start-column="43" selection-end-line="144" selection-end-column="43" />
+          <folding>
+            <element signature="e#2570#2993#2" />
+            <element signature="e#3026#3371#2" />
+            <element signature="e#3412#3780#2" />
+            <element signature="e#4248#4593#2" />
+            <element signature="e#4634#5002#2" />
           </folding>
         </state>
       </provider>

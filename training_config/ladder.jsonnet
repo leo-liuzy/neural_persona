@@ -65,6 +65,7 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
             "input_dim": std.parseInt(std.extVar("P")),
             "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
          },
+
          "encoder_d2": {
             "activations": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.extVar("ENCODER_ACTIVATION")),
             "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
@@ -84,6 +85,25 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
             "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
          },
 
+         "encoder_t1": {
+            "activations": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.extVar("ENCODER_ACTIVATION")),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
+            "input_dim": std.parseInt(std.extVar("K")),
+            "num_layers": std.parseInt(std.extVar("NUM_ENCODER_LAYERS"))
+         },
+         "mean_projection_t1": {
+            "activations": std.extVar("MEAN_PROJECTION_ACTIVATION"),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
+            "input_dim": std.extVar("P"),
+            "num_layers": std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS"))
+         },
+         "log_variance_projection_t1": {
+            "activations": std.extVar("LOG_VAR_PROJECTION_ACTIVATION"),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
+            "input_dim": std.parseInt(std.extVar("P")),
+            "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
+         },
+
          "decoder1": {
             "activations": "linear",
             "hidden_dims": [std.parseInt(std.extVar("VOCAB_SIZE")) + 1],
@@ -95,6 +115,18 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
             "hidden_dims": [std.parseInt(std.extVar("P"))],
             "input_dim": std.parseInt(std.extVar("K")),
             "num_layers": 1
+         },
+         "mean_projection_dec2": {
+            "activations": std.extVar("MEAN_PROJECTION_ACTIVATION"),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
+            "input_dim": std.extVar("P"),
+            "num_layers": std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS"))
+         },
+         "log_variance_projection_dec2": {
+            "activations": std.extVar("LOG_VAR_PROJECTION_ACTIVATION"),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
+            "input_dim": std.parseInt(std.extVar("P")),
+            "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
          },
          "type": "normal"
       }
