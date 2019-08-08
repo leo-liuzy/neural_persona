@@ -2,7 +2,7 @@ local CUDA_DEVICE = std.parseInt(std.extVar("CUDA_DEVICE"));
 
 local BASE_READER(LAZY, USE_DOC_INFO) = {
   "lazy": LAZY == 1,
-  "type": "ladder",
+  "type": "partialgen_reader",
   "use_doc_info": USE_DOC_INFO == 1
 };
 

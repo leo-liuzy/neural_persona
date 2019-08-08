@@ -129,7 +129,7 @@ class LadderVAE(Model):
             var = torch.zeros(1, self.num_topic).fill_(prior['var'])
             sigma = torch.sqrt(var)
             log_var = var.log()
-
+        
         elif prior['type'] == "laplace-approx":
             a = torch.zeros(1, self.num_topic).fill_(prior['alpha'])
             mu = a.log() - torch.mean(a.log(), 1)
