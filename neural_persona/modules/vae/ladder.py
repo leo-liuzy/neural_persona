@@ -2,11 +2,13 @@ from typing import Dict
 import os
 import torch
 from allennlp.modules import FeedForward
+from ipdb import set_trace as bp
 from overrides import overrides
 
 from neural_persona.common.util import normal_kl, create_trainable_BatchNorm1d, EPSILON
 from allennlp.models import Model
 from neural_persona.modules.vae.vae import VAE
+
 
 @VAE.register("ladder")
 class LadderVAE(Model):
@@ -129,7 +131,7 @@ class LadderVAE(Model):
             var = torch.zeros(1, self.num_topic).fill_(prior['var'])
             sigma = torch.sqrt(var)
             log_var = var.log()
-        
+
         elif prior['type'] == "laplace-approx":
             a = torch.zeros(1, self.num_topic).fill_(prior['alpha'])
             mu = a.log() - torch.mean(a.log(), 1)
@@ -157,6 +159,7 @@ class LadderVAE(Model):
         of the distribution.
         """
         output = {}
+        bp()
         # bottom-up inference -- q(z_2 | x)
         d_1 = self.estimate_params(input_vector, self.mean_projection_d1, self.log_variance_projection_d1,
                                    self.mean_bn_d1, self.log_var_bn_d1)
