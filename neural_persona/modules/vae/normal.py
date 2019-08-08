@@ -96,10 +96,12 @@ class Normal(VAE):
         theta = output["theta"]
         # self._decoder.weight (output_dim x input_dim)
         beta = self._decoder.weight.t()
-        if self._apply_batchnorm_on_decoder:
-            beta = self.decoder_bn(beta)
         if self._stochastic_beta:
             beta = torch.nn.functional.softmax(beta, dim=1)
+            # beta = torch.nn.functional.tanh(beta)
+            # beta = torch.nn.functional.sigmoid(beta)
+        if self._apply_batchnorm_on_decoder:
+            beta = self.decoder_bn(beta)
         reconstruction = theta @ beta
         output["reconstruction"] = reconstruction
 
@@ -133,7 +135,7 @@ class Normal(VAE):
         mu, log_var = params["mean"], params["log_variance"]  # pylint: disable=C0103
         # bp()
         negative_kl_divergence = -normal_kl((mu, log_var), (self.p_mu, self.p_log_var))
-        # bp()
+        bp()
         return negative_kl_divergence
 
     @overrides

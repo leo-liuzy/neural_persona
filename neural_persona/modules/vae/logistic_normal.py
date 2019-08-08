@@ -52,6 +52,25 @@ class LogisticNormal(VAE):
 
         self.latent_dim = mean_projection.get_output_dim()
         
+        # self.prior = prior
+        # if prior['type'] == "normal":
+        #    if 'mu' not in prior or 'var' not in prior:
+        #          raise Exception("MU, VAR undefined for normal")
+        #     p_mu = torch.zeros(1, self.latent_dim).fill_(prior['mu'])
+        #     p_var = torch.zeros(1, self.latent_dim).fill_(prior['var'])
+        #     p_log_var = p_var.log()
+        # elif prior['type'] == "laplace-approx":
+        #     a = torch.zeros(1, self.latent_dim).fill_(prior['alpha'])
+        #     p_mu = a.log() - torch.mean(a.log(), 1)
+        #     p_var = 1.0 / a * (1 - 2.0 / self.latent_dim) + 1.0 / self.latent_dim * torch.mean(1 / a)
+        #     p_log_var = p_var.log()
+        # else:
+        #     raise Exception("Invalid/Undefined prior!")
+       
+        # parameters of prior distribution are not trainable
+        # self.register_buffer("p_mu", p_mu)
+        # self.register_buffer("p_log_var", p_log_var)
+        
         # If specified, established batchnorm for both mean and log variance.
         self._apply_batchnorm = apply_batchnorm
         if apply_batchnorm:
@@ -84,6 +103,12 @@ class LogisticNormal(VAE):
         # bp()
         output = self.generate_latent_code(input_repr)
         theta = output["theta"]
+        # beta = self._decoder.weight.t()
+        # if self._apply_batchnorm_on_decoder:
+        #     beta = self.decoder_bn(beta)
+        # if self._stochastic_beta:
+        #     beta = torch.softmax(beta, dim=1)
+        # reconstruction = theta @ beta
         reconstruction = self._decoder(theta)
         output["reconstruction"] = reconstruction
 
@@ -101,7 +126,7 @@ class LogisticNormal(VAE):
             mean = self.mean_bn(mean)  # pylint: disable=C0103
             log_var = self.log_var_bn(log_var)  # pylint: disable=C0103
 
-        sigma = torch.sqrt(torch.exp(log_var))  # log_var is log (sigma^2).
+        sigma = torch.sqrt(torch.exp(log_var))  # log_var is actually log (variance^2).
 
         return {
                 "mean": mean,

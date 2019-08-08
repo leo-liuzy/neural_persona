@@ -5,11 +5,11 @@ from allennlp.modules import FeedForward
 from overrides import overrides
 
 from neural_persona.common.util import normal_kl, create_trainable_BatchNorm1d, EPSILON
+from allennlp.models import Model
 from neural_persona.modules.vae.vae import VAE
 
-
 @VAE.register("ladder")
-class LadderVAE(VAE):
+class LadderVAE(Model):
     """
     A Variational Autoencoder with 1 hidden layer and a Normal prior. This is a generalization of LogitNormal
     So far this class support:
@@ -20,9 +20,9 @@ class LadderVAE(VAE):
     def __init__(self,
                  vocab,
                  encoder_d1: FeedForward,
+                 encoder_d2: FeedForward,
                  mean_projection_d1: FeedForward,
                  log_variance_projection_d1: FeedForward,
-                 encoder_d2: FeedForward,
                  mean_projection_d2: FeedForward,
                  log_variance_projection_d2: FeedForward,
                  encoder_t1: FeedForward,
@@ -30,6 +30,8 @@ class LadderVAE(VAE):
                  log_variance_projection_t1: FeedForward,
                  decoder1: FeedForward,
                  decoder2: FeedForward,
+                 mean_projection_dec2: FeedForward,
+                 log_variance_projection_dec2: FeedForward,
                  prior: Dict = {"type": "normal", "mu": 0, "var": 1},
                  apply_batchnorm_on_normal: bool = False,
                  apply_batchnorm_on_decoder: bool = False,
@@ -52,6 +54,8 @@ class LadderVAE(VAE):
                                          bias=False)
         self._decoder2 = torch.nn.Linear(decoder2.get_input_dim(), decoder2.get_output_dim(),
                                          bias=False)
+        self.mean_projection_dec2 = mean_projection_dec2
+        self.log_variance_projection_dec2 = log_variance_projection_dec2
 
         self._z_dropout = torch.nn.Dropout(z_dropout)
 
@@ -59,24 +63,8 @@ class LadderVAE(VAE):
         self.num_topic = mean_projection_d2.get_output_dim()
 
         self.prior = prior
-        if prior['type'] == "normal":
-            if 'mu' not in prior or 'var' not in prior:
-                raise Exception("MU, VAR undefined for normal")
-            p_mu = torch.zeros(1, self.num_topic).fill_(prior['mu'])
-            p_var = torch.zeros(1, self.num_topic).fill_(prior['var'])
-            p_log_var = p_var.log()
-
-        elif prior['type'] == "laplace-approx":
-            a = torch.zeros(1, self.num_topic).fill_(prior['alpha'])
-            p_mu = a.log() - torch.mean(a.log(), 1)
-            p_var = 1.0 / a * (1 - 2.0 / self.num_topic) + 1.0 / self.num_topic * torch.mean(1 / a)
-            p_log_var = p_var.log()
-        else:
-            raise Exception("Invalid/Undefined prior!")
-
-        # parameters of prior distribution are not trainable
-        self.register_buffer("p_mu", p_mu)
-        self.register_buffer("p_log_var", p_log_var)
+        self.p_params = None
+        self.initialize_prior(prior)
 
         # If specified, established batchnorm for both mean and log variance.
         self._apply_batchnorm_on_normal = apply_batchnorm_on_normal
@@ -92,7 +80,6 @@ class LadderVAE(VAE):
                                                               weight_learnable=batchnorm_weight_learnable,
                                                               bias_learnable=batchnorm_bias_learnable,
                                                               eps=0.001, momentum=0.001, affine=True)
-
             self.mean_bn_d2 = create_trainable_BatchNorm1d(self.num_topic,
                                                            weight_learnable=batchnorm_weight_learnable,
                                                            bias_learnable=batchnorm_bias_learnable,
@@ -101,14 +88,22 @@ class LadderVAE(VAE):
                                                               weight_learnable=batchnorm_weight_learnable,
                                                               bias_learnable=batchnorm_bias_learnable,
                                                               eps=0.001, momentum=0.001, affine=True)
-            self.mean_bn_t1 = create_trainable_BatchNorm1d(self.num_topic,
+            self.mean_bn_t1 = create_trainable_BatchNorm1d(self.num_persona,
                                                            weight_learnable=batchnorm_weight_learnable,
                                                            bias_learnable=batchnorm_bias_learnable,
                                                            eps=0.001, momentum=0.001, affine=True)
-            self.log_var_bn_t1 = create_trainable_BatchNorm1d(self.num_topic,
+            self.log_var_bn_t1 = create_trainable_BatchNorm1d(self.num_persona,
                                                               weight_learnable=batchnorm_weight_learnable,
                                                               bias_learnable=batchnorm_bias_learnable,
                                                               eps=0.001, momentum=0.001, affine=True)
+            self.mean_bn_dec2 = create_trainable_BatchNorm1d(self.num_persona,
+                                                             weight_learnable=batchnorm_weight_learnable,
+                                                             bias_learnable=batchnorm_bias_learnable,
+                                                             eps=0.001, momentum=0.001, affine=True)
+            self.log_var_bn_dec2 = create_trainable_BatchNorm1d(self.num_persona,
+                                                                weight_learnable=batchnorm_weight_learnable,
+                                                                bias_learnable=batchnorm_bias_learnable,
+                                                                eps=0.001, momentum=0.001, affine=True)
 
         # If specified, established batchnorm for reconstruction matrix, applying batch norm across vocabulary
         self._apply_batchnorm_on_decoder = apply_batchnorm_on_decoder
@@ -126,33 +121,86 @@ class LadderVAE(VAE):
         # If specified, constrain each topic to be a distribution over vocabulary
         self._stochastic_beta = stochastic_beta
 
+    def initialize_prior(self, prior: Dict):
+        if prior['type'] == "normal":
+            if 'mu' not in prior or 'var' not in prior:
+                raise Exception("MU, VAR undefined for normal")
+            mu = torch.zeros(1, self.num_topic).fill_(prior['mu'])
+            var = torch.zeros(1, self.num_topic).fill_(prior['var'])
+            sigma = torch.sqrt(var)
+            log_var = var.log()
+
+        elif prior['type'] == "laplace-approx":
+            a = torch.zeros(1, self.num_topic).fill_(prior['alpha'])
+            mu = a.log() - torch.mean(a.log(), 1)
+            var = 1.0 / a * (1 - 2.0 / self.num_topic) + 1.0 / self.num_topic * torch.mean(1 / a)
+            sigma = torch.sqrt(var)
+            log_var = var.log()
+        else:
+            raise Exception("Invalid/Undefined prior!")
+
+        # parameters of prior distribution are not trainable
+        self.register_buffer("p_mu", mu)
+        self.register_buffer("p_var", sigma)
+        self.register_buffer("p_log_var", log_var)
+        self.p_params = {
+            "mean": mu,
+            "sigma": sigma,
+            "log_variance": log_var
+        }
 
     @overrides
-    def forward(self, input_repr: torch.FloatTensor):  # pylint: disable = W0221
+    def forward(self, input_vector: torch.FloatTensor):  # pylint: disable = W0221
         """
         Given the input representation, produces the reconstruction from theta
         as well as the negative KL-divergence, theta itself, and the parameters
         of the distribution.
         """
-        # bottom-up inference -- q(z_i | z_{i-1})
-        d_1 = self.estimate_params(input_repr, self.mean_projection_d1, self.log_variance_projection_d1,
+        output = {}
+        # bottom-up inference -- q(z_2 | x)
+        d_1 = self.estimate_params(input_vector, self.mean_projection_d1, self.log_variance_projection_d1,
                                    self.mean_bn_d1, self.log_var_bn_d1)
         d_2 = self.estimate_params(d_1['mean'], self.mean_projection_d2, self.log_variance_projection_d2,
                                    self.mean_bn_d2, self.log_var_bn_d2)
+        output["negative_kl_divergence"] = self.compute_negative_kld(d_2, self.p_params)
+
+        # sample an inferred z_2
         z_2 = self.reparameterize(params=d_2)
+        z_2 = self._z_dropout(z_2)
+
+        # get topic representation
+        theta_t = torch.softmax(z_2, dim=-1)
+        output["theta_t"] = theta_t
+
+        # top-down inference -- q(z_1 | z_2, x) TODO: should I use theta_t or z_1 to infer t_1?
         t_1 = self.estimate_params(z_2, self.mean_projection_t1, self.log_variance_projection_t1,
                                    self.mean_bn_t1, self.log_var_bn_t1)
-        z_1_params = self.merge_normal(param_d=d_1, param_t=t_1)
+        qz_1_params = self.merge_normal(param_d=d_1, param_t=t_1)
 
-
-        theta = output["theta"]
-        # self._decoder.weight (output_dim x input_dim)
-        beta = self._decoder.weight.t()
+        # decode topic representation to input to calculate persona representation
+        beta_t = self._decoder2.weight.t()
         if self._apply_batchnorm_on_decoder:
-            beta = self.decoder_bn(beta)
+            beta_t = self.decoder_bn2(beta_t)
         if self._stochastic_beta:
-            beta = torch.nn.functional.softmax(beta, dim=1)
-        reconstruction = theta @ beta
+            beta_t = torch.nn.functional.softmax(beta_t, dim=1)
+        h_1 = theta_t @ beta_t
+        pz_1_params = self.estimate_params(h_1, self.mean_projection_dec2, self.log_variance_projection_dec2,
+                                           self.mean_bn_dec2, self.log_var_bn_dec2)
+
+        output["negative_kl_divergence"] += self.compute_negative_kld(qz_1_params, pz_1_params)
+
+        # turn inferred z_1 to persona representation
+        z_1 = self.reparameterize(qz_1_params)
+        z_1 = self._z_dropout(z_1)
+        theta_p = torch.softmax(z_1, dim=-1)
+
+        # decode persona representation to word reconstruction
+        beta_p = self._decoder1.weight.t()
+        if self._apply_batchnorm_on_decoder:
+            beta_p = self.decoder_bn1(beta_p)
+        if self._stochastic_beta:
+            beta_p = torch.nn.functional.softmax(beta_p, dim=1)
+        reconstruction = theta_p @ beta_p
         output["reconstruction"] = reconstruction
 
         return output
@@ -176,7 +224,7 @@ class LadderVAE(VAE):
 
         var = 1 / (precision_d + precision_t)
         sigma = torch.sqrt(var)
-        log_var = torch.log(var + 1e-12)
+        log_var = torch.log(var + EPSILON)
 
         return {
                 "mean": mu,
@@ -210,12 +258,12 @@ class LadderVAE(VAE):
                 }
 
     @overrides
-    def compute_negative_kld(self, params: Dict):
+    def compute_negative_kld(self, q_params: Dict, p_params: Dict):
         """
         Compute the closed-form solution for negative KL-divergence for Gaussians.
         """
-        mu, log_var = params["mean"], params["log_variance"]  # pylint: disable=C0103
-        negative_kl_divergence = normal_kl((mu, log_var), (self.p_mu, self.p_log_var))
+        mu, log_var = q_params["mean"], q_params["log_variance"]  # pylint: disable=C0103
+        negative_kl_divergence = normal_kl((mu, log_var), (p_params["mean"], p_params["log_variance"]))
         return negative_kl_divergence
 
     def reparameterize(self, params):
@@ -240,33 +288,10 @@ class LadderVAE(VAE):
         return z
 
     @overrides
-    def generate_latent_code(self, input_repr: torch.Tensor):
-        """
-        Given an input vector, produces the latent encoding z, followed by the
-        mean and log variance of the variational distribution produced.
-
-        z is the result of the reparameterization trick.
-        (https://arxiv.org/abs/1312.6114)
-        """
-        params = self.estimate_params(input_repr)
-        negative_kl_divergence = self.compute_negative_kld(params)
-        z = self.reparameterize(params)
-        # Apply dropout to theta.
-        theta = self._z_dropout(z)
-
-        # Normalize theta.
-        theta = torch.softmax(theta, dim=-1)
-
-        return {
-                "theta": theta,
-                "params": params,
-                "negative_kl_divergence": negative_kl_divergence
-                }
-
-    @overrides
-    def encode(self, input_vector: torch.Tensor):
-        return self.encoder_d1(input_vector)
-
-    @overrides
-    def get_beta(self):
-        return self._decoder._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
+    def get_beta(self, level: str = "p"):
+        if level == "p":
+            return self._decoder1._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
+        elif level == "t":
+            return self._decoder2._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
+        else:
+            ValueError()

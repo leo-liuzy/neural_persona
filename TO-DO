@@ -3,6 +3,7 @@ draw the average of the metrics  x
 debug mini-doc model    x
 run mini-doc model and observe   x
 observe entity coverage     x
+re-run experiment partial-gen.DocInfo1.lr0.001.BNonNormal1.BNonDecoder0.StochasticBeta0.PrecalBackground.UpdateBackground.BNbiasLearnable1 JUST for seed NumRepeat0_6  x
 run evaluation metric on nyt-dataset
 run david's model on nyt-dataset
 get ladder vae model working on nyt-dataset

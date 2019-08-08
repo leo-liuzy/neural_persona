@@ -132,10 +132,10 @@ PARTIALGEN = {
         "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
         "KL_ANNEALING": "linear",
         ##############################################################
-        "STOCHASTIC_BETA": 0,
+        "STOCHASTIC_BETA": 1,
         "BATCHNORM_WEIGHT_LEARNABLE": 0,
         "BATCHNORM_BIAS_LEARNABLE": 1,
-        "APPLY_BATCHNORM_ON_NORMAL": 0,
+        "APPLY_BATCHNORM_ON_NORMAL": 1,
         "APPLY_BATCHNORM_ON_DECODER": 0,
         "APPLY_BATCHNORM_ON_RECON": 1,
         "USE_BACKGROUND": 1,
@@ -162,17 +162,16 @@ PARTIALGEN = {
         "NUM_LOG_VAR_PROJECTION_LAYERS": 1,
         "SEED": 34543,
         "Z_DROPOUT": 0.49,
-        "LEARNING_RATE": 0.00002,
+        "LEARNING_RATE": 0.001,
         "TRACK_NPMI": True,
         "CUDA_DEVICE": 0,
-        "UPDATE_BACKGROUND_FREQUENCY": 0,
+        "UPDATE_BACKGROUND_FREQUENCY": 1,
         "VOCAB_SIZE": os.environ.get("VOCAB_SIZE", 30000),
         "APPLY_BATCHNORM": 1,
         "APPLY_BATCHNORM_1": 0,
         "BATCH_SIZE": 64,
         "VALIDATION_METRIC": "+npmi"
 }
-
 
 
 PARTIALGEN_GLOB = {
@@ -182,7 +181,7 @@ PARTIALGEN_GLOB = {
         "STOCHASTIC_BETA": 0,
         "BATCHNORM_WEIGHT_LEARNABLE": 0,
         "BATCHNORM_BIAS_LEARNABLE": 1,
-        "APPLY_BATCHNORM_ON_NORMAL": 0,
+        "APPLY_BATCHNORM_ON_NORMAL": 1,
         "APPLY_BATCHNORM_ON_DECODER": 0,
         "APPLY_BATCHNORM_ON_RECON": 1,
         "USE_BACKGROUND": 1,
@@ -209,16 +208,17 @@ PARTIALGEN_GLOB = {
         "NUM_LOG_VAR_PROJECTION_LAYERS": 1,
         "SEED": 34543,
         "Z_DROPOUT": 0.49,
-        "LEARNING_RATE": 0.00021,
+        "LEARNING_RATE": 0.001,
         "TRACK_NPMI": True,
         "CUDA_DEVICE": 0,
-        "UPDATE_BACKGROUND_FREQUENCY": 0,
+        "UPDATE_BACKGROUND_FREQUENCY": 1,
         "VOCAB_SIZE": os.environ.get("VOCAB_SIZE", 30000),
         "APPLY_BATCHNORM": 1,
         "APPLY_BATCHNORM_1": 0,
         "BATCH_SIZE": 64,
         "VALIDATION_METRIC": "+npmi"
 }
+
 
 LADDER = {
         "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
@@ -272,8 +272,7 @@ ENVIRONMENTS = {
         'CLASSIFIER': CLASSIFIER,
         'AVITM': AVITM,
         'PARTIALGEN': PARTIALGEN,
-        'PARTIALGEN_GLOB': PARTIALGEN_GLOB,
-        'LADDER': LADDER
+        'PARTIALGEN_GLOB': PARTIALGEN_GLOB
 }
 
 
