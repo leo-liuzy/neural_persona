@@ -263,7 +263,7 @@ LADDER = {
         "APPLY_BATCHNORM": 1,
         "APPLY_BATCHNORM_1": 0,
         "BATCH_SIZE": 64,
-        "VALIDATION_METRIC": "loss"
+        "VALIDATION_METRIC": "+loss"
 }
 
 
