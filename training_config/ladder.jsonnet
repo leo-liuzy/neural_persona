@@ -128,7 +128,7 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
             "input_dim": std.parseInt(std.extVar("P")),
             "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
          },
-         "type": "normal"
+         "type": "ladder"
       }
    },
     "iterator": {
