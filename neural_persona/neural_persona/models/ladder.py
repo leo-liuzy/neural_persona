@@ -433,6 +433,7 @@ class Ladder(Model):
         negative_kl_divergence = variational_output['negative_kl_divergence']
 
         # Compute ELBO
+        # bp()
         elbo = negative_kl_divergence * self._kld_weight + reconstruction_loss
 
         loss = -torch.mean(elbo)
@@ -443,10 +444,10 @@ class Ladder(Model):
 
         # Keep track of internal states for use downstream
         activations: List[Tuple[str, torch.FloatTensor]] = []
-        intermediate_input = embedded_tokens
-        for layer_index, layer in enumerate(self.vae.encoder._linear_layers):  # pylint: disable=protected-access
-            intermediate_input = layer(intermediate_input)
-            activations.append((f"encoder_layer_{layer_index}", intermediate_input))
+        # intermediate_input = embedded_tokens
+        # for layer_index, layer in enumerate(self.vae.encoder._linear_layers):  # pylint: disable=protected-access
+          #   intermediate_input = layer(intermediate_input)
+           #  activations.append((f"encoder_layer_{layer_index}", intermediate_input))
 
         activations.append(('theta_t', theta_t))
         activations.append(('theta_p', theta_p))
