@@ -53,6 +53,7 @@ class ExtendedVocabulary(Vocabulary):
                 for i in range(start_index, num_tokens):
                     print(mapping[i].replace('\n', '@@NEWLINE@@'), file=token_file)
 
+
 @Vocabulary.register("vocabulary_with_vampire")
 class VocabularyWithPretrainedVAE(Vocabulary):
     """

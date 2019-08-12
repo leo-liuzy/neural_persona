@@ -11,7 +11,7 @@ from neural_persona.modules.vae.vae import VAE
 
 
 @VAE.register("ladder")
-class LadderVAE(Model):
+class LadderVAE(VAE):
     """
     A Variational Autoencoder with 1 hidden layer and a Normal prior. This is a generalization of LogitNormal
     So far this class support:

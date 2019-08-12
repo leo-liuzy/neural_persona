@@ -174,11 +174,12 @@ PARTIALGEN = {
 }
 
 
+
 PARTIALGEN_GLOB = {
         "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
         "KL_ANNEALING": "linear",
         ##############################################################
-        "STOCHASTIC_BETA": 0,
+        "STOCHASTIC_BETA": 1,
         "BATCHNORM_WEIGHT_LEARNABLE": 0,
         "BATCHNORM_BIAS_LEARNABLE": 1,
         "APPLY_BATCHNORM_ON_NORMAL": 1,
@@ -211,7 +212,7 @@ PARTIALGEN_GLOB = {
         "LEARNING_RATE": 0.001,
         "TRACK_NPMI": True,
         "CUDA_DEVICE": 0,
-        "UPDATE_BACKGROUND_FREQUENCY": 1,
+        "UPDATE_BACKGROUND_FREQUENCY": 0,
         "VOCAB_SIZE": os.environ.get("VOCAB_SIZE", 30000),
         "APPLY_BATCHNORM": 1,
         "APPLY_BATCHNORM_1": 0,
@@ -219,15 +220,14 @@ PARTIALGEN_GLOB = {
         "VALIDATION_METRIC": "+npmi"
 }
 
-
 LADDER = {
         "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
         "KL_ANNEALING": "linear",
         ##############################################################
-        "STOCHASTIC_BETA": 0,
+        "STOCHASTIC_BETA": 1,
         "BATCHNORM_WEIGHT_LEARNABLE": 0,
         "BATCHNORM_BIAS_LEARNABLE": 1,
-        "APPLY_BATCHNORM_ON_NORMAL": 0,
+        "APPLY_BATCHNORM_ON_NORMAL": 1,
         "APPLY_BATCHNORM_ON_DECODER": 0,
         "APPLY_BATCHNORM_ON_RECON": 1,
         "USE_BACKGROUND": 1,
@@ -238,8 +238,7 @@ LADDER = {
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
         "LINEAR_SCALING": 1000,
-        "K":  25,  # num_topics
-        "P":  50,  # num_persona
+        "VAE_HIDDEN_DIM":  81,
         "ADDITIONAL_UNLABELED_DATA_PATH": None,
         "TRAIN_PATH": os.environ["DATA_DIR"] + "/train.npz",
         "DEV_PATH": os.environ["DATA_DIR"] + "/dev.npz",
@@ -255,7 +254,7 @@ LADDER = {
         "NUM_LOG_VAR_PROJECTION_LAYERS": 1,
         "SEED": 34543,
         "Z_DROPOUT": 0.49,
-        "LEARNING_RATE": 0.00002,
+        "LEARNING_RATE": 0.001,
         "TRACK_NPMI": True,
         "CUDA_DEVICE": 0,
         "UPDATE_BACKGROUND_FREQUENCY": 0,
@@ -263,7 +262,7 @@ LADDER = {
         "APPLY_BATCHNORM": 1,
         "APPLY_BATCHNORM_1": 0,
         "BATCH_SIZE": 64,
-        "VALIDATION_METRIC": "+npmi"
+        "VALIDATION_METRIC": "loss"
 }
 
 

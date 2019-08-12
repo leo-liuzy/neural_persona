@@ -24,7 +24,7 @@ from torch.nn.functional import log_softmax
 
 from neural_persona.common.util import (compute_background_log_frequency, load_sparse,
                                         read_json)
-from neural_persona.modules import VAE
+from neural_persona.modules import VAE, LadderVAE
 from neural_persona.modules.encoder import Encoder
 from neural_persona.common.util import create_trainable_BatchNorm1d
 
@@ -75,7 +75,7 @@ class Ladder(Model):
     def __init__(self,
                  vocab: Vocabulary,
                  bow_embedder: TokenEmbedder,
-                 vae: VAE,
+                 vae: LadderVAE,
                  apply_batchnorm_on_recon: bool = False,
                  batchnorm_weight_learnable: bool = False,
                  batchnorm_bias_learnable: bool = True,
@@ -239,7 +239,7 @@ class Ladder(Model):
 
             # Logs the newest set of topics.
             if self.track_topics:
-                topic_table = tabulate(self.extract_topics(self.vae.get_beta()), headers=["Topic #", "Words"])
+                topic_table = tabulate(self.extract_topics(self.vae.get_beta(level="p")), headers=["Topic #", "Words"])
                 topic_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "topics")
                 if not os.path.exists(topic_dir):
                     os.mkdir(topic_dir)
@@ -250,7 +250,7 @@ class Ladder(Model):
 
             if self.track_npmi:
                 if self._ref_vocab:
-                    topics = self.extract_topics(self.vae.get_beta())
+                    topics = self.extract_topics(self.vae.get_beta(level="p"))
                     self._cur_npmi = self.compute_npmi(topics[1:])
             self._metric_epoch_tracker = epoch_num[0]
 
@@ -385,7 +385,8 @@ class Ladder(Model):
         """
 
         # For easy transfer to the GPU.
-        self.device = self.vae.get_beta().device  # pylint: disable=W0201
+        self.device = self.vae.get_beta(level="p").device  # pylint: disable=W0201
+        self.device = self.vae.get_beta(level="t").device  # pylint: disable=W0201
 
         output_dict = {}
 
@@ -417,7 +418,7 @@ class Ladder(Model):
         # Reconstructed bag-of-words from the VAE with background bias.
         reconstructed_bow = variational_output['reconstruction'] + self._background_freq
 
-        # Apply batchnorm to the reconstructed bag of words.
+        # Apply batch_norm to the reconstructed bag of words.
         # Helps with word variety in topic space.
 
         reconstructed_bow = self.bow_bn(reconstructed_bow) if self._apply_batchnorm_on_recon else reconstructed_bow
@@ -437,7 +438,8 @@ class Ladder(Model):
         loss = -torch.mean(elbo)
 
         output_dict['loss'] = loss
-        theta = variational_output['theta']
+        theta_t = variational_output['theta_t']
+        theta_p = variational_output['theta_p']
 
         # Keep track of internal states for use downstream
         activations: List[Tuple[str, torch.FloatTensor]] = []
@@ -446,7 +448,8 @@ class Ladder(Model):
             intermediate_input = layer(intermediate_input)
             activations.append((f"encoder_layer_{layer_index}", intermediate_input))
 
-        activations.append(('theta', theta))
+        activations.append(('theta_t', theta_t))
+        activations.append(('theta_p', theta_p))
 
         output_dict['activations'] = activations
 
