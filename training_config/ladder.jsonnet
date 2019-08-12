@@ -19,7 +19,7 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
       "directory_path": std.extVar("VOCABULARY_DIRECTORY")
    },
    "model": {
-      "type": "partial-gen",
+      "type": "ladder",
       "bow_embedder": {
          "type": "bag_of_word_counts",
          "vocab_namespace": "ladder",
