@@ -6,6 +6,7 @@ from operator import is_not
 from typing import Dict, List, Optional, Tuple, Union
 from ipdb import set_trace as bp
 import numpy as np
+import seaborn as sns
 import torch
 
 from allennlp.common.checks import ConfigurationError
@@ -95,6 +96,7 @@ class VAMPIRE(Model):
                  update_background_freq: bool = False,
                  track_topics: bool = True,
                  track_npmi: bool = True,
+                 visual_topic: bool = True,
                  initializer: InitializerApplicator = InitializerApplicator(),
                  regularizer: Optional[RegularizerApplicator] = None) -> None:
         super().__init__(vocab, regularizer)
@@ -105,6 +107,7 @@ class VAMPIRE(Model):
         self.vae = vae
         self.track_topics = track_topics
         self.track_npmi = track_npmi
+        self.visual_topic = visual_topic
         self.vocab_namespace = "vampire"
         self._update_background_freq = update_background_freq
         # bp()
@@ -236,7 +239,11 @@ class VAMPIRE(Model):
 
             # Logs the newest set of topics.
             if self.track_topics:
-                topic_table = tabulate(self.extract_topics(self.vae.get_beta()), headers=["Topic #", "Words"])
+                k = 20
+                # (K, vocabulary size)
+                beta = torch.softmax(self.vae.get_beta(), dim=1)
+
+                topic_table = tabulate(self.extract_topics(beta, k=k), headers=["Topic #", "Words"])
                 topic_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "topics")
                 if not os.path.exists(topic_dir):
                     os.mkdir(topic_dir)
@@ -244,6 +251,17 @@ class VAMPIRE(Model):
 
                 # Topics are saved for the previous epoch.
                 topic_filepath = os.path.join(ser_dir, "topics", "topics_{}.txt".format(self._metric_epoch_tracker))
+                topic_filepath_png = os.path.join(ser_dir, "topics", "topics_{}.png".format(self._metric_epoch_tracker))
+                if self.visual_topic:
+                    _, indices = torch.topk(beta, k=2, dim=1)
+                    tmp = beta.scatter(1, indices, torch.zeros_like(beta))
+                    mask = tmp == 0
+                    result = beta * mask.float()
+                    ax = sns.heatmap(result, cmap="YlGn")
+                    ax.set_xlabel("word idx")
+                    ax.set_ylabel("topic idx")
+                    figure = ax.get_figure()
+                    figure.savefig(topic_filepath_png)
                 with open(topic_filepath, 'w+') as file_:
                     file_.write(topic_table)
 
