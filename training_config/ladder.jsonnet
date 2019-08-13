@@ -39,6 +39,7 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
       "background_data_path": std.extVar("BACKGROUND_DATA_PATH"),
       "update_background_freq": std.parseInt(std.extVar("UPDATE_BACKGROUND_FREQUENCY")) == 1,
       "track_npmi": std.parseInt(std.extVar("TRACK_NPMI")) == 1,
+      "track_persona": std.parseInt(std.extVar("TRACK_PERSONA")) == 1,
       "vae": {
          "z_dropout": std.extVar("Z_DROPOUT"),
          "prior": std.parseJson(std.extVar("PRIOR")),

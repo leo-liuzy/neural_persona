@@ -90,6 +90,7 @@ class Ladder(Model):
                  background_data_path: str = None,
                  update_background_freq: bool = False,
                  track_topics: bool = True,
+                 track_persona: bool = True,
                  track_npmi: bool = True,
                  initializer: InitializerApplicator = InitializerApplicator(),
                  regularizer: Optional[RegularizerApplicator] = None) -> None:
@@ -101,6 +102,7 @@ class Ladder(Model):
         self.vae = vae
         self.track_topics = track_topics
         self.track_npmi = track_npmi
+        self.track_persona = track_persona
         self.vocab_namespace = "partial-gen"
         self._update_background_freq = update_background_freq
 
@@ -245,6 +247,7 @@ class Ladder(Model):
                     os.mkdir(topic_dir)
                 ser_dir = os.path.dirname(self.vocab.serialization_dir)
                 topic_filepath = os.path.join(ser_dir, "topics", "topics_{}.txt".format(epoch_num[0]))
+
                 with open(topic_filepath, 'w+') as file_:
                     file_.write(topic_table)
 
@@ -397,7 +400,7 @@ class Ladder(Model):
 
         # if you supply input as token IDs, embed them into bag-of-word-counts with a token embedder
         if isinstance(tokens, dict):
-            embedded_tokens = (self._bag_of_words_embedder(tokens['tokens']).to(device=self.device))
+            embedded_tokens = self._bag_of_words_embedder(tokens['tokens']).to(device=self.device)
         else:
             embedded_tokens = tokens
 
@@ -432,7 +435,7 @@ class Ladder(Model):
         # KL-divergence that is returned is the mean of the batch by default.
         negative_kl_divergence = variational_output['negative_kl_divergence']
 
-        # Compute ELBO
+        # Compute ELBo
         elbo = negative_kl_divergence * self._kld_weight + reconstruction_loss
 
         loss = -torch.mean(elbo)

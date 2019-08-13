@@ -257,6 +257,7 @@ LADDER = {
         "Z_DROPOUT": 0.49,
         "LEARNING_RATE": 0.001,
         "TRACK_NPMI": True,
+        "TRACK_PERSONA": True,
         "CUDA_DEVICE": 0,
         "UPDATE_BACKGROUND_FREQUENCY": 0,
         "VOCAB_SIZE": os.environ.get("VOCAB_SIZE", 30000),
