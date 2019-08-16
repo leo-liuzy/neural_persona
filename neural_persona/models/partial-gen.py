@@ -173,7 +173,8 @@ class PartialGen(Model):
         ``file`` : str
             path to background frequency file
         """
-        background_freq = compute_background_log_frequency(self.vocab, self.vocab_namespace, file_)
+        # background_freq = compute_background_log_frequency(self.vocab, self.vocab_namespace, file_)
+        background_freq = torch.zeros(self.vocab.get_vocab_size(self.vocab_namespace))
         return torch.nn.Parameter(background_freq, requires_grad=self._update_background_freq)
 
     @staticmethod

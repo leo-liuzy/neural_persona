@@ -8,6 +8,9 @@ from ipdb import set_trace as bp
 import numpy as np
 import seaborn as sns
 import torch
+import itertools
+from collections import Counter
+import pandas
 
 from allennlp.common.checks import ConfigurationError
 from allennlp.common.file_utils import cached_path
@@ -242,26 +245,43 @@ class VAMPIRE(Model):
                 k = 20
                 # (K, vocabulary size)
                 beta = torch.softmax(self.vae.get_beta(), dim=1)
-
-                topic_table = tabulate(self.extract_topics(beta, k=k), headers=["Topic #", "Words"])
+                topics = self.extract_topics(beta, k=k)
+                topic_table = tabulate(topics, headers=["Topic #", "Words"])
                 topic_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "topics")
                 if not os.path.exists(topic_dir):
                     os.mkdir(topic_dir)
                 ser_dir = os.path.dirname(self.vocab.serialization_dir)
-
+                # bp()
                 # Topics are saved for the previous epoch.
                 topic_filepath = os.path.join(ser_dir, "topics", "topics_{}.txt".format(self._metric_epoch_tracker))
-                topic_filepath_png = os.path.join(ser_dir, "topics", "topics_{}.png".format(self._metric_epoch_tracker))
+                words = list(itertools.chain(*[words for _, words in topics[1:]]))
                 if self.visual_topic:
-                    _, indices = torch.topk(beta, k=2, dim=1)
-                    tmp = beta.scatter(1, indices, torch.zeros_like(beta))
-                    mask = tmp == 0
-                    result = beta * mask.float()
-                    ax = sns.heatmap(result, cmap="YlGn")
-                    ax.set_xlabel("word idx")
-                    ax.set_ylabel("topic idx")
+                    top_k = 100
+                    width = top_k // 3
+                    topic_filepath_png = os.path.join(ser_dir, "topics", "topics_{}_top_{}.png".format(self._metric_epoch_tracker, top_k))
+                    word2count = Counter(words)
+                    top_k_idx2count = dict(sorted(word2count.items(), key=lambda x: x[1], reverse=True)[:top_k])
+                    df = pandas.DataFrame.from_dict(top_k_idx2count, orient='index')
+                    ax = df.plot(kind='bar')
+                    ax.tick_params(axis="x", labelsize=6)
                     figure = ax.get_figure()
-                    figure.savefig(topic_filepath_png)
+                    figure.set_figheight(6)
+                    figure.set_figwidth(width)
+                    figure.subplots_adjust(bottom=0.7)
+                    # figure.set_fontsize(4)
+                    figure.savefig(topic_filepath_png, dpi=300)
+                    figure.clf()
+                    # _, indices = torch.topk(beta, k=k, dim=1)
+                    # tmp = beta.scatter(1, indices, torch.zeros_like(beta))
+                    # mask = tmp == 0
+                    # result = beta * mask.float()
+                    # ax = sns.heatmap(result.cpu(), cmap="YlGn")
+                    # ax.set_xlabel("word idx")
+                    # ax.set_ylabel("topic idx")
+                    # figure = ax.get_figure()
+                    # figure.savefig(topic_filepath_png)
+                    # figure.clf()
+                    
                 with open(topic_filepath, 'w+') as file_:
                     file_.write(topic_table)
 

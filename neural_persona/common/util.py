@@ -92,6 +92,8 @@ def compute_background_log_frequency(vocab: Vocabulary, vocab_namespace: str, pr
             log_term_frequency[i] = precomputed_bg[token]
     assert log_term_frequency.sum().allclose(torch.ones(1))
     log_term_frequency = torch.log(log_term_frequency)
+
+    # return torch.zeros(vocab.get_vocab_size(vocab_namespace))
     return log_term_frequency
 
 

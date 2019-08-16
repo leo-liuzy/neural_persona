@@ -132,7 +132,7 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
          "type": "ladder"
       }
    },
-    "iterator": {
+   "iterator": {
       "batch_size": std.parseInt(std.extVar("BATCH_SIZE")),
       "track_epoch": true,
       "type": "basic"

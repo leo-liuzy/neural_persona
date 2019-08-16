@@ -65,8 +65,8 @@ class LadderVAE(VAE):
         self.num_topic = mean_projection_d2.get_output_dim()
 
         self.prior = prior
-
         self.p_params = None
+        # self.p_mu, self.p_sigma, self.p_log_var = None, None, None
         self.initialize_prior(prior)
 
         # If specified, established batchnorm for both mean and log variance.
@@ -146,11 +146,11 @@ class LadderVAE(VAE):
         self.register_buffer("p_mu", mu)
         self.register_buffer("p_sigma", sigma)
         self.register_buffer("p_log_var", log_var)
-        self.p_params = {
-            "mean": mu,
-            "sigma": sigma,
-            "log_variance": log_var
-        }
+        # self.p_params = {
+        #     "mean": self.p_mu,
+        #     "sigma": self.p_sigma,
+        #     "log_variance": self.p_log_var
+        # }
 
     @overrides
     def forward(self, input_vector: torch.FloatTensor):  # pylint: disable = W0221
@@ -160,13 +160,15 @@ class LadderVAE(VAE):
         of the distribution.
         """
         output = {}
-        bp()
+        # bp()
         # bottom-up inference -- q(z_2 | x)
-        d_1 = self.estimate_params(input_vector, self.mean_projection_d1, self.log_variance_projection_d1,
+        input_repr1 = self.encoder_d1(input_vector)
+        d_1 = self.estimate_params(input_repr1, self.mean_projection_d1, self.log_variance_projection_d1,
                                    self.mean_bn_d1, self.log_var_bn_d1)
-        d_2 = self.estimate_params(d_1['mean'], self.mean_projection_d2, self.log_variance_projection_d2,
+        input_repr2 = self.encoder_d2(d_1['mean'])
+        d_2 = self.estimate_params(input_repr2, self.mean_projection_d2, self.log_variance_projection_d2,
                                    self.mean_bn_d2, self.log_var_bn_d2)
-        output["negative_kl_divergence"] = self.compute_negative_kld(d_2, self.p_params)
+        output["negative_kl_divergence"] = self.compute_negative_kld(d_2, {"mean": self.p_mu, "log_variance": self.p_log_var})
 
         # sample an inferred z_2
         z_2 = self.reparameterize(params=d_2)
@@ -194,9 +196,11 @@ class LadderVAE(VAE):
         output["negative_kl_divergence"] += self.compute_negative_kld(qz_1_params, pz_1_params)
 
         # turn inferred z_1 to persona representation
-        z_1 = self.reparameterize(qz_1_params)
+        # z_1 = self.reparameterize(qz_1_params)
+        z_1 = qz_1_params["mean"]
         z_1 = self._z_dropout(z_1)
         theta_p = torch.softmax(z_1, dim=-1)
+        output["theta_p"] = theta_p
 
         # decode persona representation to word reconstruction
         beta_p = self._decoder1.weight.t()
@@ -267,7 +271,9 @@ class LadderVAE(VAE):
         Compute the closed-form solution for negative KL-divergence for Gaussians.
         """
         mu, log_var = q_params["mean"], q_params["log_variance"]  # pylint: disable=C0103
-        negative_kl_divergence = normal_kl((mu, log_var), (p_params["mean"], p_params["log_variance"]))
+        # bp()
+        negative_kl_divergence = -normal_kl((mu, log_var), (p_params["mean"], p_params["log_variance"]))
+        # bp()
         return negative_kl_divergence
 
     def reparameterize(self, params):
@@ -277,6 +283,7 @@ class LadderVAE(VAE):
         # Generate random noise and sample theta.
         # Shape: (batch, latent_dim)
         batch_size = params["mean"].size(0)
+        latent_dim = params["mean"].size(-1)
 
         # Enable reparameterization for training only.
         if self.training:
@@ -285,7 +292,7 @@ class LadderVAE(VAE):
             # Seed all GPUs with the same seed if available.
             if torch.cuda.is_available():
                 torch.cuda.manual_seed_all(seed)
-            epsilon = torch.randn(batch_size, self.latent_dim).to(device=mu.device)
+            epsilon = torch.randn(batch_size, latent_dim).to(device=mu.device)
             z = mu + sigma * epsilon  # pylint: disable=C0103
         else:
             z = mu  # pylint: disable=C0103

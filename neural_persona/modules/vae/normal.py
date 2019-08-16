@@ -135,7 +135,7 @@ class Normal(VAE):
         mu, log_var = params["mean"], params["log_variance"]  # pylint: disable=C0103
         # bp()
         negative_kl_divergence = -normal_kl((mu, log_var), (self.p_mu, self.p_log_var))
-        bp()
+        # bp()
         return negative_kl_divergence
 
     @overrides
