@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 from typing import List, Dict, Any
-
+import pickle
 import nltk
 import numpy as np
 import itertools
@@ -105,7 +105,6 @@ def main():
     ser_dir = os.path.join(os.path.dirname(args.serialization_dir), args.vocab_namespace)
     if not os.path.exists(ser_dir):
         os.mkdir(ser_dir)
-    ser_dir = os.path.dirname(ser_dir)
     vocabulary_dir = os.path.join(ser_dir, "vocabulary")
     if not os.path.isdir(vocabulary_dir):
         os.mkdir(vocabulary_dir)
@@ -129,18 +128,20 @@ def main():
     master = count_vectorizer.fit_transform(text)
     max_entity_per_doc = max(len(example['text']) for example in train_examples + dev_examples)
 
-    vectorized_train_examples = [{"text": count_vectorizer.transform(example["text"]).tocsc(),
-                                  "entities": example["entities"], "max_entity_per_doc": max_entity_per_doc}
+    vectorized_train_examples = [{"text": count_vectorizer.transform(example["text"]),
+                                  "entities": example["entities"], }
                                  for example in train_examples]
-    vectorized_dev_examples = [{"text": count_vectorizer.transform(example["text"]).tocsc(),
-                                "entities": example["entities"], "max_entity_per_doc": max_entity_per_doc}
+    vectorized_dev_examples = [{"text": count_vectorizer.transform(example["text"]),
+                                "entities": example["entities"]}
                                for example in dev_examples]
     # add @@unknown@@ token vector for both doc and entity representation
     # this decision is for code simplicity
-    vectorized_train_examples = [{"text": sparse.hstack((np.array([0] * example["text"].shape[0])[:, None], example["text"])),
-                                  "entities": example["entities"]} for example in vectorized_train_examples]
-    vectorized_dev_examples = [{"text": sparse.hstack((np.array([0] * example["text"].shape[0])[:, None], example["text"])),
-                                "entities": example["entities"]} for example in vectorized_dev_examples]
+    vectorized_train_examples = [{"text": sparse.hstack((np.array([0] * example["text"].shape[0])[:, None], example["text"])).tocsc(),
+                                  "entities": example["entities"],
+                                  "max_entity_per_doc": max_entity_per_doc} for example in vectorized_train_examples]
+    vectorized_dev_examples = [{"text": sparse.hstack((np.array([0] * example["text"].shape[0])[:, None], example["text"])).tocsc(),
+                                "entities": example["entities"],
+                                "max_entity_per_doc": max_entity_per_doc} for example in vectorized_dev_examples]
 
     # add @@unknown@@ token vector
     master = sparse.hstack((np.array([0] * master.shape[0])[:, None], master))
@@ -152,10 +153,9 @@ def main():
     bgfreq = dict(zip(vocab, np.array(master.sum(0))[0] / master.sum()))
 
     print("saving data...")
-    np.savez(os.path.join(ser_dir, "train.pk"), vectorized_train_examples)
-    np.savez(os.path.join(ser_dir, "dev.pk"), vectorized_dev_examples)
-    # save_named_sparse(named_vectorized_train_examples, os.path.join(args.serialization_dir, "train.npz"))
-    # save_named_sparse(named_vectorized_dev_examples, os.path.join(args.serialization_dir, "dev.npz"))
+    pickle.dump(vectorized_train_examples, open(os.path.join(ser_dir, "train.pk"), "wb"))
+    pickle.dump(vectorized_dev_examples, open(os.path.join(ser_dir, "dev.pk"), "wb"))
+    # np.savez(os.path.join(ser_dir, "dev.pk"), vectorized_dev_examples)
 
     write_to_json(bgfreq, os.path.join(ser_dir, f"{args.vocab_namespace}.bgfreq"))
     
