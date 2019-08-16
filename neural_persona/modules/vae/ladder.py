@@ -2,6 +2,7 @@ from typing import Dict
 import os
 import torch
 from allennlp.modules import FeedForward
+from allennlp.modules.seq2vec_encoders import Seq2VecEncoder
 from ipdb import set_trace as bp
 from overrides import overrides
 
@@ -21,6 +22,7 @@ class LadderVAE(VAE):
     """
     def __init__(self,
                  vocab,
+                 extracter: Seq2VecEncoder,
                  encoder_d1: FeedForward,
                  encoder_d2: FeedForward,
                  mean_projection_d1: FeedForward,
@@ -42,6 +44,8 @@ class LadderVAE(VAE):
                  stochastic_beta: bool = False,
                  z_dropout: float = 0.2) -> None:
         super(LadderVAE, self).__init__(vocab)
+        self.extracter = extracter
+
         self.encoder_d1 = encoder_d1
         self.mean_projection_d1 = mean_projection_d1
         self.log_variance_projection_d1 = log_variance_projection_d1

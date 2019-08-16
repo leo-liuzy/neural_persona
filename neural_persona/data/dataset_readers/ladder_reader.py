@@ -46,22 +46,17 @@ class LadderReader(DatasetReader):
     def _read(self, file_path):
         examples = pickle.load(open(file_path, "rb"))
         for ix, example in enumerate(examples):
-            padded_batch_size = example["max_entity_per_doc"]
 
             mat = example["text"].todense()
             _, vocab_size = mat.shape
 
             entities_idx = [entity["entity_text_ids"] for entity in example["entities"]]
             entities = np.stack([mat[elm].sum(0) for elm in entities_idx])
-
-            vec = np.zeros((padded_batch_size, vocab_size))
-            # vec[:entities.shape[0], :] = entities
+            # instances are padded automatically
             vec = entities
 
             if self._use_doc_info:
                 d = mat.sum(0).repeat(len(entities_idx), axis=0)
-                # vec_d = np.zeros((padded_batch_size, vocab_size))
-                # vec_d[d.shape[0], :] = d
                 vec_d = d
                 vec = np.concatenate([vec, vec_d], axis=1)
             instance = self.text_to_instance(vec)

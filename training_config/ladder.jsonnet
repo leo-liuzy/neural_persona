@@ -2,7 +2,7 @@ local CUDA_DEVICE = std.parseInt(std.extVar("CUDA_DEVICE"));
 
 local BASE_READER(LAZY, USE_DOC_INFO) = {
   "lazy": LAZY == 1,
-  "type": "partialgen_reader",
+  "type": "ladder_reader",
   "use_doc_info": USE_DOC_INFO == 1
 };
 
@@ -39,7 +39,6 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
       "background_data_path": std.extVar("BACKGROUND_DATA_PATH"),
       "update_background_freq": std.parseInt(std.extVar("UPDATE_BACKGROUND_FREQUENCY")) == 1,
       "track_npmi": std.parseInt(std.extVar("TRACK_NPMI")) == 1,
-      "track_persona": std.parseInt(std.extVar("TRACK_PERSONA")) == 1,
       "vae": {
          "z_dropout": std.extVar("Z_DROPOUT"),
          "prior": std.parseJson(std.extVar("PRIOR")),
@@ -129,10 +128,10 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
             "input_dim": std.parseInt(std.extVar("P")),
             "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
          },
-         "type": "ladder"
+ "type": "ladder"
       }
    },
-   "iterator": {
+    "iterator": {
       "batch_size": std.parseInt(std.extVar("BATCH_SIZE")),
       "track_epoch": true,
       "type": "basic"
