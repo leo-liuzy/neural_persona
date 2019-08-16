@@ -9,7 +9,6 @@ import seaborn as sns
 import numpy as np
 from collections import Counter
 import pandas
-import itertools
 import torch
 
 from allennlp.common.checks import ConfigurationError
