@@ -74,6 +74,7 @@ def main(args):
     min_length = int(options.min_length)
     seed = options.seed
     token_field_name = options.token_field_name
+    entity = options.entity is not None
 
     if seed is not None:
         np.random.seed(int(seed))
@@ -93,7 +94,7 @@ def main(args):
                     strip_html,
                     lower,
                     min_length,
-                    token_field_name)
+                    entity)
 
 
 def preprocess_data(train_infile,
@@ -108,7 +109,7 @@ def preprocess_data(train_infile,
                     strip_html=False,
                     lower=True,
                     min_length=3,
-                    entity: bool = True):
+                    entity: bool = False):
 
     if stopwords == 'mallet':
         print("Using Mallet stopwords")
@@ -137,9 +138,7 @@ def preprocess_data(train_infile,
         n_test = 0
 
     all_items = train_items + test_items
-    all_texts = [" ".join([" ".join(tokenized_sentence)
-                           for tokenized_sentence in item["text"]])
-                 for item in all_items]
+    all_texts = [" ".join(item["text"]) for item in all_items]
     if entity:
         all_texts = []
         for item in all_items:

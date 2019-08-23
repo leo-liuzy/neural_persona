@@ -165,6 +165,7 @@ class LadderVAE(VAE):
         """
         output = {}
         # bp()
+
         # bottom-up inference -- q(z_2 | x)
         input_repr1 = self.encoder_d1(input_vector)
         d_1 = self.estimate_params(input_repr1, self.mean_projection_d1, self.log_variance_projection_d1,

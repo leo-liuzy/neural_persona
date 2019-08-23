@@ -234,6 +234,8 @@ LADDER = {
         "USE_DOC_INFO": 0,
         # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
         "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
+        "NGRAM_FILTER_SIZES": "[2, 3, 4, 5]",
+        "NUM_FILTER": 3,
         ##############################################################
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
@@ -241,12 +243,61 @@ LADDER = {
         "K":  100,
         "P": 100,
         "ADDITIONAL_UNLABELED_DATA_PATH": None,
-        "TRAIN_PATH": os.environ["DATA_DIR"] + "/train.npz",
-        "DEV_PATH": os.environ["DATA_DIR"] + "/dev.npz",
+        "TRAIN_PATH": os.environ["DATA_DIR"] + "/train.pk",
+        "DEV_PATH": os.environ["DATA_DIR"] + "/dev.pk",
         "REFERENCE_COUNTS": os.environ["DATA_DIR"] + "/reference/ref.npz",
         "REFERENCE_VOCAB": os.environ["DATA_DIR"] + "/reference/ref.vocab.json",
         "VOCABULARY_DIRECTORY": os.environ["DATA_DIR"] + "/vocabulary/",
-        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "/partial-gen.bgfreq",
+        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "/ladder.bgfreq",
+        "NUM_ENCODER_LAYERS": 2,
+        "ENCODER_ACTIVATION": "relu",
+        "MEAN_PROJECTION_ACTIVATION": "linear",
+        "NUM_MEAN_PROJECTION_LAYERS": 1,
+        "LOG_VAR_PROJECTION_ACTIVATION": "linear",
+        "NUM_LOG_VAR_PROJECTION_LAYERS": 1,
+        "SEED": 34543,
+        "Z_DROPOUT": 0.49,
+        "LEARNING_RATE": 0.001,
+        "TRACK_NPMI": True,
+        "TRACK_PERSONA": True,
+        "CUDA_DEVICE": 0,
+        "UPDATE_BACKGROUND_FREQUENCY": 0,
+        "VOCAB_SIZE": os.environ.get("VOCAB_SIZE", 30000),
+        "APPLY_BATCHNORM": 1,
+        "APPLY_BATCHNORM_1": 0,
+        "BATCH_SIZE": 64,
+        "VALIDATION_METRIC": "+loss"
+}
+
+
+PERSONA_TOPIC = {
+        "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
+        "KL_ANNEALING": "linear",
+        ##############################################################
+        "STOCHASTIC_BETA": 1,
+        "BATCHNORM_WEIGHT_LEARNABLE": 0,
+        "BATCHNORM_BIAS_LEARNABLE": 1,
+        "APPLY_BATCHNORM_ON_NORMAL": 1,
+        "APPLY_BATCHNORM_ON_DECODER": 0,
+        "APPLY_BATCHNORM_ON_RECON": 1,
+        "USE_BACKGROUND": 1,
+        "USE_DOC_INFO": 0,
+        # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
+        "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
+        "NGRAM_FILTER_SIZES": "[2, 3, 4, 5]",
+        "NUM_FILTER": 3,
+        ##############################################################
+        "SIGMOID_WEIGHT_1": 0.25,
+        "SIGMOID_WEIGHT_2": 15,
+        "LINEAR_SCALING": 1000,
+        "VAE_HIDDEN_DIM":  81,
+        "ADDITIONAL_UNLABELED_DATA_PATH": None,
+        "TRAIN_PATH": os.environ["DATA_DIR"] + "/train.pk",
+        "DEV_PATH": os.environ["DATA_DIR"] + "/dev.pk",
+        "REFERENCE_COUNTS": os.environ["DATA_DIR"] + "/reference/ref.npz",
+        "REFERENCE_VOCAB": os.environ["DATA_DIR"] + "/reference/ref.vocab.json",
+        "VOCABULARY_DIRECTORY": os.environ["DATA_DIR"] + "/vocabulary/",
+        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "/ladder.bgfreq",
         "NUM_ENCODER_LAYERS": 2,
         "ENCODER_ACTIVATION": "relu",
         "MEAN_PROJECTION_ACTIVATION": "linear",
@@ -274,7 +325,8 @@ ENVIRONMENTS = {
         'AVITM': AVITM,
         'PARTIALGEN': PARTIALGEN,
         'PARTIALGEN_GLOB': PARTIALGEN_GLOB,
-        'LADDER': LADDER
+        'LADDER': LADDER,
+        'PERSONA_TOPIC': PERSONA_TOPIC
 }
 
 

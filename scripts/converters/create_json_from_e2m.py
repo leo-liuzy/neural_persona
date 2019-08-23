@@ -24,7 +24,7 @@ def write_json_from_e2m_file(files: List[str], data_set: str = "train", model_ty
     doc_cover_pairs = []
     if not os.path.exists(f"{new_data_home}/{model_type}/"):
         os.makedirs(f"{new_data_home}/{model_type}/")
-    assert model_type in ["avitm", "partial-gen"]
+    assert model_type in ["vampire", "partial-gen"]
     assert data_set in ["train", "dev", "test"]
     data = []  # {"docs": [], "entities": [], "doc_reindex_table": {i: i for i in range(len(files))}}
     mentions = []
@@ -40,7 +40,7 @@ def write_json_from_e2m_file(files: List[str], data_set: str = "train", model_ty
         doc_len = len(doc_sentences)
         doc_text = " ".join(doc_sentences)
         # doc_idx = len(data["docs"])
-        if model_type == "avitm":
+        if model_type == "vampire":
             data.append({'text': doc_text})
             continue
 
@@ -90,7 +90,7 @@ def write_json_from_e2m_file_ladder(files: List[str], data_set: str = "train"):
         all_mentions_idx = list(itertools.chain(*[entity["mentions"] for entity in entities]))
         doc_cover_pairs.append((doc_len, len(set(all_mentions_idx))))
         mentions.append(" ".join([doc_sentences[i] for i in all_mentions_idx]))
-        data.append({"text": content["content"], "entities": new_entities})
+        data.append({"text": doc_sentences, "entities": new_entities})
 
     with open(f"{new_data_home}/{data_set}.jsonl", "w") as f:
         for datum in data:
@@ -104,9 +104,9 @@ def write_json_from_e2m_file_ladder(files: List[str], data_set: str = "train"):
 
 
 # for d_e and d type of data feed
-# write_json_from_e2m_file(train_files, "train", "avitm")
-# write_json_from_e2m_file(dev_files, "dev", "avitm")
-# write_json_from_e2m_file(test_files, "test", "avitm")
+# write_json_from_e2m_file(train_files, "train", "vampire")
+# write_json_from_e2m_file(dev_files, "dev", "vampire")
+# write_json_from_e2m_file(test_files, "test", "vampire")
 #
 # write_json_from_e2m_file(train_files, "train", "partial-gen")
 # write_json_from_e2m_file(dev_files, "dev", "partial-gen")

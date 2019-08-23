@@ -1,5 +1,5 @@
 local CUDA_DEVICE = std.parseInt(std.extVar("CUDA_DEVICE"));
-
+local EXTRACTER_OUTPUT_DIM = std.length(std.parseJson(std.extVar("NGRAM_FILTER_SIZES"))) * std.parseInt(std.extVar("NUM_FILTER"));
 local BASE_READER(LAZY, USE_DOC_INFO) = {
   "lazy": LAZY == 1,
   "type": "ladder_reader",
@@ -22,7 +22,7 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
       "type": "ladder",
       "bow_embedder": {
          "type": "bag_of_word_counts",
-         "vocab_namespace": "partial-gen",
+         "vocab_namespace": "ladder",
          "ignore_oov": true
       },
       "apply_batchnorm_on_recon": std.parseInt(std.extVar("APPLY_BATCHNORM_ON_RECON")) == 1,
@@ -47,10 +47,16 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
          "batchnorm_weight_learnable": std.parseInt(std.extVar("BATCHNORM_WEIGHT_LEARNABLE")) == 1,
          "batchnorm_bias_learnable": std.parseInt(std.extVar("BATCHNORM_BIAS_LEARNABLE")) == 1,
          "stochastic_beta": std.parseInt(std.extVar("STOCHASTIC_BETA")) == 1,
+         "extracter": {
+            "type": "cnn",
+            "embedding_dim": std.parseInt(std.extVar("VOCAB_SIZE")) + 1,
+            "num_filters": std.parseInt(std.extVar("NUM_FILTER")),
+            "ngram_filter_sizes": std.parseJson(std.extVar("NGRAM_FILTER_SIZES"))
+         },
          "encoder_d1": {
             "activations": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.extVar("ENCODER_ACTIVATION")),
             "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
-            "input_dim": std.parseInt(std.extVar("VOCAB_SIZE")) + 1,
+            "input_dim": EXTRACTER_OUTPUT_DIM,
             "num_layers": std.parseInt(std.extVar("NUM_ENCODER_LAYERS"))
          },
          "mean_projection_d1": {
@@ -106,7 +112,7 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
 
          "decoder1": {
             "activations": "linear",
-            "hidden_dims": [std.parseInt(std.extVar("VOCAB_SIZE")) + 1],
+            "hidden_dims": [EXTRACTER_OUTPUT_DIM],
             "input_dim": std.parseInt(std.extVar("P")),
             "num_layers": 1
          },
@@ -134,7 +140,7 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
     "iterator": {
       "batch_size": std.parseInt(std.extVar("BATCH_SIZE")),
       "track_epoch": true,
-      "type": "basic"
+      "type": "basic",
    },
    "trainer": {
       "cuda_device": CUDA_DEVICE,

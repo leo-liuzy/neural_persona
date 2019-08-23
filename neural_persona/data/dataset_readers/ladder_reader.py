@@ -51,6 +51,8 @@ class LadderReader(DatasetReader):
             _, vocab_size = mat.shape
 
             entities_idx = [entity["entity_text_ids"] for entity in example["entities"]]
+            if len(entities_idx) == 0:
+                continue
             entities = np.stack([mat[elm].sum(0) for elm in entities_idx])
             # instances are padded automatically
             vec = entities

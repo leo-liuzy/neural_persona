@@ -1,15 +1,12 @@
 import logging
 import os
 from functools import partial
-import itertools
 from itertools import combinations
 from operator import is_not
 from typing import Any, Dict, List, Optional, Tuple, Union
 from ipdb import set_trace as bp
-import seaborn as sns
+
 import numpy as np
-from collections import Counter
-import pandas
 import torch
 
 from allennlp.common.checks import ConfigurationError
@@ -23,19 +20,20 @@ from allennlp.training.metrics import Average, CategoricalAccuracy
 from overrides import overrides
 from scipy import sparse
 from tabulate import tabulate
+from torch import nn
 from torch.nn.functional import log_softmax
 
 from neural_persona.common.util import (compute_background_log_frequency, load_sparse,
                                         read_json)
-from neural_persona.modules import VAE, LadderVAE
+from neural_persona.modules import VAE
 from neural_persona.modules.encoder import Encoder
 from neural_persona.common.util import create_trainable_BatchNorm1d
 
 logger = logging.getLogger(__name__)
 
 
-@Model.register("ladder")
-class Ladder(Model):
+@Model.register("persona_based")
+class PersonaBasedTopic(Model):
     """
     avitm is a pytorch reimplementation of [https://github.com/akashgit/autoencoding_vi_for_topic_models]
 
@@ -93,9 +91,7 @@ class Ladder(Model):
                  background_data_path: str = None,
                  update_background_freq: bool = False,
                  track_topics: bool = True,
-                 track_persona: bool = True,
                  track_npmi: bool = True,
-                 visual_persona: bool = True,
                  initializer: InitializerApplicator = InitializerApplicator(),
                  regularizer: Optional[RegularizerApplicator] = None) -> None:
         super().__init__(vocab, regularizer)
@@ -106,9 +102,7 @@ class Ladder(Model):
         self.vae = vae
         self.track_topics = track_topics
         self.track_npmi = track_npmi
-        self.track_persona = track_persona
-        self.visual_persona = visual_persona
-        self.vocab_namespace = "partial-gen"
+        self.vocab_namespace = "persona_based"
         self._update_background_freq = update_background_freq
 
         vocab_size = self.vocab.get_vocab_size(self.vocab_namespace)
@@ -180,7 +174,8 @@ class Ladder(Model):
         ``file`` : str
             path to background frequency file
         """
-        background_freq = compute_background_log_frequency(self.vocab, self.vocab_namespace, file_)
+        # background_freq = compute_background_log_frequency(self.vocab, self.vocab_namespace, file_)
+        background_freq = torch.zeros(self.vocab.get_vocab_size(self.vocab_namespace))
         return torch.nn.Parameter(background_freq, requires_grad=self._update_background_freq)
 
     @staticmethod
@@ -246,40 +241,18 @@ class Ladder(Model):
 
             # Logs the newest set of topics.
             if self.track_topics:
-                k = 20
-                beta = torch.softmax(self.vae.get_beta(level="p"), dim=1)
-                topics = self.extract_topics(beta, k=k)
-                topic_table = tabulate(topics, headers=["Topic #", "Words"])
+                topic_table = tabulate(self.extract_topics(self.vae.get_beta()), headers=["Topic #", "Words"])
                 topic_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "topics")
                 if not os.path.exists(topic_dir):
                     os.mkdir(topic_dir)
                 ser_dir = os.path.dirname(self.vocab.serialization_dir)
                 topic_filepath = os.path.join(ser_dir, "topics", "topics_{}.txt".format(epoch_num[0]))
-                words = list(itertools.chain(*[words for _, words in topics[1:]]))
-
-                if self.visual_persona:
-                    top_k = 100
-                    width = top_k // 3
-                    topic_filepath_png = os.path.join(ser_dir, "topics",
-                                                      "topics_{}_top_{}.png".format(self._metric_epoch_tracker, top_k))
-                    word2count = Counter(words)
-                    top_k_idx2count = dict(sorted(word2count.items(), key=lambda x: x[1], reverse=True)[:top_k])
-                    df = pandas.DataFrame.from_dict(top_k_idx2count, orient='index')
-                    ax = df.plot(kind='bar')
-                    ax.tick_params(axis="x", labelsize=6)
-                    figure = ax.get_figure()
-                    figure.set_figheight(6)
-                    figure.set_figwidth(width)
-                    figure.subplots_adjust(bottom=0.7)
-                    # figure.set_fontsize(4)
-                    figure.savefig(topic_filepath_png, dpi=300)
-                    figure.clf()
                 with open(topic_filepath, 'w+') as file_:
                     file_.write(topic_table)
 
             if self.track_npmi:
                 if self._ref_vocab:
-                    topics = self.extract_topics(self.vae.get_beta(level="p"))
+                    topics = self.extract_topics(self.vae.get_beta())
                     self._cur_npmi = self.compute_npmi(topics[1:])
             self._metric_epoch_tracker = epoch_num[0]
 
@@ -414,8 +387,7 @@ class Ladder(Model):
         """
 
         # For easy transfer to the GPU.
-        self.device = self.vae.get_beta(level="p").device  # pylint: disable=W0201
-        # self.device = self.vae.get_beta(level="t").device  # pylint: disable=W0201
+        self.device = self.vae.get_beta().device  # pylint: disable=W0201
 
         output_dict = {}
 
@@ -426,7 +398,7 @@ class Ladder(Model):
 
         # if you supply input as token IDs, embed them into bag-of-word-counts with a token embedder
         if isinstance(tokens, dict):
-            embedded_tokens = self._bag_of_words_embedder(tokens['tokens']).to(device=self.device)
+            embedded_tokens = (self._bag_of_words_embedder(tokens['tokens']).to(device=self.device))
         else:
             embedded_tokens = tokens
 
@@ -438,16 +410,17 @@ class Ladder(Model):
             embedded_tokens = weights[0] * embedded_doc_tokens + weights[1] * embedded_entity_tokens
         else:
             # bp()
-            assert x_dim == self.vocab.get_vocab_size(self.vocab_namespace) 
+            assert x_dim == self.vocab.get_vocab_size(self.vocab_namespace)
         # Encode the text into a shared representation for both the VAE
+        encoder_output = self.vae.encode(embedded_tokens)
 
         # Perform variational inference.
-        variational_output = self.vae(embedded_tokens)
+        variational_output = self.vae(encoder_output)
 
         # Reconstructed bag-of-words from the VAE with background bias.
         reconstructed_bow = variational_output['reconstruction'] + self._background_freq
 
-        # Apply batch_norm to the reconstructed bag of words.
+        # Apply batchnorm to the reconstructed bag of words.
         # Helps with word variety in topic space.
 
         reconstructed_bow = self.bow_bn(reconstructed_bow) if self._apply_batchnorm_on_recon else reconstructed_bow
@@ -456,25 +429,28 @@ class Ladder(Model):
         if self._use_doc_info:
             reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_entity_tokens)
         else:
-            reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_tokens)
+            # bp()
+            reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_tokens.sum(1))
 
         # KL-divergence that is returned is the mean of the batch by default.
         negative_kl_divergence = variational_output['negative_kl_divergence']
 
-        # Compute ELBo
+        # Compute ELBO
         elbo = negative_kl_divergence * self._kld_weight + reconstruction_loss
 
         loss = -torch.mean(elbo)
 
         output_dict['loss'] = loss
-        theta_t = variational_output['theta_t']
-        theta_p = variational_output['theta_p']
+        theta = variational_output['theta']
 
         # Keep track of internal states for use downstream
         activations: List[Tuple[str, torch.FloatTensor]] = []
+        # intermediate_input = embedded_tokens
+        # for layer_index, layer in enumerate(self.vae.encoder._linear_layers):  # pylint: disable=protected-access
+         #    intermediate_input = layer(intermediate_input)
+         #    activations.append((f"encoder_layer_{layer_index}", intermediate_input))
 
-        activations.append(('theta_t', theta_t))
-        activations.append(('theta_p', theta_p))
+        activations.append(('theta', theta))
 
         output_dict['activations'] = activations
 

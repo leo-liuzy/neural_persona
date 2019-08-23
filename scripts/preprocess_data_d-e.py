@@ -29,8 +29,8 @@ def load_data(data_path: str, tokenize: bool = False, tokenizer_type: str = "jus
     with tqdm(open(data_path, "r"), desc=f"loading {data_path}") as f:
         for line in f:
             example = json.loads(line)
-            tokenized_text = example["text"]
-            sentences = [" ".join(sentence) for sentence in tokenized_text]
+            sentences = example["text"]
+            # sentences = [" ".join(sentence) for sentence in tokenized_text]
             text = []
             for sentence in sentences:
                 if tokenize:
@@ -135,7 +135,7 @@ def main():
                                 "entities": example["entities"]}
                                for example in dev_examples]
     # add @@unknown@@ token vector for both doc and entity representation
-    # this decision is for code simplicity
+    # this decision is for code simplicityf
     vectorized_train_examples = [{"text": sparse.hstack((np.array([0] * example["text"].shape[0])[:, None], example["text"])).tocsc(),
                                   "entities": example["entities"],
                                   "max_entity_per_doc": max_entity_per_doc} for example in vectorized_train_examples]
