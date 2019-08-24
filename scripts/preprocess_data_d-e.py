@@ -63,6 +63,17 @@ def create_mentions(examples: List[Dict[str, Any]], unique_sentence: bool = Fals
     return result
 
 
+def collapse_entities(data_set):
+    result = []
+    for example in data_set:
+        mat = example["text"]
+        entities_idx = [entity["entity_text_ids"] for entity in example["entities"]]
+        if len(entities_idx) == 0:
+            continue
+        entities = np.stack([mat[elm].sum(0) for elm in entities_idx])
+        result.append(entities)
+    return result
+
 def main():
     parser = argparse.ArgumentParser(formatter_class = argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--train-path", type=str, required=True,
@@ -142,6 +153,8 @@ def main():
     vectorized_dev_examples = [{"text": sparse.hstack((np.array([0] * example["text"].shape[0])[:, None], example["text"])).tocsc(),
                                 "entities": example["entities"],
                                 "max_entity_per_doc": max_entity_per_doc} for example in vectorized_dev_examples]
+    tmp_train = collapse_entities(vectorized_train_examples)
+    tmp_dev = collapse_entities(vectorized_dev_examples)
 
     # add @@unknown@@ token vector
     master = sparse.hstack((np.array([0] * master.shape[0])[:, None], master))
@@ -153,9 +166,10 @@ def main():
     bgfreq = dict(zip(vocab, np.array(master.sum(0))[0] / master.sum()))
 
     print("saving data...")
-    pickle.dump(vectorized_train_examples, open(os.path.join(ser_dir, "train.pk"), "wb"))
-    pickle.dump(vectorized_dev_examples, open(os.path.join(ser_dir, "dev.pk"), "wb"))
-    # np.savez(os.path.join(ser_dir, "dev.pk"), vectorized_dev_examples)
+    # pickle.dump(vectorized_train_examples, open(os.path.join(ser_dir, "train.pk"), "wb"))
+    # pickle.dump(vectorized_dev_examples, open(os.path.join(ser_dir, "dev.pk"), "wb"))
+    np.savez(os.path.join(ser_dir, "train.npz"), tmp_train)
+    np.savez(os.path.join(ser_dir, "dev.npz"), tmp_dev)
 
     write_to_json(bgfreq, os.path.join(ser_dir, f"{args.vocab_namespace}.bgfreq"))
     
