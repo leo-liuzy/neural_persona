@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 import pickle
 import nltk
 import numpy as np
-import itertools
+from itertools import chain
 import pandas as pd
 import spacy
 from allennlp.data.tokenizers.word_splitter import SpacyWordSplitter
@@ -44,6 +44,7 @@ def load_data(data_path: str, tokenize: bool = False, tokenizer_type: str = "jus
             if entity:
                 assert "entities" in example
                 entities = example["entities"]
+                # new_entities = [{"label": entity["entity_label"], "text": text[entity["entity_text_ids"]]} for entity in entities]
                 texts.append({"text": text, "entities": entities})
             else:
                 texts.append({"text": text})
@@ -55,7 +56,7 @@ def create_mentions(examples: List[Dict[str, Any]], unique_sentence: bool = Fals
     result = []
     for example in examples:
         entities = example["entities"]
-        all_mentions_idx = itertools.chain(*[entity["entity_text_ids"] for entity in entities])
+        all_mentions_idx = chain(*[entity["entity_text_ids"] for entity in entities])
         if unique_sentence:
             all_mentions_idx = set(all_mentions_idx)
         all_mentions_idx = list(all_mentions_idx)
@@ -73,6 +74,32 @@ def collapse_entities(data_set):
         entities = np.stack([mat[elm].sum(0) for elm in entities_idx])
         result.append(entities)
     return result
+
+
+def extract_entity_from_doc_as_doc(data_set):
+    result = []
+    for example in data_set:
+        entities_idx = list(chain(*[entity["entity_text_ids"] for entity in example["entities"]]))
+        if len(entities_idx) == 0:
+            continue
+        mat = example["text"]
+        new_example = np.asarray(mat[entities_idx].sum(0)).squeeze(0)
+        result.append(new_example)
+    return result
+
+
+def extract_context_from_doc_as_doc(data_set):
+    result = []
+    for example in data_set:
+        entities_idx = list(chain(*[entity["entity_text_ids"] for entity in example["entities"]]))
+        mat = example["text"]
+        context_idx = [i for i in range(mat.shape[0]) if i not in entities_idx]
+        if len(context_idx) == 0:
+            continue
+        new_example = np.asarray(mat[context_idx].sum(0)).squeeze(0)
+        result.append(new_example)
+    return result
+
 
 def main():
     parser = argparse.ArgumentParser(formatter_class = argparse.ArgumentDefaultsHelpFormatter)
@@ -113,7 +140,7 @@ def main():
     if not os.path.isdir(args.serialization_dir):
         os.mkdir(args.serialization_dir)
 
-    ser_dir = os.path.join(os.path.dirname(args.serialization_dir), args.vocab_namespace)
+    ser_dir = args.serialization_dir
     if not os.path.exists(ser_dir):
         os.mkdir(ser_dir)
     vocabulary_dir = os.path.join(ser_dir, "vocabulary")
@@ -139,22 +166,31 @@ def main():
     master = count_vectorizer.fit_transform(text)
     max_entity_per_doc = max(len(example['text']) for example in train_examples + dev_examples)
 
-    vectorized_train_examples = [{"text": count_vectorizer.transform(example["text"]),
+    vectorized_train_examples = [{"text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
+                                                         count_vectorizer.transform(example["text"]))).tocsc(),
                                   "entities": example["entities"], }
                                  for example in train_examples]
-    vectorized_dev_examples = [{"text": count_vectorizer.transform(example["text"]),
+    vectorized_dev_examples = [{"text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
+                                                       count_vectorizer.transform(example["text"]))).tocsc(),
                                 "entities": example["entities"]}
                                for example in dev_examples]
     # add @@unknown@@ token vector for both doc and entity representation
-    # this decision is for code simplicityf
-    vectorized_train_examples = [{"text": sparse.hstack((np.array([0] * example["text"].shape[0])[:, None], example["text"])).tocsc(),
-                                  "entities": example["entities"],
-                                  "max_entity_per_doc": max_entity_per_doc} for example in vectorized_train_examples]
-    vectorized_dev_examples = [{"text": sparse.hstack((np.array([0] * example["text"].shape[0])[:, None], example["text"])).tocsc(),
-                                "entities": example["entities"],
-                                "max_entity_per_doc": max_entity_per_doc} for example in vectorized_dev_examples]
-    tmp_train = collapse_entities(vectorized_train_examples)
-    tmp_dev = collapse_entities(vectorized_dev_examples)
+    # this decision is for code simplicity
+    vectorized_train_examples = [{"text": example["text"],
+                                  "entities": [{"label": entity["entity_label"],
+                                                "text": example["text"][entity["entity_text_ids"]]}
+                                               for entity in example["entities"]]}
+                                 for example in vectorized_train_examples]
+    vectorized_dev_examples = [{"text": example["text"],
+                                "entities": [{"label": entity["entity_label"],
+                                              "text": example["text"][entity["entity_text_ids"]]}
+                                             for entity in example["entities"]]}
+                               for example in vectorized_dev_examples]
+
+    # vectorized_train_examples = extract_entity_from_doc_as_doc(vectorized_train_examples)
+    # vectorized_dev_examples = extract_entity_from_doc_as_doc(vectorized_dev_examples)
+    # vectorized_train_examples = extract_context_from_doc_as_doc(vectorized_train_examples)
+    # vectorized_dev_examples = extract_context_from_doc_as_doc(vectorized_dev_examples)
 
     # add @@unknown@@ token vector
     master = sparse.hstack((np.array([0] * master.shape[0])[:, None], master))
@@ -166,10 +202,10 @@ def main():
     bgfreq = dict(zip(vocab, np.array(master.sum(0))[0] / master.sum()))
 
     print("saving data...")
-    # pickle.dump(vectorized_train_examples, open(os.path.join(ser_dir, "train.pk"), "wb"))
-    # pickle.dump(vectorized_dev_examples, open(os.path.join(ser_dir, "dev.pk"), "wb"))
-    np.savez(os.path.join(ser_dir, "train.npz"), tmp_train)
-    np.savez(os.path.join(ser_dir, "dev.npz"), tmp_dev)
+    pickle.dump(vectorized_train_examples, open(os.path.join(ser_dir, "train.pk"), "wb"))
+    pickle.dump(vectorized_dev_examples, open(os.path.join(ser_dir, "dev.pk"), "wb"))
+    # np.save(os.path.join(ser_dir, "train.pk"), vectorized_train_examples)
+    # np.save(os.path.join(ser_dir, "dev.pk"), vectorized_dev_examples)
 
     write_to_json(bgfreq, os.path.join(ser_dir, f"{args.vocab_namespace}.bgfreq"))
     

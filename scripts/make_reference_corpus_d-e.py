@@ -73,7 +73,6 @@ def main(args):
     lower = not options.no_lower
     min_length = int(options.min_length)
     seed = options.seed
-    token_field_name = options.token_field_name
     entity = options.entity is not None
 
     if seed is not None:

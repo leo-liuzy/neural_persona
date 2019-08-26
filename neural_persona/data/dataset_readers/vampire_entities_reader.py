@@ -21,8 +21,8 @@ from neural_persona.common.util import load_sparse, load_named_sparse
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
-@DatasetReader.register("ladder_reader")
-class LadderReader(DatasetReader):
+@DatasetReader.register("vampire_entities_reader")
+class VampireEntitiesReader(DatasetReader):
     """ 
     Reads bag of word vectors from a sparse matrices representing training and validation data.
 
@@ -37,48 +37,15 @@ class LadderReader(DatasetReader):
     lazy : ``bool``, optional, (default = ``False``)
         Whether or not instances can be read lazily.
     """
-    def __init__(self, lazy: bool = False, use_doc_info: bool = False) -> None:
+    def __init__(self, lazy: bool = False) -> None:
         super().__init__(lazy=lazy)
-        # bp()
-        self._use_doc_info = use_doc_info
 
     @overrides
     def _read(self, file_path):
-        examples = pickle.load(open(file_path, "rb"))
+        examples = np.load(file_path)
         for ix, example in enumerate(examples):
-            padded_batch_size = example["max_entity_per_doc"]
-
-            mat = example["text"].todense()
-            _, vocab_size = mat.shape
-            all_idx = [i for i in range(example["text"].shape[0])]
-            entities_idx = [entity["entity_text_ids"] for entity in example["entities"]]
-            all_entities_idx = list(itertools.chain(*entities_idx))
-            context_idx = [i for i in all_idx if i not in all_entities_idx]
-            
-            if len(context_idx) == 0:
-                continue
-            
-            if len(entities_idx) == 0:
-                continue
-            entities = np.stack([mat[elm].sum(0) for elm in entities_idx])
             # bp()
-            try:
-                context = np.stack(mat[context_idx])
-            except:
-                bp()
-            # vec = np.zeros((padded_batch_size, vocab_size))
-            # vec[:entities.shape[0], :] = entities
-            vec = entities
-            vec = context
-            # vec = mat
-
-            if self._use_doc_info:
-                d = mat.sum(0).repeat(len(entities_idx), axis=0)
-                # vec_d = np.zeros((padded_batch_size, vocab_size))
-                # vec_d[d.shape[0], :] = d
-                vec_d = d
-                vec = np.concatenate([vec, vec_d], axis=1)
-            instance = self.text_to_instance(vec)
+            instance = self.text_to_instance(example)
             # bp()
             if instance is not None:
                 yield instance
