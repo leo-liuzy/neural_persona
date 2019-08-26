@@ -47,16 +47,10 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
          "batchnorm_weight_learnable": std.parseInt(std.extVar("BATCHNORM_WEIGHT_LEARNABLE")) == 1,
          "batchnorm_bias_learnable": std.parseInt(std.extVar("BATCHNORM_BIAS_LEARNABLE")) == 1,
          "stochastic_beta": std.parseInt(std.extVar("STOCHASTIC_BETA")) == 1,
-         "extracter": {
-            "type": "cnn",
-            "embedding_dim": std.parseInt(std.extVar("VOCAB_SIZE")) + 1,
-            "num_filters": std.parseInt(std.extVar("NUM_FILTER")),
-            "ngram_filter_sizes": std.parseJson(std.extVar("NGRAM_FILTER_SIZES"))
-         },
          "encoder": {
             "activations": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.extVar("ENCODER_ACTIVATION")),
             "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("VAE_HIDDEN_DIM"))),
-            "input_dim": EXTRACTER_OUTPUT_DIM,
+            "input_dim": std.parseInt(std.extVar("VOCAB_SIZE")) + 1,
             "num_layers": std.parseInt(std.extVar("NUM_ENCODER_LAYERS"))
          },
          "mean_projection": {
@@ -77,7 +71,7 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
             "input_dim": std.parseInt(std.extVar("VAE_HIDDEN_DIM")),
             "num_layers": 1
          },
-         "type": "cnn"
+         "type": "normal"
       }
    },
     "iterator": {

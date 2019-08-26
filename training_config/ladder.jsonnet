@@ -22,7 +22,7 @@ local BASE_READER(LAZY, USE_DOC_INFO) = {
       "type": "ladder",
       "bow_embedder": {
          "type": "bag_of_word_counts",
-         "vocab_namespace": "ladder",
+         "vocab_namespace": "partial-gen",
          "ignore_oov": true
       },
       "apply_batchnorm_on_recon": std.parseInt(std.extVar("APPLY_BATCHNORM_ON_RECON")) == 1,

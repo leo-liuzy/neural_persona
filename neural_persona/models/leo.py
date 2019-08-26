@@ -447,7 +447,7 @@ class Leo(Model):
             self._kld_weight = 1.0  # pylint: disable=W0201
         else:
             self.update_kld_weight(epoch_num)
-
+        bp()
         # if you supply input as token IDs, embed them into bag-of-word-counts with a token embedder
         if isinstance(tokens, dict):
             embedded_tokens = (self._bag_of_words_embedder(tokens['tokens'])

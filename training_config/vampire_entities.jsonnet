@@ -2,7 +2,7 @@ local CUDA_DEVICE = std.parseInt(std.extVar("CUDA_DEVICE"));
 
 local BASE_READER(LAZY) = {
   "lazy": LAZY == 1,
-  "type": "vampire_reader"
+  "type": "vampire_entities_reader"
 };
 
 {
@@ -70,10 +70,10 @@ local BASE_READER(LAZY) = {
    "trainer": {
       "cuda_device": CUDA_DEVICE,
       "num_serialized_models_to_keep": 1,
-      "num_epochs": 50,
+      "num_epochs": 100,
       "patience": 10,
       "optimizer": {
-         "lr": std.extVar("LEARNING_RATE"),
+         "lr": 0.0001,
          "type": "adam"
       },
       "validation_metric": std.extVar("VALIDATION_METRIC")
