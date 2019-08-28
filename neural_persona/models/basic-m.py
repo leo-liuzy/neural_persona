@@ -44,8 +44,8 @@ def print_param_for_check(model: torch.nn.Module):
     print("-" * 80)
 
 
-@Model.register("basic")
-class Basic(Model):
+@Model.register("basic-m")
+class BasicModified(Model):
     """
     VAMPIRE is a variational document model for pretraining under low
     resource environments.
@@ -152,7 +152,7 @@ class Basic(Model):
             self._kld_weight = 1.0
         else:
             raise ConfigurationError("anneal type {} not found".format(kl_weight_annealing))
-
+        
         # setup batchnorm
         self.doc_bow_bn = torch.nn.BatchNorm1d(vocab_size, eps=0.001, momentum=0.001, affine=True)
         self.doc_bow_bn.weight.data.copy_(torch.ones(vocab_size, dtype=torch.float64))
@@ -259,6 +259,20 @@ class Basic(Model):
                 topic_filepath = os.path.join(ser_dir, "topics", "topics_{}.txt".format(self._metric_epoch_tracker))
                 with open(topic_filepath, 'w+') as file_:
                     file_.write(topic_table)
+
+                W = torch.softmax(self.vae.get_W(), dim=1)
+                personas = self.extract_weights(W, k=k)
+                persona_table = tabulate(personas, headers=["Persona #", "Words"])
+                persona_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "personas")
+                if not os.path.exists(persona_dir):
+                    os.mkdir(persona_dir)
+                ser_dir = os.path.dirname(self.vocab.serialization_dir)
+                # bp()
+                # Topics are saved for the previous epoch.
+                persona_filepath = os.path.join(ser_dir, "personas",
+                                                "personas_{}.txt".format(self._metric_epoch_tracker))
+                with open(persona_filepath, 'w+') as file_:
+                    file_.write(persona_table)
 
             self._metric_epoch_tracker = epoch_num[0]
 
@@ -440,23 +454,22 @@ class Basic(Model):
         # Encode the text into a shared representation for both the VAE
         # and downstream classifiers to use.
         # bp()
-        embedded_docs, _ = embedded_entities.max(1)
         variational_output = self.vae(embedded_docs, embedded_entities)
         entities_mask = (embedded_entities.sum(-1) != 0).float()
         # bp()
         # Reconstructed bag-of-words from the VAE with background bias.
-        # doc_reconstructed_bow = variational_output['doc_reconstruction'] + self._background_freq
+        doc_reconstructed_bow = variational_output['doc_reconstruction'] + self._background_freq
         entity_reconstructed_bow = variational_output['entity_reconstruction'] + self._background_freq
 
         # Apply batchnorm to the reconstructed bag of words.
         # Helps with word variety in topic space.
-        # doc_reconstructed_bow = self.doc_bow_bn(doc_reconstructed_bow)
+        doc_reconstructed_bow = self.doc_bow_bn(doc_reconstructed_bow)
         # entity_reconstructed_bow = self.entity_bow_bn(entity_reconstructed_bow) * entities_mask.unsqueeze(-1)
 
         # Reconstruction log likelihood: log P(x | z) = log softmax(z beta + b)
-        # reconstruction_loss = self.bow_reconstruction_loss(doc_reconstructed_bow, embedded_docs)
+        reconstruction_loss = self.bow_reconstruction_loss(doc_reconstructed_bow, embedded_docs)
         # bp()
-        reconstruction_loss = (self.bow_reconstruction_loss(entity_reconstructed_bow, embedded_entities) * entities_mask).sum(1)
+        reconstruction_loss += (self.bow_reconstruction_loss(entity_reconstructed_bow, embedded_entities) * entities_mask).sum(1)
 
         # KL-divergence that is returned is the mean of the batch by default.
         doc_negative_kl_divergence = variational_output['doc_negative_kl_divergence']
@@ -472,6 +485,14 @@ class Basic(Model):
         if torch.isnan(loss):
             bp()
         output_dict['loss'] = loss
+        theta = variational_output['theta']
+
+        # Keep track of internal states for use downstream
+        activations: List[Tuple[str, torch.FloatTensor]] = []
+
+        activations.append(('theta', theta))
+
+        output_dict['activations'] = activations
         # bp()
         # Update metrics
         self.metrics['nkld'](-torch.mean(negative_kl_divergence))

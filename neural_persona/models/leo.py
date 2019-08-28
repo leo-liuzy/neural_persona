@@ -1,5 +1,6 @@
 import logging
 import os
+import warnings
 from functools import partial
 from itertools import combinations
 from operator import is_not
