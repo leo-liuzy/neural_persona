@@ -104,14 +104,14 @@ class Leo(Model):
                  regularizer: Optional[RegularizerApplicator] = None) -> None:
         super().__init__(vocab, regularizer)
 
-        self.metrics = {'nkld': Average(), 'nll': Average()}
+        self.metrics = {'nkld': Average(), 'doc_nkld': Average(), 'entity_nkld': Average(), 'nll': Average()}
 
         self.vocab = vocab
         self.vae = vae
         self.track_topics = track_topics
         self.track_npmi = track_npmi
         self.visual_topic = visual_topic
-        self.vocab_namespace = "vampire"
+        self.vocab_namespace = "entity_based"
         self._update_background_freq = update_background_freq
         # bp()
         self._background_freq = self.initialize_bg_from_file(file_=background_data_path)
@@ -136,7 +136,7 @@ class Leo(Model):
                                                                self._ref_doc_sum)
             self.n_docs = self._ref_count_mat.shape[0]
 
-        vampire_vocab_size = self.vocab.get_vocab_size(self.vocab_namespace)
+        vocab_size = self.vocab.get_vocab_size(self.vocab_namespace)
         self._bag_of_words_embedder = bow_embedder
 
         self._kl_weight_annealing = kl_weight_annealing
@@ -154,9 +154,13 @@ class Leo(Model):
             raise ConfigurationError("anneal type {} not found".format(kl_weight_annealing))
 
         # setup batchnorm
-        self.bow_bn = torch.nn.BatchNorm1d(vampire_vocab_size, eps=0.001, momentum=0.001, affine=True)
-        self.bow_bn.weight.data.copy_(torch.ones(vampire_vocab_size, dtype=torch.float64))
-        self.bow_bn.weight.requires_grad = False
+        self.doc_bow_bn = torch.nn.BatchNorm1d(vocab_size, eps=0.001, momentum=0.001, affine=True)
+        self.doc_bow_bn.weight.data.copy_(torch.ones(vocab_size, dtype=torch.float64))
+        self.doc_bow_bn.weight.requires_grad = False
+
+        # self.entity_bow_bn = torch.nn.BatchNorm1d(vocab_size, eps=0.001, momentum=0.001, affine=True)
+        # self.entity_bow_bn.weight.data.copy_(torch.ones(vocab_size, dtype=torch.float64))
+        # self.entity_bow_bn.weight.requires_grad = False
 
         # Maintain these states for periodically printing topics and updating KLD
         self._metric_epoch_tracker = 0
@@ -244,7 +248,7 @@ class Leo(Model):
                 k = 20
                 # (K, vocabulary size)
                 beta = torch.softmax(self.vae.get_beta(), dim=1)
-                topics = self.extract_topics(beta, k=k)
+                topics = self.extract_weights(beta, k=k)
                 topic_table = tabulate(topics, headers=["Topic #", "Words"])
                 topic_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "topics")
                 if not os.path.exists(topic_dir):
@@ -253,36 +257,22 @@ class Leo(Model):
                 # bp()
                 # Topics are saved for the previous epoch.
                 topic_filepath = os.path.join(ser_dir, "topics", "topics_{}.txt".format(self._metric_epoch_tracker))
-                words = list(itertools.chain(*[words for _, words in topics[1:]]))
-                if self.visual_topic:
-                    top_k = 100
-                    width = top_k // 3
-                    topic_filepath_png = os.path.join(ser_dir, "topics", "topics_{}_top_{}.png".format(self._metric_epoch_tracker, top_k))
-                    word2count = Counter(words)
-                    top_k_idx2count = dict(sorted(word2count.items(), key=lambda x: x[1], reverse=True)[:top_k])
-                    df = pandas.DataFrame.from_dict(top_k_idx2count, orient='index')
-                    ax = df.plot(kind='bar')
-                    ax.tick_params(axis="x", labelsize=6)
-                    figure = ax.get_figure()
-                    figure.set_figheight(6)
-                    figure.set_figwidth(width)
-                    figure.subplots_adjust(bottom=0.7)
-                    # figure.set_fontsize(4)
-                    figure.savefig(topic_filepath_png, dpi=300)
-                    figure.clf()
-                    # _, indices = torch.topk(beta, k=k, dim=1)
-                    # tmp = beta.scatter(1, indices, torch.zeros_like(beta))
-                    # mask = tmp == 0
-                    # result = beta * mask.float()
-                    # ax = sns.heatmap(result.cpu(), cmap="YlGn")
-                    # ax.set_xlabel("word idx")
-                    # ax.set_ylabel("topic idx")
-                    # figure = ax.get_figure()
-                    # figure.savefig(topic_filepath_png)
-                    # figure.clf()
-                    
                 with open(topic_filepath, 'w+') as file_:
                     file_.write(topic_table)
+
+                W = torch.softmax(self.vae.get_W(), dim=1)
+                personas = self.extract_weights(W, k=k)
+                persona_table = tabulate(personas, headers=["Persona #", "Words"])
+                persona_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "personas")
+                if not os.path.exists(persona_dir):
+                    os.mkdir(persona_dir)
+                ser_dir = os.path.dirname(self.vocab.serialization_dir)
+                # bp()
+                # Topics are saved for the previous epoch.
+                persona_filepath = os.path.join(ser_dir, "personas",
+                                                "personas_{}.txt".format(self._metric_epoch_tracker))
+                with open(persona_filepath, 'w+') as file_:
+                    file_.write(persona_table)
 
             self._metric_epoch_tracker = epoch_num[0]
 
@@ -297,13 +287,13 @@ class Leo(Model):
         """
 
         if self.track_npmi and self._ref_vocab and not self.training and not self._npmi_updated:
-            topics = self.extract_topics(self.vae.get_beta())
+            topics = self.extract_weights(self.vae.get_beta())
             self._cur_npmi = self.compute_npmi(topics[1:])
             self._npmi_updated = True
         elif self.training:
             self._npmi_updated = False
 
-    def extract_topics(self, weights: torch.Tensor, k: int = 20) -> List[Tuple[str, List[int]]]:
+    def extract_weights(self, weights: torch.Tensor, k: int = 20) -> List[Tuple[str, List[int]]]:
         """
         Given the learned (K, vocabulary size) weights, print the
         top k words from each row as a topic.
@@ -419,6 +409,7 @@ class Leo(Model):
     @overrides
     def forward(self,  # pylint: disable=arguments-differ
                 tokens: Union[Dict[str, torch.IntTensor], torch.IntTensor],
+                entities: Union[Dict[str, torch.IntTensor], torch.IntTensor],
                 epoch_num: List[int] = None):
         """
         Parameters
@@ -447,35 +438,45 @@ class Leo(Model):
             self._kld_weight = 1.0  # pylint: disable=W0201
         else:
             self.update_kld_weight(epoch_num)
-        bp()
+        # bp()
         # if you supply input as token IDs, embed them into bag-of-word-counts with a token embedder
-        if isinstance(tokens, dict):
-            embedded_tokens = (self._bag_of_words_embedder(tokens['tokens'])
-                               .to(device=self.device))
+        if isinstance(entities, dict):
+            embedded_entities = (self._bag_of_words_embedder(entities['tokens'])
+                                 .to(device=self.device))
         else:
-            embedded_tokens = tokens
+            embedded_entities = entities
 
+        if isinstance(tokens, dict):
+            embedded_docs = (self._bag_of_words_embedder(tokens['tokens'])
+                             .to(device=self.device))
+        else:
+            embedded_docs = tokens
         # Encode the text into a shared representation for both the VAE
         # and downstream classifiers to use.
         # bp()
-        encoder_output = self.vae.encoder(embedded_tokens)
-
-        # Perform variational inference.
-        variational_output = self.vae(encoder_output)
-
+        variational_output = self.vae(embedded_docs, embedded_entities)
+        entities_mask = (embedded_entities.sum(-1) != 0).float()
+        # bp()
         # Reconstructed bag-of-words from the VAE with background bias.
-        reconstructed_bow = variational_output['reconstruction'] + self._background_freq
+        doc_reconstructed_bow = variational_output['doc_reconstruction'] + self._background_freq
+        entity_reconstructed_bow = variational_output['entity_reconstruction'] + self._background_freq
 
         # Apply batchnorm to the reconstructed bag of words.
         # Helps with word variety in topic space.
-        reconstructed_bow = self.bow_bn(reconstructed_bow)
+        doc_reconstructed_bow = self.doc_bow_bn(doc_reconstructed_bow)
+        # entity_reconstructed_bow = self.entity_bow_bn(entity_reconstructed_bow) * entities_mask.unsqueeze(-1)
 
         # Reconstruction log likelihood: log P(x | z) = log softmax(z beta + b)
-        reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_tokens)
+        reconstruction_loss = self.bow_reconstruction_loss(doc_reconstructed_bow, embedded_docs)
+        # bp()
+        reconstruction_loss += (self.bow_reconstruction_loss(entity_reconstructed_bow, embedded_entities) * entities_mask).sum(1)
 
         # KL-divergence that is returned is the mean of the batch by default.
-        negative_kl_divergence = variational_output['negative_kl_divergence']
-
+        doc_negative_kl_divergence = variational_output['doc_negative_kl_divergence']
+        # masked sum of entity KL-divergence since there are some paddings
+        entity_negative_kl_divergence = torch.sum(variational_output["entity_negative_kl_divergence"] * entities_mask, dim=-1)
+        # total KL-divergence is the sum of doc's KL and entities' KL
+        negative_kl_divergence = doc_negative_kl_divergence  #  + entity_negative_kl_divergence
         # Compute ELBO
         elbo = negative_kl_divergence * self._kld_weight + reconstruction_loss
 
@@ -488,10 +489,6 @@ class Leo(Model):
 
         # Keep track of internal states for use downstream
         activations: List[Tuple[str, torch.FloatTensor]] = []
-        intermediate_input = embedded_tokens
-        for layer_index, layer in enumerate(self.vae.encoder._linear_layers):  # pylint: disable=protected-access
-            intermediate_input = layer(intermediate_input)
-            activations.append((f"encoder_layer_{layer_index}", intermediate_input))
 
         activations.append(('theta', theta))
 
@@ -499,8 +496,10 @@ class Leo(Model):
         # bp()
         # Update metrics
         self.metrics['nkld'](-torch.mean(negative_kl_divergence))
+        self.metrics['doc_nkld'](-torch.mean(doc_negative_kl_divergence))
+        self.metrics['entity_nkld'](-torch.mean(entity_negative_kl_divergence))
         self.metrics['nll'](-torch.mean(reconstruction_loss))
-
+        # bp()
         # batch_num is tracked for kl weight annealing
         self.batch_num += 1
 

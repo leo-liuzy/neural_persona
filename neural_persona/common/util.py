@@ -53,16 +53,19 @@ def normal_kl(N0, N1, eps=EPSILON):
     mu_0, log_var_0 = N0
     var_0 = log_var_0.exp()
     mu_1, log_var_1 = N1
-    batch_size, k = mu_0.size()
+    if len(mu_0.size()) == 3:
+        _, _, k = mu_0.size()
+    else:
+        _, k = mu_0.size()
     var_1 = log_var_1.exp()
 
     d = mu_1 - mu_0
-    tmp_0 = log_var_0.sum(dim=1)
+    tmp_0 = log_var_0.sum(dim=-1)
     tmp_0[tmp_0 == 0] = eps
-    tmp_1 = log_var_1.sum(dim=1)
+    tmp_1 = log_var_1.sum(dim=-1)
 
-    first_term = torch.sum(var_0 / var_1, dim=1)
-    second_term = torch.sum(d ** 2 / var_1, dim=1)
+    first_term = torch.sum(var_0 / var_1, dim=-1)
+    second_term = torch.sum(d ** 2 / var_1, dim=-1)
     result = 0.5 * (first_term + second_term - k + tmp_1 - tmp_0)
 
     return result

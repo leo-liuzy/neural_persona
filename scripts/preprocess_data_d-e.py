@@ -176,12 +176,12 @@ def main():
                                for example in dev_examples]
     # add @@unknown@@ token vector for both doc and entity representation
     # this decision is for code simplicity
-    vectorized_train_examples = [{"text": example["text"],
+    vectorized_train_examples = [{"text": np.asarray(example["text"].sum(0)).squeeze(0),
                                   "entities": [{"label": entity["entity_label"],
                                                 "text": example["text"][entity["entity_text_ids"]]}
                                                for entity in example["entities"]]}
                                  for example in vectorized_train_examples]
-    vectorized_dev_examples = [{"text": example["text"],
+    vectorized_dev_examples = [{"text": np.asarray(example["text"].sum(0)).squeeze(0),
                                 "entities": [{"label": entity["entity_label"],
                                               "text": example["text"][entity["entity_text_ids"]]}
                                              for entity in example["entities"]]}
