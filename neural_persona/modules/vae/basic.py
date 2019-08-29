@@ -87,7 +87,6 @@ class BasicVAE(VAE):
                  encoder_entity: FeedForward,
                  mean_projection_entity: FeedForward,
                  log_variance_projection_entity: FeedForward,
-                 decoder_topic: FeedForward,
                  decoder_persona: FeedForward,
                  mean_projection_p_z1: FeedForward,
                  log_variance_projection_p_z1: FeedForward,
@@ -109,14 +108,14 @@ class BasicVAE(VAE):
         self.mean_projection_p_z1 = mean_projection_p_z1
         self.log_variance_projection_p_z1 = log_variance_projection_p_z1
 
-        self._decoder_topic = torch.nn.Linear(decoder_topic.get_input_dim(), decoder_topic.get_output_dim(),
-                                              bias=False)
+        # self._decoder_topic = torch.nn.Linear(decoder_topic.get_input_dim(), decoder_topic.get_output_dim(),
+        #                                       bias=False)
         self._decoder_persona = torch.nn.Linear(decoder_persona.get_input_dim(), decoder_persona.get_output_dim(),
                                                 bias=False)
         self._z_dropout = torch.nn.Dropout(z_dropout)
 
-        self.num_persona = encoder_entity.get_output_dim()
         self.num_topic = encoder_topic.get_output_dim()
+        self.num_persona = self.num_topic
 
         self.prior = prior
         self.p_params = None
@@ -140,11 +139,11 @@ class BasicVAE(VAE):
 
         # If specified, established batchnorm for reconstruction matrix, applying batch norm across vocabulary
         self._apply_batchnorm_on_decoder = apply_batchnorm_on_decoder
-        if apply_batchnorm_on_decoder:
-            self.decoder_bn_topic = create_trainable_BatchNorm1d(decoder_topic.get_output_dim(),
-                                                                 weight_learnable=batchnorm_weight_learnable,
-                                                                 bias_learnable=batchnorm_bias_learnable,
-                                                                 eps=0.001, momentum=0.001, affine=True)
+        # if apply_batchnorm_on_decoder:
+        #     self.decoder_bn_topic = create_trainable_BatchNorm1d(decoder_topic.get_output_dim(),
+        #                                                          weight_learnable=batchnorm_weight_learnable,
+        #                                                          bias_learnable=batchnorm_bias_learnable,
+        #                                                          eps=0.001, momentum=0.001, affine=True)
 
         # If specified, constrain each topic to be a distribution over vocabulary
         self._stochastic_beta = stochastic_beta
@@ -309,4 +308,4 @@ class BasicVAE(VAE):
 
     @overrides
     def get_beta(self):
-        return self._decoder_topic._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
+        return self._decoder_persona._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212

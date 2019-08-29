@@ -1,6 +1,6 @@
 from typing import Dict
-import os
 import warnings
+import os
 import torch
 from allennlp.modules import FeedForward
 from allennlp.modules.seq2vec_encoders import Seq2VecEncoder
@@ -70,7 +70,6 @@ def gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
         ret = y_soft
     return ret
 
-
 @VAE.register("basic-m")
 class BasicModifiedVAE(VAE):
     """
@@ -116,8 +115,8 @@ class BasicModifiedVAE(VAE):
                                                 bias=False)
         self._z_dropout = torch.nn.Dropout(z_dropout)
 
-        self.num_persona = encoder_entity.get_output_dim()
         self.num_topic = encoder_topic.get_output_dim()
+        self.num_persona = encoder_entity.get_output_dim()
 
         self.prior = prior
         self.p_params = None
@@ -130,22 +129,6 @@ class BasicModifiedVAE(VAE):
         self.mean_bn_topic, self.log_var_bn_topic = None, None
         self.mean_bn_p_z1, self.log_var_bn_p_z1 = None, None
         if apply_batchnorm_on_normal:
-            # self.mean_bn_entity = create_trainable_BatchNorm1d(self.num_persona,
-            #                                                    weight_learnable=batchnorm_weight_learnable,
-            #                                                    bias_learnable=batchnorm_bias_learnable,
-            #                                                    eps=0.001, momentum=0.001, affine=True)
-            # self.log_var_bn_entity = create_trainable_BatchNorm1d(self.num_persona,
-            #                                                       weight_learnable=batchnorm_weight_learnable,
-            #                                                       bias_learnable=batchnorm_bias_learnable,
-            #                                                       eps=0.001, momentum=0.001, affine=True)
-            # self.mean_bn_p_z1 = create_trainable_BatchNorm1d(self.num_persona,
-            #                                                  weight_learnable=batchnorm_weight_learnable,
-            #                                                  bias_learnable=batchnorm_bias_learnable,
-            #                                                  eps=0.001, momentum=0.001, affine=True)
-            # self.log_var_bn_p_z1 = create_trainable_BatchNorm1d(self.num_persona,
-            #                                                     weight_learnable=batchnorm_weight_learnable,
-            #                                                     bias_learnable=batchnorm_bias_learnable,
-            #                                                     eps=0.001, momentum=0.001, affine=True)
             self.mean_bn_topic = create_trainable_BatchNorm1d(self.num_topic,
                                                               weight_learnable=batchnorm_weight_learnable,
                                                               bias_learnable=batchnorm_bias_learnable,
@@ -158,11 +141,6 @@ class BasicModifiedVAE(VAE):
         # If specified, established batchnorm for reconstruction matrix, applying batch norm across vocabulary
         self._apply_batchnorm_on_decoder = apply_batchnorm_on_decoder
         if apply_batchnorm_on_decoder:
-            self.decoder_bn_persona = create_trainable_BatchNorm1d(decoder_persona.get_output_dim(),
-                                                                   weight_learnable=batchnorm_weight_learnable,
-                                                                   bias_learnable=batchnorm_bias_learnable,
-                                                                   eps=0.001, momentum=0.001, affine=True)
-
             self.decoder_bn_topic = create_trainable_BatchNorm1d(decoder_topic.get_output_dim(),
                                                                  weight_learnable=batchnorm_weight_learnable,
                                                                  bias_learnable=batchnorm_bias_learnable,
@@ -224,7 +202,6 @@ class BasicModifiedVAE(VAE):
                                           self.mean_bn_topic, self.log_var_bn_topic)
         # estimate the intermediate document representation
         q_z2 = self.reparameterize(doc_params)
-        p_z2 = self.reparameterize(p_params)
         theta = self._z_dropout(q_z2)
         theta = torch.softmax(theta, dim=-1)
         output.update({"theta": theta,
@@ -247,20 +224,22 @@ class BasicModifiedVAE(VAE):
         theta = theta.unsqueeze(-2).repeat(1, max_num_entity, 1)
         entity_theta_merged = torch.cat([entity_vector.float(), theta], dim=-1)
         entity_repr = self.encoder_entity(entity_theta_merged)
-        entity_params = self.estimate_params(entity_repr, self.mean_projection_entity, self.log_variance_projection_entity, self.mean_bn_entity, self.log_var_bn_entity)
+        entity_params = self.estimate_params(entity_repr, self.mean_projection_entity,
+                                             self.log_variance_projection_entity, self.mean_bn_entity,
+                                             self.log_var_bn_entity)
 
-        p_z1_params = self.estimate_params(p_z2, self.mean_projection_p_z1, self.log_variance_projection_p_z1, self.mean_bn_p_z1, self.log_var_bn_p_z1)
         # bp()
-        p_z1_params = {"mean": p_z1_params["mean"].unsqueeze(1),
-                       "sigma": p_z1_params["sigma"].unsqueeze(1),
-                       "log_variance": p_z1_params["log_variance"].unsqueeze(1)}
+        p_z1_params = {"mean": theta,
+                       "sigma": torch.ones_like(theta),
+                       "log_variance": torch.zeros_like(theta)}
         q_z1 = self.reparameterize(entity_params)
         q_z1 = self._z_dropout(q_z1)
         # bp()
         persona = gumbel_softmax(q_z1, dim=-1)  # torch.softmax(q_z1, dim=-1)
         output.update({"persona": persona,
                        "entity_params": entity_params,
-                       "entity_negative_kl_divergence": self.compute_negative_kld(q_params=entity_params, p_params=p_z1_params)
+                       "entity_negative_kl_divergence": self.compute_negative_kld(q_params=entity_params,
+                                                                                  p_params=p_z1_params)
                        })
         # bp()
         # decode persona representation to word reconstruction
@@ -269,37 +248,10 @@ class BasicModifiedVAE(VAE):
             W = self.decoder_bn_persona(W)
         if self._stochastic_beta:
             W = torch.nn.functional.softmax(W, dim=1)
-        entity_reconstruction = persona @ W @ beta
+        entity_reconstruction = gumbel_softmax(persona @ W, dim=-1)  @ beta
         output["entity_reconstruction"] = entity_reconstruction
 
         return output
-
-    @staticmethod
-    def merge_normal(param_d, param_t):
-        """
-        Merge the parameter of bottom-up(d) normal distribution and top-down(t) normal distribution
-        (using LVAE notation)
-        :param param_d: bottom-up normal distribution parameter
-        :param param_t: top-down normal distribution parameter
-        :return: approximate posterior distribution q(z_i | z_{i+1}, x)
-        """
-
-        mu_d, log_var_d = param_d["mean"], param_d["log_variance"]
-        mu_t, log_var_t = param_t["mean"], param_t["log_variance"]  # use the bottom-up pass notation
-        precision_d, precision_t = 1 / torch.exp(log_var_d), 1 / torch.exp(log_var_t)
-
-        # Merge distributions into a single new distribution
-        mu = ((mu_d * precision_d) + (mu_t * precision_t)) / (precision_d + precision_t)
-
-        var = 1 / (precision_d + precision_t)
-        sigma = torch.sqrt(var)
-        log_var = torch.log(var + EPSILON)
-
-        return {
-                "mean": mu,
-                "sigma": sigma,
-                "log_variance": log_var
-                }
 
     @overrides
     def estimate_params(self,
@@ -368,7 +320,7 @@ class BasicModifiedVAE(VAE):
 
     @overrides
     def get_beta(self):
-        return self._decoder_topic._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
+        return self._decoder_persona._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
 
     def get_W(self):
         persona = self._decoder_persona._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212

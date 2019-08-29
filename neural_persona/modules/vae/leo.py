@@ -267,7 +267,7 @@ class LeoVAE(VAE):
             W = self.decoder_bn_persona(W)
         if self._stochastic_beta:
             W = torch.nn.functional.softmax(W, dim=1)
-        entity_reconstruction = persona @ W @ beta
+        entity_reconstruction = gumbel_softmax(persona @ W, dim=-1) @ beta
         output["entity_reconstruction"] = entity_reconstruction
 
         return output

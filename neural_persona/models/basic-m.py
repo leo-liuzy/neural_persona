@@ -152,7 +152,7 @@ class BasicModified(Model):
             self._kld_weight = 1.0
         else:
             raise ConfigurationError("anneal type {} not found".format(kl_weight_annealing))
-        
+
         # setup batchnorm
         self.doc_bow_bn = torch.nn.BatchNorm1d(vocab_size, eps=0.001, momentum=0.001, affine=True)
         self.doc_bow_bn.weight.data.copy_(torch.ones(vocab_size, dtype=torch.float64))
@@ -454,6 +454,7 @@ class BasicModified(Model):
         # Encode the text into a shared representation for both the VAE
         # and downstream classifiers to use.
         # bp()
+        embedded_docs, _ = embedded_entities.max(1)
         variational_output = self.vae(embedded_docs, embedded_entities)
         entities_mask = (embedded_entities.sum(-1) != 0).float()
         # bp()
@@ -485,14 +486,6 @@ class BasicModified(Model):
         if torch.isnan(loss):
             bp()
         output_dict['loss'] = loss
-        theta = variational_output['theta']
-
-        # Keep track of internal states for use downstream
-        activations: List[Tuple[str, torch.FloatTensor]] = []
-
-        activations.append(('theta', theta))
-
-        output_dict['activations'] = activations
         # bp()
         # Update metrics
         self.metrics['nkld'](-torch.mean(negative_kl_divergence))

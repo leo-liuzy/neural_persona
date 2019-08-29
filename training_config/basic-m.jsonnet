@@ -18,7 +18,7 @@ local BASE_READER(LAZY) = {
       "directory_path": std.extVar("VOCABULARY_DIRECTORY")
    },
    "model": {
-      "type": "leo",
+      "type": "basic",
       "bow_embedder": {
          "type": "bag_of_word_counts",
          "vocab_namespace": "entity_based",
@@ -54,7 +54,7 @@ local BASE_READER(LAZY) = {
          },
         "log_variance_projection_p_z1": {
             "activations": std.extVar("LOG_VAR_PROJECTION_ACTIVATION"),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
             "input_dim": std.parseInt(std.extVar("K")),
             "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
          },
@@ -72,36 +72,35 @@ local BASE_READER(LAZY) = {
          },
          "encoder_entity": {
             "activations": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.extVar("ENCODER_ACTIVATION")),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
             "input_dim": std.parseInt(std.extVar("VOCAB_SIZE")) + 1 + std.parseInt(std.extVar("K")),
             "num_layers": std.parseInt(std.extVar("NUM_ENCODER_LAYERS"))
          },
          "mean_projection_entity": {
             "activations": std.extVar("MEAN_PROJECTION_ACTIVATION"),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
-            "input_dim": std.extVar("P"),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
+            "input_dim": std.extVar("K"),
             "num_layers": std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS"))
          },
         "log_variance_projection_entity": {
             "activations": std.extVar("LOG_VAR_PROJECTION_ACTIVATION"),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
-            "input_dim": std.parseInt(std.extVar("P")),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
+            "input_dim": std.parseInt(std.extVar("K")),
             "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
          },
-
          "decoder_topic": {
             "activations": "linear",
             "hidden_dims": [std.parseInt(std.extVar("VOCAB_SIZE")) + 1],
             "input_dim": std.parseInt(std.extVar("K")),
             "num_layers": 1
          },
-          "decoder_persona": {
+         "decoder_persona": {
             "activations": "linear",
-            "hidden_dims": [std.parseInt(std.extVar("K"))],
-            "input_dim": std.parseInt(std.extVar("P")),
+            "hidden_dims": [std.parseInt(std.extVar("VOCAB_SIZE")) + 1],
+            "input_dim": std.parseInt(std.extVar("K")),
             "num_layers": 1
          },
-         "type": "basic-m"
+         "type": "basic"
       }
    },
     "iterator": {
