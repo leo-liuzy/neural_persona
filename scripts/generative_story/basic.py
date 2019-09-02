@@ -10,7 +10,7 @@ np.random.seed(6)
 alpha = 1
 d_dim = 20
 s_dim = d_dim  # assumption of basic model
-num_doc = 20000
+num_doc = 10000
 vocab_size = 3001
 result_dir = "/home/lzy/proj/neural_persona/examples/toy/basic"
 
@@ -43,17 +43,9 @@ for i in tqdm(range(num_doc)):
     k = C_ij // 2
 
     # reconstruct entity BoW vector
-    entities_vector = np.zeros_like(p_s_i)
-    indices = np.argsort(p_s_i, axis=-1)[:, -k:]
-    for idx, indice in enumerate(indices):
-        entities_vector[idx, indice] = np.rint(softmax(p_s_i[idx, indice], axis=-1) * C_ij)
-
-    # reconstruct entity BoW vector
     p_x = softmax(d @ beta + b, axis=-1)
-    doc_vector = np.zeros_like(p_x)
-    indice = np.argsort(p_x)[-C_i // 2:]
-    doc_vector[indice] = np.rint(softmax(p_x[indice], axis=-1) * C_i)
-    pk_output.append({"doc": doc_vector, "entities": entities_vector})
+    entities_vector = np.random.multinomial(C_ij, p_x, size=E_i)
+    pk_output.append({"entities": entities_vector, "theta": theta, "e_i": e_i})
 
 # create folder if not exists
 if not os.path.exists(result_dir):

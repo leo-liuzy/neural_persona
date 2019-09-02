@@ -111,7 +111,7 @@ class VAMPIRE(Model):
         self.track_topics = track_topics
         self.track_npmi = track_npmi
         self.visual_topic = visual_topic
-        self.vocab_namespace = "vampire"
+        self.vocab_namespace = "entity_based"
         self._update_background_freq = update_background_freq
         # bp()
         self._background_freq = self.initialize_bg_from_file(file_=background_data_path)
@@ -421,6 +421,7 @@ class VAMPIRE(Model):
     @overrides
     def forward(self,  # pylint: disable=arguments-differ
                 tokens: Union[Dict[str, torch.IntTensor], torch.IntTensor],
+                entities: Union[Dict[str, torch.IntTensor], torch.IntTensor],
                 epoch_num: List[int] = None):
         """
         Parameters
@@ -439,7 +440,7 @@ class VAMPIRE(Model):
             bp()
         # For easy transfer to the GPU.
         self.device = self.vae.get_beta().device  # pylint: disable=W0201
-
+        # bp()
         output_dict = {}
 
         self.update_npmi()
@@ -457,9 +458,15 @@ class VAMPIRE(Model):
         else:
             embedded_tokens = tokens
 
+        if isinstance(entities, dict):
+            embedded_entities = (self._bag_of_words_embedder(entities['tokens']).to(device=self.device))
+        else:
+            embedded_entities = entities
+        # embedded_tokens = embedded_tokens.sum(1)
         # Encode the text into a shared representation for both the VAE
         # and downstream classifiers to use.
         # bp()
+        embedded_tokens, _ = embedded_entities.max(1)
         encoder_output = self.vae.encoder(embedded_tokens)
 
         # Perform variational inference.

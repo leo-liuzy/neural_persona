@@ -20,7 +20,6 @@ from allennlp.training.metrics import Average, CategoricalAccuracy
 from overrides import overrides
 from scipy import sparse
 from tabulate import tabulate
-from torch import nn
 from torch.nn.functional import log_softmax
 
 from neural_persona.common.util import (compute_background_log_frequency, load_sparse,
@@ -174,8 +173,8 @@ class PersonaBasedTopic(Model):
         ``file`` : str
             path to background frequency file
         """
-        # background_freq = compute_background_log_frequency(self.vocab, self.vocab_namespace, file_)
-        background_freq = torch.zeros(self.vocab.get_vocab_size(self.vocab_namespace))
+        background_freq = compute_background_log_frequency(self.vocab, self.vocab_namespace, file_)
+        # background_freq = torch.zeros(self.vocab.get_vocab_size(self.vocab_namespace))
         return torch.nn.Parameter(background_freq, requires_grad=self._update_background_freq)
 
     @staticmethod
@@ -412,6 +411,7 @@ class PersonaBasedTopic(Model):
             # bp()
             assert x_dim == self.vocab.get_vocab_size(self.vocab_namespace)
         # Encode the text into a shared representation for both the VAE
+        embedded_tokens = embedded_tokens.sum(1)
         encoder_output = self.vae.encode(embedded_tokens)
 
         # Perform variational inference.
@@ -430,7 +430,7 @@ class PersonaBasedTopic(Model):
             reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_entity_tokens)
         else:
             # bp()
-            reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_tokens.sum(1))
+            reconstruction_loss = self.bow_reconstruction_loss(reconstructed_bow, embedded_tokens)
 
         # KL-divergence that is returned is the mean of the batch by default.
         negative_kl_divergence = variational_output['negative_kl_divergence']

@@ -259,6 +259,7 @@ class Basic(Model):
                 topic_filepath = os.path.join(ser_dir, "topics", "topics_{}.txt".format(self._metric_epoch_tracker))
                 with open(topic_filepath, 'w+') as file_:
                     file_.write(topic_table)
+                torch.save(self.vae.state_dict(), f"{ser_dir}/last_model.pk")
 
             self._metric_epoch_tracker = epoch_num[0]
 

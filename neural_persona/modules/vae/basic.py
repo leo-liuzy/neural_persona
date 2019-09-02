@@ -203,6 +203,14 @@ class BasicVAE(VAE):
         q_z2 = self.reparameterize(doc_params)
         theta = self._z_dropout(q_z2)
         theta = torch.softmax(theta, dim=-1)
+        beta = self._decoder_persona.weight.t()
+        if self._apply_batchnorm_on_decoder:
+            beta = self.decoder_bn_persona(beta)
+        if self._stochastic_beta:
+            beta = torch.nn.functional.softmax(beta, dim=1)
+        doc_reconstruction = theta @ beta
+        output["doc_reconstruction"] = doc_reconstruction
+
         output.update({"theta": theta,
                        "doc_params": doc_params,
                        "doc_negative_kl_divergence": self.compute_negative_kld(q_params=doc_params,
@@ -212,8 +220,9 @@ class BasicVAE(VAE):
         # decode topic representation to input to calculate persona representation
         # TODO: bn on entity are not used. wonder: should we run a batch on all global entity representation
         theta = theta.unsqueeze(-2).repeat(1, max_num_entity, 1)
-        # entity_theta_merged = torch.cat([entity_vector.float(), theta], dim=-1)
-        entity_repr = self.encoder_entity(entity_vector)
+        entity_theta_merged = torch.cat([entity_vector.float(), theta], dim=-1)
+        # bp()
+        entity_repr = self.encoder_entity(entity_theta_merged)
         entity_params = self.estimate_params(entity_repr, self.mean_projection_entity, self.log_variance_projection_entity, self.mean_bn_entity, self.log_var_bn_entity)
 
         # bp()

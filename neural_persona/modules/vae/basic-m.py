@@ -116,7 +116,7 @@ class BasicModifiedVAE(VAE):
         self._z_dropout = torch.nn.Dropout(z_dropout)
 
         self.num_topic = encoder_topic.get_output_dim()
-        self.num_persona = encoder_entity.get_output_dim()
+        self.num_persona = self.num_topic
 
         self.prior = prior
         self.p_params = None
@@ -146,6 +146,10 @@ class BasicModifiedVAE(VAE):
                                                                  bias_learnable=batchnorm_bias_learnable,
                                                                  eps=0.001, momentum=0.001, affine=True)
 
+            self.decoder_bn_persona = create_trainable_BatchNorm1d(decoder_persona.get_output_dim(),
+                                                                 weight_learnable=batchnorm_weight_learnable,
+                                                                 bias_learnable=batchnorm_bias_learnable,
+                                                                 eps=0.001, momentum=0.001, affine=True)
         # If specified, constrain each topic to be a distribution over vocabulary
         self._stochastic_beta = stochastic_beta
 
@@ -215,7 +219,7 @@ class BasicModifiedVAE(VAE):
             # beta = torch.nn.functional.tanh(beta)
             # beta = torch.nn.functional.sigmoid(beta)
         if self._apply_batchnorm_on_decoder:
-            beta = self.decoder_bn(beta)
+            beta = self.decoder_bn_topic(beta)
         doc_reconstruction = theta @ beta
         output["doc_reconstruction"] = doc_reconstruction
 
@@ -248,6 +252,7 @@ class BasicModifiedVAE(VAE):
             W = self.decoder_bn_persona(W)
         if self._stochastic_beta:
             W = torch.nn.functional.softmax(W, dim=1)
+        # bp()
         entity_reconstruction = gumbel_softmax(persona @ W, dim=-1)  @ beta
         output["entity_reconstruction"] = entity_reconstruction
 

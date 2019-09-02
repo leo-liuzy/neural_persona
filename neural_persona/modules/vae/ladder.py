@@ -45,7 +45,7 @@ class LadderVAE(VAE):
                  z_dropout: float = 0.2) -> None:
         super(LadderVAE, self).__init__(vocab)
         self.extracter = extracter
-
+        # bp() 
         self.encoder_d1 = encoder_d1
         self.mean_projection_d1 = mean_projection_d1
         self.log_variance_projection_d1 = log_variance_projection_d1
@@ -164,8 +164,12 @@ class LadderVAE(VAE):
         of the distribution.
         """
         output = {}
+        _, max_num_p, x_dim = input_vector.shape
+        mask = input_vector.sum(dim=-1) != 0
+        # mask = tmp.repeat(1, 1, x_dim)
         # bp()
-
+        input_vector = self.extracter(input_vector, mask)
+        # bp()
         # bottom-up inference -- q(z_2 | x)
         input_repr1 = self.encoder_d1(input_vector)
         d_1 = self.estimate_params(input_repr1, self.mean_projection_d1, self.log_variance_projection_d1,

@@ -1,7 +1,6 @@
 import logging
 import os
 from functools import partial
-import itertools
 from itertools import combinations
 from operator import is_not
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -108,7 +107,7 @@ class Ladder(Model):
         self.track_npmi = track_npmi
         self.track_persona = track_persona
         self.visual_persona = visual_persona
-        self.vocab_namespace = "partial-gen"
+        self.vocab_namespace = "ladder"
         self._update_background_freq = update_background_freq
 
         vocab_size = self.vocab.get_vocab_size(self.vocab_namespace)
@@ -416,14 +415,14 @@ class Ladder(Model):
         # For easy transfer to the GPU.
         self.device = self.vae.get_beta(level="p").device  # pylint: disable=W0201
         # self.device = self.vae.get_beta(level="t").device  # pylint: disable=W0201
-
+        # bp()
         output_dict = {}
 
         if not self.training:
             self._kld_weight = 1.0  # pylint: disable=W0201
         else:
             self.update_kld_weight(epoch_num)
-
+        # bp()
         # if you supply input as token IDs, embed them into bag-of-word-counts with a token embedder
         if isinstance(tokens, dict):
             embedded_tokens = self._bag_of_words_embedder(tokens['tokens']).to(device=self.device)
