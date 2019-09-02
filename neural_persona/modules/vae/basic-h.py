@@ -73,7 +73,7 @@ def gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
 @VAE.register("basic")
 class BasicVAE(VAE):
     """
-    A Variational Autoencoder with 1 hidden layer and a Normal prior. This is a generalization of LogitNormal
+    A Hierarchical Variational Autoencoder with 2 hidden layer and a Normal prior. This is a generalization of LogitNormal
     So far this class support:
         - normal prior with any simple mean and simple variance  --- "normal"
             (e.g. mu = [0, 0, ..., 0], var = [1, 1, ..., 1])
@@ -88,8 +88,6 @@ class BasicVAE(VAE):
                  mean_projection_entity: FeedForward,
                  log_variance_projection_entity: FeedForward,
                  decoder_persona: FeedForward,
-                 mean_projection_p_z1: FeedForward,
-                 log_variance_projection_p_z1: FeedForward,
                  prior: Dict = {"type": "normal", "mu": 0, "var": 1},
                  apply_batchnorm_on_normal: bool = False,
                  apply_batchnorm_on_decoder: bool = False,
@@ -105,8 +103,8 @@ class BasicVAE(VAE):
         self.encoder_entity = encoder_entity
         self.mean_projection_entity = mean_projection_entity
         self.log_variance_projection_entity = log_variance_projection_entity
-        self.mean_projection_p_z1 = mean_projection_p_z1
-        self.log_variance_projection_p_z1 = log_variance_projection_p_z1
+        # self.mean_projection_p_z1 = mean_projection_p_z1
+        # self.log_variance_projection_p_z1 = log_variance_projection_p_z1
 
         # self._decoder_topic = torch.nn.Linear(decoder_topic.get_input_dim(), decoder_topic.get_output_dim(),
         #                                       bias=False)
@@ -177,77 +175,54 @@ class BasicVAE(VAE):
         # }
 
     @overrides
-    def forward(self, doc_vector: torch.FloatTensor, entity_vector: torch.FloatTensor):  # pylint: disable = W0221
+    def forward(self, entity_vector: torch.FloatTensor):  # pylint: disable = W0221
         """
         Given the input representation, produces the reconstruction from theta
         as well as the negative KL-divergence, theta itself, and the parameters
         of the distribution.
         """
         output = {}
-        # bp()
-        # calculate the mask for later use
         batch_size, max_num_entity, _ = entity_vector.shape
         # prior -- N(0, 1)
-        p_params = {"mean": self.p_mu.repeat(batch_size, 1),
-                    "sigma": self.p_sigma.repeat(batch_size, 1),
-                    "log_variance": self.p_log_var.repeat(batch_size, 1)
-                    }
-        doc_vector, _ = entity_vector.max(dim=1)
-        # encode the document representation
-        doc_repr = self.encoder_topic(doc_vector)
+        p_params = {"mean": self.p_mu,
+                    "sigma": self.p_sigma,
+                    "log_variance": self.p_log_var}
+
         # bp()
-        # calculate for the distribution for document representation
-        doc_params = self.estimate_params(doc_repr, self.mean_projection_topic, self.log_variance_projection_topic,
-                                          self.mean_bn_topic, self.log_var_bn_topic)
-        # estimate the intermediate document representation
-        q_z2 = self.reparameterize(doc_params)
-        theta = self._z_dropout(q_z2)
-        theta = torch.softmax(theta, dim=-1)
-        beta = self._decoder_persona.weight.t()
-        if self._apply_batchnorm_on_decoder:
-            beta = self.decoder_bn_persona(beta)
-        if self._stochastic_beta:
-            beta = torch.nn.functional.softmax(beta, dim=1)
-        doc_reconstruction = theta @ beta
-        output["doc_reconstruction"] = doc_reconstruction
-
-        output.update({"theta": theta,
-                       "doc_params": doc_params,
-                       "doc_negative_kl_divergence": self.compute_negative_kld(q_params=doc_params,
-                                                                               p_params=p_params)
-                       })
-
-        # decode topic representation to input to calculate persona representation
+        # estimate persona
+        hidden_s = self.encoder_entity(entity_vector)
         # TODO: bn on entity are not used. wonder: should we run a batch on all global entity representation
-        theta = theta.unsqueeze(-2).repeat(1, max_num_entity, 1)
-        entity_theta_merged = torch.cat([entity_vector.float(), theta], dim=-1)
-        # bp()
-        entity_repr = self.encoder_entity(entity_theta_merged)
-        entity_params = self.estimate_params(entity_repr, self.mean_projection_entity, self.log_variance_projection_entity, self.mean_bn_entity, self.log_var_bn_entity)
-
-        # bp()
-        p_z1_params = {"mean": theta,
-                       "sigma": torch.ones_like(theta),
-                       "log_variance": torch.zeros_like(theta)}
-        q_z1 = self.reparameterize(entity_params)
-        q_z1 = self._z_dropout(q_z1)
-        # bp()
-        persona = torch.softmax(q_z1, dim=-1)  # torch.softmax(q_z1, dim=-1)
-        output.update({"persona": persona,
-                       "entity_params": entity_params,
-                       "entity_negative_kl_divergence": self.compute_negative_kld(q_params=entity_params,
-                                                                                  p_params=p_z1_params)
+        s_params = self.estimate_params(hidden_s, self.mean_projection_entity, self.log_variance_projection_entity,
+                                        self.mean_bn_entity, self.log_var_bn_entity)
+        s = self.reparameterize(s_params)
+        global_s, _ = s.max(1)  # free for other function choices e.g. avg(.)
+        hidden_d = self.encoder_topic(global_s)
+        d_params = self.estimate_params(hidden_d, self.mean_projection_topic, self.log_variance_projection_topic,
+                                        self.mean_bn_topic, self.log_var_bn_topic)
+        d = self.reparameterize(d_params)
+        output.update({"d": d,
+                       "d_params": d_params,
+                       "d_negative_kl_divergence": self.compute_negative_kld(q_params=d_params,
+                                                                             p_params=p_params)
                        })
-        # bp()
-        # decode persona representation to word reconstruction
+        d = d.unsqueeze(1).repeat(1, max_num_entity, 1)
+        p_s_params = {"mean": d,
+                      "sigma": torch.ones_like(d),
+                      "log_variance": torch.zeros_like(d)}
+        output.update({"s": s,
+                       "s_params": s_params,
+                       "s_negative_kl_divergence": self.compute_negative_kld(q_params=s_params,
+                                                                             p_params=p_s_params)})
+
+        e = torch.softmax(s, dim=-1)
         beta = self._decoder_persona.weight.t()
         if self._apply_batchnorm_on_decoder:
             beta = self.decoder_bn_persona(beta)
         if self._stochastic_beta:
             beta = torch.nn.functional.softmax(beta, dim=1)
-        entity_reconstruction = persona @ beta
-        output["entity_reconstruction"] = entity_reconstruction
-
+        e_reconstruction = e @ beta
+        output["e_reconstruction"] = e_reconstruction
+        bp()
         return output
 
     @overrides

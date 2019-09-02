@@ -2,7 +2,7 @@ local CUDA_DEVICE = std.parseInt(std.extVar("CUDA_DEVICE"));
 
 local BASE_READER(LAZY) = {
   "lazy": LAZY == 1,
-  "type": "vampire_entities_reader"
+  "type": "entity_based_reader"
 };
 
 {

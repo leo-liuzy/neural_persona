@@ -2,7 +2,7 @@ local CUDA_DEVICE = std.parseInt(std.extVar("CUDA_DEVICE"));
 
 local BASE_READER(LAZY) = {
   "lazy": LAZY == 1,
-  "type": "entity_based_reader"
+  "type": "toy_reader"
 };
 
 {
@@ -18,7 +18,7 @@ local BASE_READER(LAZY) = {
       "directory_path": std.extVar("VOCABULARY_DIRECTORY")
    },
    "model": {
-      "type": "basic-m",
+      "type": "basic",
       "bow_embedder": {
          "type": "bag_of_word_counts",
          "vocab_namespace": "entity_based",
@@ -73,7 +73,7 @@ local BASE_READER(LAZY) = {
          "encoder_entity": {
             "activations": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.extVar("ENCODER_ACTIVATION")),
             "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
-            "input_dim": std.parseInt(std.extVar("VOCAB_SIZE")) + 1 + std.parseInt(std.extVar("K")),
+            "input_dim": std.parseInt(std.extVar("VOCAB_SIZE")) + 1+ std.parseInt(std.extVar("K")) ,
             "num_layers": std.parseInt(std.extVar("NUM_ENCODER_LAYERS"))
          },
          "mean_projection_entity": {
@@ -88,19 +88,14 @@ local BASE_READER(LAZY) = {
             "input_dim": std.parseInt(std.extVar("K")),
             "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
          },
-         "decoder_topic": {
-            "activations": "linear",
-            "hidden_dims": [std.parseInt(std.extVar("VOCAB_SIZE")) + 1],
-            "input_dim": std.parseInt(std.extVar("K")),
-            "num_layers": 1
-         },
+
          "decoder_persona": {
             "activations": "linear",
-            "hidden_dims": [std.parseInt(std.extVar("K"))],
+            "hidden_dims": [std.parseInt(std.extVar("VOCAB_SIZE")) + 1 ],
             "input_dim": std.parseInt(std.extVar("K")),
             "num_layers": 1
          },
-         "type": "basic-m"
+         "type": "basic"
       }
    },
     "iterator": {

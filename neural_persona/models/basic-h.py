@@ -104,7 +104,7 @@ class Basic(Model):
                  regularizer: Optional[RegularizerApplicator] = None) -> None:
         super().__init__(vocab, regularizer)
 
-        self.metrics = {'nkld': Average(), 'doc_nkld': Average(), 'entity_nkld': Average(), 'nll': Average()}
+        self.metrics = {'nkld': Average(), 'd_nkld': Average(), 'e_nkld': Average(), 'nll': Average()}
 
         self.vocab = vocab
         self.vae = vae
@@ -395,13 +395,13 @@ class Basic(Model):
 
     @overrides
     def forward(self,  # pylint: disable=arguments-differ
-                tokens: Union[Dict[str, torch.IntTensor], torch.IntTensor],
+                doc: Union[Dict[str, torch.IntTensor], torch.IntTensor],
                 entities: Union[Dict[str, torch.IntTensor], torch.IntTensor],
                 epoch_num: List[int] = None):
         """
         Parameters
         ----------
-        tokens: ``Union[Dict[str, torch.IntTensor], torch.IntTensor]``
+        doc: ``Union[Dict[str, torch.IntTensor], torch.IntTensor]``
             A batch of tokens. We expect tokens to be represented in one of two ways:
                 1. As token IDs. This representation will be used with downstream models, where bag-of-word count embedding
                 must be done on the fly. If token IDs are provided, we use the bag-of-word-counts embedder to embed these
@@ -432,22 +432,15 @@ class Basic(Model):
                                  .to(device=self.device))
         else:
             embedded_entities = entities
-
-        if isinstance(tokens, dict):
-            embedded_docs = (self._bag_of_words_embedder(tokens['tokens'])
-                             .to(device=self.device))
-        else:
-            embedded_docs = tokens
         # Encode the text into a shared representation for both the VAE
         # and downstream classifiers to use.
         # bp()
-        embedded_docs, _ = embedded_entities.max(1)
-        variational_output = self.vae(embedded_docs, embedded_entities)
+        variational_output = self.vae(embedded_entities)
         entities_mask = (embedded_entities.sum(-1) != 0).float()
         # bp()
         # Reconstructed bag-of-words from the VAE with background bias.
         # doc_reconstructed_bow = variational_output['doc_reconstruction'] + self._background_freq
-        entity_reconstructed_bow = variational_output['entity_reconstruction'] + self._background_freq
+        entity_reconstructed_bow = variational_output['e_reconstruction'] + self._background_freq
 
         # Apply batchnorm to the reconstructed bag of words.
         # Helps with word variety in topic space.
@@ -460,11 +453,11 @@ class Basic(Model):
         reconstruction_loss = (self.bow_reconstruction_loss(entity_reconstructed_bow, embedded_entities) * entities_mask).sum(1)
 
         # KL-divergence that is returned is the mean of the batch by default.
-        doc_negative_kl_divergence = variational_output['doc_negative_kl_divergence']
+        doc_negative_kl_divergence = variational_output['d_negative_kl_divergence']
         # masked sum of entity KL-divergence since there are some paddings
-        entity_negative_kl_divergence = torch.sum(variational_output["entity_negative_kl_divergence"] * entities_mask, dim=-1)
+        entity_negative_kl_divergence = torch.sum(variational_output["s_negative_kl_divergence"] * entities_mask, dim=-1)
         # total KL-divergence is the sum of doc's KL and entities' KL
-        negative_kl_divergence = doc_negative_kl_divergence  #  + entity_negative_kl_divergence
+        negative_kl_divergence = doc_negative_kl_divergence + entity_negative_kl_divergence
         # Compute ELBO
         elbo = negative_kl_divergence * self._kld_weight + reconstruction_loss
 
@@ -476,8 +469,8 @@ class Basic(Model):
         # bp()
         # Update metrics
         self.metrics['nkld'](-torch.mean(negative_kl_divergence))
-        self.metrics['doc_nkld'](-torch.mean(doc_negative_kl_divergence))
-        self.metrics['entity_nkld'](-torch.mean(entity_negative_kl_divergence))
+        self.metrics['d_nkld'](-torch.mean(doc_negative_kl_divergence))
+        self.metrics['e_nkld'](-torch.mean(entity_negative_kl_divergence))
         self.metrics['nll'](-torch.mean(reconstruction_loss))
         # bp()
         # batch_num is tracked for kl weight annealing

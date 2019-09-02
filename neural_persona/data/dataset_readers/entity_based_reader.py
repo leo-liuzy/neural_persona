@@ -68,7 +68,7 @@ class EntityBasedReader(DatasetReader):
         """
         # pylint: disable=arguments-differ
         fields: Dict[str, Field] = {}
-        fields['tokens'] = ArrayField(example["text"])
+        fields['doc'] = ArrayField(example["text"])
         if len(example["entities"]) == 0:
             return
         stacked_entities = np.stack([np.asarray(entity["text"].sum(0)).squeeze(0) for entity in example["entities"]])
