@@ -186,3 +186,4 @@ class Normal(VAE):
     @overrides
     def get_beta(self):
         return self._decoder._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
+

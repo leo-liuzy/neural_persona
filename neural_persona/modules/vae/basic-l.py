@@ -70,10 +70,10 @@ def gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
         ret = y_soft
     return ret
 
-@VAE.register("basic-h")
+@VAE.register("basic-l")
 class BasicVAE(VAE):
     """
-    A Hierarchical Variational Autoencoder with 2 hidden layer and a Normal prior. This is a generalization of LogitNormal
+    A Ladder Variational Autoencoder with 2 hidden layer and a Normal prior. This is a generalization of LogitNormal
     So far this class support:
         - normal prior with any simple mean and simple variance  --- "normal"
             (e.g. mu = [0, 0, ..., 0], var = [1, 1, ..., 1])
@@ -87,6 +87,12 @@ class BasicVAE(VAE):
                  encoder_entity: FeedForward,
                  mean_projection_entity: FeedForward,
                  log_variance_projection_entity: FeedForward,
+                 encoder_entity_approx: FeedForward,
+                 mean_projection_entity_approx: FeedForward,
+                 log_variance_projection_entity_approx: FeedForward,
+                 decoder_topic: FeedForward,  # decode topic input to persona hidden
+                 decoder_mean_projection_topic: FeedForward,
+                 decoder_log_variance_projection_topic: FeedForward,
                  decoder_persona: FeedForward,
                  prior: Dict = {"type": "normal", "mu": 0, "var": 1},
                  apply_batchnorm_on_normal: bool = False,
@@ -98,22 +104,24 @@ class BasicVAE(VAE):
         super(BasicVAE, self).__init__(vocab)
 
         self.encoder_topic = encoder_topic
-        self.mean_projection_topic = mean_projection_topic
-        self.log_variance_projection_topic = log_variance_projection_topic
+        self.mean_topic = mean_projection_topic
+        self.log_var_topic = log_variance_projection_topic
         self.encoder_entity = encoder_entity
-        self.mean_projection_entity = mean_projection_entity
-        self.log_variance_projection_entity = log_variance_projection_entity
-        # self.mean_projection_p_z1 = mean_projection_p_z1
-        # self.log_variance_projection_p_z1 = log_variance_projection_p_z1
-
-        # self._decoder_topic = torch.nn.Linear(decoder_topic.get_input_dim(), decoder_topic.get_output_dim(),
-        #                                       bias=False)
+        self.mean_entity = mean_projection_entity
+        self.log_var_entity = log_variance_projection_entity
+        self.encoder_entity_approx = encoder_entity_approx
+        self.mean_entity_approx = mean_projection_entity_approx
+        self.log_var_entity_approx = log_variance_projection_entity_approx
+        self.decoder_mean_topic = decoder_mean_projection_topic
+        self.decoder_log_var_topic = decoder_log_variance_projection_topic
+        self._decoder_topic = torch.nn.Linear(decoder_topic.get_input_dim(), decoder_topic.get_output_dim(),
+                                              bias=False)
         self._decoder_persona = torch.nn.Linear(decoder_persona.get_input_dim(), decoder_persona.get_output_dim(),
                                                 bias=False)
         self._z_dropout = torch.nn.Dropout(z_dropout)
 
         self.num_topic = encoder_topic.get_output_dim()
-        self.num_persona = self.num_topic
+        self.num_persona = encoder_entity.get_output_dim()
 
         self.prior = prior
         self.p_params = None
@@ -124,7 +132,8 @@ class BasicVAE(VAE):
         self._apply_batchnorm_on_normal = apply_batchnorm_on_normal
         self.mean_bn_entity, self.log_var_bn_entity = None, None
         self.mean_bn_topic, self.log_var_bn_topic = None, None
-        self.mean_bn_p_z1, self.log_var_bn_p_z1 = None, None
+        self.decoder_mean_bn_topic, self.decoder_log_var_bn_topic = None, None
+        self.mean_bn_entity_approx, self.log_var_bn_entity_approx = None, None
         if apply_batchnorm_on_normal:
             self.mean_bn_topic = create_trainable_BatchNorm1d(self.num_topic,
                                                               weight_learnable=batchnorm_weight_learnable,
@@ -134,15 +143,26 @@ class BasicVAE(VAE):
                                                                  weight_learnable=batchnorm_weight_learnable,
                                                                  bias_learnable=batchnorm_bias_learnable,
                                                                  eps=0.001, momentum=0.001, affine=True)
+            self.decoder_mean_bn_topic = create_trainable_BatchNorm1d(self.num_persona,
+                                                                      weight_learnable=batchnorm_weight_learnable,
+                                                                      bias_learnable=batchnorm_bias_learnable,
+                                                                      eps=0.001, momentum=0.001, affine=True)
+            self.decoder_log_var_bn_topic = create_trainable_BatchNorm1d(self.num_persona,
+                                                                         weight_learnable=batchnorm_weight_learnable,
+                                                                         bias_learnable=batchnorm_bias_learnable,
+                                                                         eps=0.001, momentum=0.001, affine=True)
 
         # If specified, established batchnorm for reconstruction matrix, applying batch norm across vocabulary
         self._apply_batchnorm_on_decoder = apply_batchnorm_on_decoder
-        # if apply_batchnorm_on_decoder:
-        #     self.decoder_bn_topic = create_trainable_BatchNorm1d(decoder_topic.get_output_dim(),
-        #                                                          weight_learnable=batchnorm_weight_learnable,
-        #                                                          bias_learnable=batchnorm_bias_learnable,
-        #                                                          eps=0.001, momentum=0.001, affine=True)
-
+        if apply_batchnorm_on_decoder:
+            self.decoder_bn_topic = create_trainable_BatchNorm1d(decoder_topic.get_output_dim(),
+                                                                 weight_learnable=batchnorm_weight_learnable,
+                                                                 bias_learnable=batchnorm_bias_learnable,
+                                                                 eps=0.001, momentum=0.001, affine=True)
+            self.decoder_bn_persona = create_trainable_BatchNorm1d(decoder_persona.get_output_dim(),
+                                                                   weight_learnable=batchnorm_weight_learnable,
+                                                                   bias_learnable=batchnorm_bias_learnable,
+                                                                   eps=0.001, momentum=0.001, affine=True)
         # If specified, constrain each topic to be a distribution over vocabulary
         self._stochastic_beta = stochastic_beta
 
@@ -183,38 +203,65 @@ class BasicVAE(VAE):
         """
         output = {}
         batch_size, max_num_entity, _ = entity_vector.shape
+
         # prior -- N(0, 1)
         p_params = {"mean": self.p_mu,
                     "sigma": self.p_sigma,
                     "log_variance": self.p_log_var}
 
         # bp()
-        # estimate persona
+        # estimate persona in bottom-up direction
         hidden_s = self.encoder_entity(entity_vector)
         # TODO: bn on entity are not used. wonder: should we run a batch on all global entity representation
-        s_params = self.estimate_params(hidden_s, self.mean_projection_entity, self.log_variance_projection_entity,
-                                        self.mean_bn_entity, self.log_var_bn_entity)
-        s = self.reparameterize(s_params)
-        global_s, _ = s.max(1)  # free for other function choices e.g. avg(.)
+        tilde_s_params = self.estimate_params(hidden_s, self.mean_entity, self.log_var_entity,
+                                              self.mean_bn_entity, self.log_var_bn_entity)
+        tilde_s = self.reparameterize(tilde_s_params)
+
+        # estimate topic in bottom-up direction
+        # TODO: free for other function choices e.g. avg(.)
+        global_s, _ = tilde_s.max(1)
         hidden_d = self.encoder_topic(global_s)
-        d_params = self.estimate_params(hidden_d, self.mean_projection_topic, self.log_variance_projection_topic,
+        d_params = self.estimate_params(hidden_d, self.mean_topic, self.log_var_topic,
                                         self.mean_bn_topic, self.log_var_bn_topic)
         d = self.reparameterize(d_params)
+        theta = torch.softmax(d, dim=-1)
         output.update({"d": d,
+                       "theta": theta,
                        "d_params": d_params,
                        "d_negative_kl_divergence": self.compute_negative_kld(q_params=d_params,
                                                                              p_params=p_params)
                        })
-        d = d.unsqueeze(1).repeat(1, max_num_entity, 1)
-        p_s_params = {"mean": d,
-                      "sigma": torch.ones_like(d),
-                      "log_variance": torch.zeros_like(d)}
-        output.update({"s": s,
-                       "s_params": s_params,
-                       "s_negative_kl_divergence": self.compute_negative_kld(q_params=s_params,
-                                                                             p_params=p_s_params)})
 
-        e = torch.softmax(s, dim=-1)
+        # estimate persona in top-down direction
+        theta = theta.unsqueeze(1)  # .repeat(1, max_num_entity, 1)
+        t = self.encoder_entity_approx(theta)
+        t_params = self.estimate_params(t, self.mean_entity_approx, self.log_var_entity_approx,
+                                        self.mean_bn_entity_approx, self.log_var_bn_entity_approx)
+
+        # merge top-down and bottom-up inference of persona
+        persona_params = self.merge_normal(tilde_s_params, t_params)
+
+        # generative model's persona params
+        W = self._decoder_topic.weight.t()
+        if self._apply_batchnorm_on_decoder:
+            W = self.decoder_bn_persona(W)
+        if self._stochastic_beta:
+            W = torch.nn.functional.softmax(W, dim=1)
+        # TODO: use d or theta
+        p_persona_hidden = d @ W
+        bp()
+        decoder_persona_params = self.estimate_params(p_persona_hidden, self.decoder_mean_topic,
+                                                      self.decoder_log_var_topic,
+                                                      self.decoder_mean_bn_topic, self.decoder_log_var_bn_topic)
+        bp()
+        inferred_persona = self.reparameterize(persona_params)
+        e = torch.softmax(inferred_persona, dim=-1)
+        output.update({"s": inferred_persona,
+                       "e": e,
+                       "s_params": persona_params,
+                       "s_negative_kl_divergence": self.compute_negative_kld(q_params=persona_params,
+                                                                             p_params=decoder_persona_params)})
+
         beta = self._decoder_persona.weight.t()
         if self._apply_batchnorm_on_decoder:
             beta = self.decoder_bn_persona(beta)
@@ -265,6 +312,33 @@ class BasicVAE(VAE):
         # bp()
         return negative_kl_divergence
 
+    @staticmethod
+    def merge_normal(param_d, param_t):
+        """
+        Merge the parameter of bottom-up(d) normal distribution and top-down(t) normal distribution
+        (using LVAE notation)
+        :param param_d: bottom-up normal distribution parameter
+        :param param_t: top-down normal distribution parameter
+        :return: approximate posterior distribution q(z_i | z_{i+1}, x)
+        """
+
+        mu_d, log_var_d = param_d["mean"], param_d["log_variance"]
+        mu_t, log_var_t = param_t["mean"], param_t["log_variance"]  # use the bottom-up pass notation
+        precision_d, precision_t = 1 / torch.exp(log_var_d), 1 / torch.exp(log_var_t)
+
+        # Merge distributions into a single new distribution
+        mu = ((mu_d * precision_d) + (mu_t * precision_t)) / (precision_d + precision_t)
+
+        var = 1 / (precision_d + precision_t)
+        sigma = torch.sqrt(var)
+        log_var = torch.log(var + EPSILON)
+
+        return {
+            "mean": mu,
+            "sigma": sigma,
+            "log_variance": log_var
+        }
+
     def reparameterize(self, params):
         """z is the result of the reparameterization trick."""
         mu, sigma = params["mean"], params["sigma"]  # pylint: disable=C0103
@@ -293,3 +367,6 @@ class BasicVAE(VAE):
     @overrides
     def get_beta(self):
         return self._decoder_persona._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
+
+    def get_W(self):
+        return self._decoder_topic._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
