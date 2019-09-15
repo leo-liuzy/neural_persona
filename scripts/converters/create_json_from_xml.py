@@ -177,14 +177,14 @@ if __name__ == "__main__":
     Processed Entity: {num_entity}
     Missed Entity: {num_missed_entity}
     
-    Considering included docs...
+    Considering included entities...
     Total Mention: {num_covered_mentions + num_uncovered_mentions}
     Processed Mention: {num_covered_mentions}
     Missed Mentions: {num_uncovered_mentions}
     """)
 
-    json.dump(docs, open("doc_id2char_id_map.json", "w"))
-    json.dump(actors, open("char_id2actor_id.json", "w"))
+    json.dump(docs, open(f"{data_home}/doc_id2char_id_map.json", "w"))
+    json.dump(actors, open(f"{data_home}/char_id2actor_id.json", "w"))
     with open(f"{data_home}/corpus.jsonl", "w") as f:
         for datum in processed_corpus:
             json.dump(datum, f)
