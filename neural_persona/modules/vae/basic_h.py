@@ -71,7 +71,7 @@ def gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
     return ret
 
 @VAE.register("basic-h")
-class BasicVAE(VAE):
+class BasicHVAE(VAE):
     """
     A Hierarchical Variational Autoencoder with 2 hidden layer and a Normal prior. This is a generalization of LogitNormal
     So far this class support:
@@ -95,7 +95,7 @@ class BasicVAE(VAE):
                  batchnorm_bias_learnable: bool = True,
                  stochastic_beta: bool = False,
                  z_dropout: float = 0.2) -> None:
-        super(BasicVAE, self).__init__(vocab)
+        super(BasicHVAE, self).__init__(vocab)
 
         self.encoder_topic = encoder_topic
         self.mean_projection_topic = mean_projection_topic

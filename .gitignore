@@ -1,6 +1,7 @@
 .*
 !/.gitignore
 .mypy_cache/
+archives/
 visual/*.png
 .idea/
 .pytest_cache/

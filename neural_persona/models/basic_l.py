@@ -44,8 +44,8 @@ def print_param_for_check(model: torch.nn.Module):
     print("-" * 80)
 
 
-@Model.register("basic-h")
-class Basic(Model):
+@Model.register("basic-l")
+class BasicL(Model):
     """
     VAMPIRE is a variational document model for pretraining under low
     resource environments.
@@ -93,6 +93,8 @@ class Basic(Model):
                  linear_scaling: float = 1000.0,
                  sigmoid_weight_1: float = 0.25,
                  sigmoid_weight_2: float = 15,
+                 saturation_period: int = 2,
+                 period: int = 10,
                  reference_counts: str = None,
                  reference_vocabulary: str = None,
                  background_data_path: str = None,
@@ -150,6 +152,11 @@ class Basic(Model):
             self._kld_weight = float(1/(1 + np.exp(-self._sigmoid_weight_1 * (1 - self._sigmoid_weight_2))))
         elif kl_weight_annealing == "constant":
             self._kld_weight = 1.0
+        elif kl_weight_annealing == "cyclic-linear":
+            self.period = period
+            self.saturation_period = saturation_period
+            self.cyclic_kl_anneal_tracker = 0
+            self._kld_weight = 1/self.period
         else:
             raise ConfigurationError("anneal type {} not found".format(kl_weight_annealing))
 
@@ -166,7 +173,8 @@ class Basic(Model):
         self._metric_epoch_tracker = 0
         self._kl_epoch_tracker = 0
         self._cur_epoch = 0
-        self._cur_npmi = 0.0
+        self._cur_entity_npmi = 0.0
+        self._cur_doc_npmi = 0.0
         self.batch_num = 0
 
         initializer(self)
@@ -228,10 +236,18 @@ class Basic(Model):
                     self._kld_weight = float(1 / (1 + np.exp(- self._sigmoid_weight_1 * (self._cur_epoch - self._sigmoid_weight_2))))
                 elif self._kl_weight_annealing == "constant":
                     self._kld_weight = 1.0
+                elif self._kl_weight_annealing == "cyclic-linear":
+                    self._kld_weight += 1/self.period
+                    if self._kld_weight > 1:
+                        self.cyclic_kl_anneal_tracker += 1
+                        self._kld_weight = 1
+                    if self.cyclic_kl_anneal_tracker > self.saturation_period:
+                        self.cyclic_kl_anneal_tracker = 0
+                        self._kld_weight = 1/self.period
                 else:
                     raise ConfigurationError("anneal type {} not found".format(self._kl_weight_annealing))
 
-    def update_topics(self, epoch_num: Optional[List[int]]) -> None:
+    def update_topics_and_personas(self, epoch_num: Optional[List[int]]) -> None:
         """
         Update topics and NPMI once per epoch
 
@@ -246,20 +262,32 @@ class Basic(Model):
             # Logs the newest set of topics.
             if self.track_topics:
                 k = 20
-                # (K, vocabulary size)
-                beta = torch.softmax(self.vae.get_beta(), dim=1)
-                topics = self.extract_weights(beta, k=k)
+                # (K - doc dim, P - persona dim)
+                W = torch.softmax(self.vae.get_W(), dim=-1)
+                # (P - persona dim, V)
+                beta = torch.softmax(self.vae.get_beta(), dim=-1)
+                ser_dir = os.path.dirname(self.vocab.serialization_dir)
+
+                # Personas are saved for the previous epoch.
+                personas = self.extract_weights(beta, k=k)
+                persona_table = tabulate(personas, headers=["Persona #", "Words"])
+                persona_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "personas")
+                if not os.path.exists(persona_dir):
+                    os.mkdir(persona_dir)
+                persona_filepath = os.path.join(ser_dir, "personas", "personas_{}.txt".format(self._metric_epoch_tracker))
+                with open(persona_filepath, 'w+') as file_:
+                    file_.write(persona_table)
+
+                # Topics are saved for the previous epoch.
+                topics = self.extract_weights(W @ beta, k=k)
                 topic_table = tabulate(topics, headers=["Topic #", "Words"])
                 topic_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "topics")
                 if not os.path.exists(topic_dir):
                     os.mkdir(topic_dir)
-                ser_dir = os.path.dirname(self.vocab.serialization_dir)
-                # bp()
-                # Topics are saved for the previous epoch.
+
                 topic_filepath = os.path.join(ser_dir, "topics", "topics_{}.txt".format(self._metric_epoch_tracker))
                 with open(topic_filepath, 'w+') as file_:
                     file_.write(topic_table)
-                torch.save(self.vae.state_dict(), f"{ser_dir}/last_model.pk")
 
             self._metric_epoch_tracker = epoch_num[0]
 
@@ -274,8 +302,16 @@ class Basic(Model):
         """
 
         if self.track_npmi and self._ref_vocab and not self.training and not self._npmi_updated:
-            topics = self.extract_weights(self.vae.get_beta())
-            self._cur_npmi = self.compute_npmi(topics[1:])
+            # (K - doc dim, P - persona dim)
+            W = torch.softmax(self.vae.get_W(), dim=-1)
+            # (P - persona dim, V)
+            beta = torch.softmax(self.vae.get_beta(), dim=-1)
+
+            topics = self.extract_weights(W @ beta)
+            self._cur_doc_npmi = self.compute_npmi(topics[1:])
+            personas = self.extract_weights(beta)
+            self._cur_doc_npmi = self.compute_npmi(topics[1:])
+            self._cur_entity_npmi = self.compute_npmi(personas[1:])
             self._npmi_updated = True
         elif self.training:
             self._npmi_updated = False
@@ -419,7 +455,7 @@ class Basic(Model):
         output_dict = {}
 
         self.update_npmi()
-        self.update_topics(epoch_num)
+        self.update_topics_and_personas(epoch_num)
 
         if not self.training:
             self._kld_weight = 1.0  # pylint: disable=W0201
@@ -476,7 +512,8 @@ class Basic(Model):
         # batch_num is tracked for kl weight annealing
         self.batch_num += 1
 
-        self.metrics['npmi'] = self._cur_npmi
+        self.metrics['e_npmi'] = self._cur_entity_npmi
+        self.metrics['d_npmi'] = self._cur_doc_npmi
 
         return output_dict
 

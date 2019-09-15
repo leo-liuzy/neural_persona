@@ -21,7 +21,7 @@ CLASSIFIER = {
         "EMBEDDING_DROPOUT": 0.5,
         "LEARNING_RATE": 0.004,
         "DROPOUT": 0.5,
-        "VAMPIRE_DIRECTORY": os.environ.get("VAMPIRE_DIR", None),
+         "VAMPIRE_DIRECTORY": os.environ.get("VAMPIRE_DIR", None),
         "VAMPIRE_DIM": os.environ.get("VAMPIRE_DIM", None),
         "BATCH_SIZE": 32,
         "NUM_ENCODER_LAYERS": 1,

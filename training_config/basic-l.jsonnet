@@ -24,6 +24,8 @@ local BASE_READER(LAZY) = {
          "vocab_namespace": "entity_based",
          "ignore_oov": true
       },
+      "saturation_period": 2,
+      "period": 10,
       "kl_weight_annealing": std.extVar("KL_ANNEALING"),
       "sigmoid_weight_1": std.extVar("SIGMOID_WEIGHT_1"),
       "sigmoid_weight_2": std.extVar("SIGMOID_WEIGHT_2"),

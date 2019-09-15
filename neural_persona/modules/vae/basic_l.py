@@ -71,7 +71,7 @@ def gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
     return ret
 
 @VAE.register("basic-l")
-class BasicVAE(VAE):
+class BasicLVAE(VAE):
     """
     A Ladder Variational Autoencoder with 2 hidden layer and a Normal prior. This is a generalization of LogitNormal
     So far this class support:
@@ -101,7 +101,7 @@ class BasicVAE(VAE):
                  batchnorm_bias_learnable: bool = True,
                  stochastic_beta: bool = False,
                  z_dropout: float = 0.2) -> None:
-        super(BasicVAE, self).__init__(vocab)
+        super(BasicLVAE, self).__init__(vocab)
 
         self.encoder_topic = encoder_topic
         self.mean_topic = mean_projection_topic
@@ -249,11 +249,11 @@ class BasicVAE(VAE):
             W = torch.nn.functional.softmax(W, dim=1)
         # TODO: use d or theta
         p_persona_hidden = d @ W
-        bp()
+        # bp()
         decoder_persona_params = self.estimate_params(p_persona_hidden, self.decoder_mean_topic,
                                                       self.decoder_log_var_topic,
                                                       self.decoder_mean_bn_topic, self.decoder_log_var_bn_topic)
-        bp()
+        decoder_persona_params = {k: v.unsqueeze(1) for k, v in decoder_persona_params.items()}
         inferred_persona = self.reparameterize(persona_params)
         e = torch.softmax(inferred_persona, dim=-1)
         output.update({"s": inferred_persona,
@@ -269,7 +269,7 @@ class BasicVAE(VAE):
             beta = torch.nn.functional.softmax(beta, dim=1)
         e_reconstruction = e @ beta
         output["e_reconstruction"] = e_reconstruction
-        bp()
+        # bp()
         return output
 
     @overrides
