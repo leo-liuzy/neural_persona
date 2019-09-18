@@ -24,11 +24,11 @@ def infer_repr(archive_file, in_file, ontology, namespace):
     :param labeled_data: [(docid, label(s), forward_output), ... ] each tuple is for one document.
     e.g. the output tensor is of size (1=num_document, num_entities, entity_dim). In our case, label is an entities' name
     :param ontology: is a lookup function f, that f(docid, label(char name)) will give the cluster index
+    if not valid query(name is not labeled), return None
     :return: X, y
     """
     X = []
     y = []
-    docs = []
     archive = load_archive(archive_file)
     model = archive.model
     dev = pickle.load(open(in_file, "rb"))
@@ -40,48 +40,19 @@ def infer_repr(archive_file, in_file, ontology, namespace):
         entities = doc["entities"]
         if len(entities) == 0:
             continue
+        idxs = [ontology(docid, entity["label"]) for entity in entities]
+        entities_text = np.asarray(np.stack([entity["text"].sum(0) for entity in entities]))
 
-        for i in range(len(entities)):
-            entity = entities[i]
-            label = entity["label"]
-            idx = ontology(docid, label)
-            entity_text = np.asarray(entity["text"].sum(0))
-            
-        entities_label = [entity["label"] for entity in entities]
         tensor_input = torch.from_numpy(entities_text)
         # turn input into float tensor of size (batch_size=1, num_entity, vocab_size)
         tensor_input = tensor_input.float().unsqueeze(0)
-
         output_dic = model.vae(tensor_input)
-        out.append((docid, entities_label, output_dic))
-    pickle.dump(out, open(out_file, "wb"))
-
-
-def cluster(ontology, labeled_data, namespace):
-    """
-
-    :param labeled_data: [(docid, label(s), forward_output), ... ] each tuple is for one document.
-    e.g. the output tensor is of size (1=num_document, num_entities, entity_dim). In our case, label is an entities' name
-    :param ontology: is a lookup function f, that f(label) will give the cluster index
-    :return: X, y
-    """
-    X = []
-    y = []
-    docs = []
-    for datum in labeled_data:
-        docid, labels, output_dic = datum
-        tensors = output_dic[namespace][0]
-        assert len(labels) == tensors.shape[0]
-        for i in range(len(labels)):
-            label = labels[i]
-            idx = ontology(docid, label)
-            if idx is None:
-                continue
-            tensor = tensors[i].detach().numpy()
-            X.append(tensor)
-            y.append(idx)
-            docs.append(docid)
-    return np.array(X), np.array(y), docs
+        tensor_output = output_dic[namespace][0].detach().numpy()
+        for i in range(len(idxs)):
+            if idxs[i] is not None:
+                X.append(tensor_output[i])
+                y.append(idxs[i])
+    return np.array(X), np.array(y)
 
 
 def movies_ontology(table):
@@ -102,14 +73,32 @@ def movies_ontology(table):
     return f
 
 
-name_ontology = movies_ontology(json.load(open("dataset/movies/charid2nameidx.json", "r")))
-tvtrope_ontology = movies_ontology(json.load(open("dataset/movies/charid2tropeidx.json", "r")))
+charid2nameidx, char_name_lst = json.load(open("dataset/movies/charid2nameidx.json", "r"))
+charid2tropeidx, trope_name_lst = json.load(open("dataset/movies/charid2tropeidx.json", "r"))
+name_ontology = movies_ontology(charid2nameidx)
+tvtrope_ontology = movies_ontology(charid2tropeidx)
 
 
 if __name__ == "__main__":
-    infer_repr(archive_file="archives/basic_ladder/movies/model.tar.gz",
-               in_file=f"{os.getcwd()}/examples/movies/entity_based/dev.pk",
-               out_file="archives/basic_ladder/movies/out.pk")
+    X, y = infer_repr(archive_file="archives/basic_ladder/movies/model.tar.gz",
+                      in_file=f"examples/movies/entity_based/train.pk",
+                      ontology=name_ontology,
+                      namespace="e")
+
+    print("Reducing entities with tsne")
+    tsne = TSNE(n_components=2, random_state=0)
+    X_2d = tsne.fit_transform(X)
+    target_ids = list(range(len(char_name_lst)))
+    target = char_name_lst
+    plt.figure(figsize=(6, 5))
+    for i, label in zip(target_ids, target):
+        plt.scatter(X_2d[y == i, 0], X_2d[y == i, 1], label=label)
+    plt.legend()
+    plt.show()
+    # plt.scatter(X_2d[:, 0], X_2d[:, 1])
+    plt.title("tsne_entity")
+    plt.savefig("archives/basic_ladder/movies/tsne_inferred_entity_name_cluster")
+    plt.show()
 
     # ontology = json.load(open("archives/all.json", "r"))
     # fb_id_table = {}
@@ -120,27 +109,10 @@ if __name__ == "__main__":
     #             fb_id_table[fb_id] = idx
     #         except:
     #             print(fb_id)
-    labeled_inferred_data = pickle.load(open("archives/basic_ladder/movies/out.pk", "rb"))
-    cluster(name_ontology, labeled_inferred_data, "e")
     # points = pickle.load(open("archives/basic_ladder/inferred_entity_dev.pk", "rb"))
     # X = np.array([point[1].tolist() for point in points])
     # y = np.array([fb_id_table[point[0]] for point in points])
     #
-    # print("Reducing entities with tsne")
-    # tsne = TSNE(n_components=2, random_state=0)
-    # X_2d = tsne.fit_transform(X)
-    #
-    # target = list(ontology.keys())[:2]
-    # target_ids = list(range(len(target)))[:1]
-    # plt.figure(figsize=(6, 5))
-    # for i, label in zip(target_ids, target):
-    #     plt.scatter(X_2d[y == i, 0], X_2d[y == i, 1], label=label)
-    # plt.legend()
-    # plt.show()
-    # # plt.scatter(X_2d[:, 0], X_2d[:, 1])
-    # plt.title("tsne_entity")
-    # plt.savefig("archives/basic_ladder/tsne_inferred_entity")
-    # plt.show()
 
     # points = pickle.load(open("archives/inferred_doc_dev.pk", "rb"))
     # X = np.array([point.squeeze(0).tolist() for point in points])
