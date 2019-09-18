@@ -45,9 +45,9 @@ def load_data(data_path: str, tokenize: bool = False, tokenizer_type: str = "jus
                 assert "entities" in example
                 entities = example["entities"]
                 # new_entities = [{"label": entity["entity_label"], "text": text[entity["entity_text_ids"]]} for entity in entities]
-                texts.append({"text": text, "entities": entities})
+                texts.append({"docid": example["docid"], "text": text, "entities": entities})
             else:
-                texts.append({"text": text})
+                texts.append({"docid": example["docid"], "text": text})
 
     return texts
 
@@ -56,7 +56,7 @@ def create_mentions(examples: List[Dict[str, Any]], unique_sentence: bool = Fals
     result = []
     for example in examples:
         entities = example["entities"]
-        all_mentions_idx = chain(*[entity["entity_text_ids"] for entity in entities])
+        all_mentions_idx = chain(*[entity["mentions"] for entity in entities])
         if unique_sentence:
             all_mentions_idx = set(all_mentions_idx)
         all_mentions_idx = list(all_mentions_idx)
@@ -68,7 +68,7 @@ def collapse_entities(data_set):
     result = []
     for example in data_set:
         mat = example["text"]
-        entities_idx = [entity["entity_text_ids"] for entity in example["entities"]]
+        entities_idx = [entity["mentions"] for entity in example["entities"]]
         if len(entities_idx) == 0:
             continue
         entities = np.stack([mat[elm].sum(0) for elm in entities_idx])
@@ -79,7 +79,7 @@ def collapse_entities(data_set):
 def extract_entity_from_doc_as_doc(data_set):
     result = []
     for example in data_set:
-        entities_idx = list(chain(*[entity["entity_text_ids"] for entity in example["entities"]]))
+        entities_idx = list(chain(*[entity["mentions"] for entity in example["entities"]]))
         if len(entities_idx) == 0:
             continue
         mat = example["text"]
@@ -91,7 +91,7 @@ def extract_entity_from_doc_as_doc(data_set):
 def extract_context_from_doc_as_doc(data_set):
     result = []
     for example in data_set:
-        entities_idx = list(chain(*[entity["entity_text_ids"] for entity in example["entities"]]))
+        entities_idx = list(chain(*[entity["mentions"] for entity in example["entities"]]))
         mat = example["text"]
         context_idx = [i for i in range(mat.shape[0]) if i not in entities_idx]
         if len(context_idx) == 0:
@@ -166,24 +166,29 @@ def main():
     master = count_vectorizer.fit_transform(text)
     max_entity_per_doc = max(len(example['text']) for example in train_examples + dev_examples)
 
-    vectorized_train_examples = [{"text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
+    vectorized_train_examples = [{"docid": example["docid"],
+                                  "text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
                                                          count_vectorizer.transform(example["text"]))).tocsc(),
-                                  "entities": example["entities"], }
+                                  "entities": example["entities"],
+                                  }
                                  for example in train_examples]
-    vectorized_dev_examples = [{"text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
+    vectorized_dev_examples = [{"docid": example["docid"],
+                                "text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
                                                        count_vectorizer.transform(example["text"]))).tocsc(),
                                 "entities": example["entities"]}
                                for example in dev_examples]
     # add @@unknown@@ token vector for both doc and entity representation
     # this decision is for code simplicity
-    vectorized_train_examples = [{"text": np.asarray(example["text"].sum(0)).squeeze(0),
-                                  "entities": [{"label": entity["entity_label"],
-                                                "text": example["text"][entity["entity_text_ids"]]}
+    vectorized_train_examples = [{"docid": example["docid"],
+                                  "text": np.asarray(example["text"].sum(0)).squeeze(0),
+                                  "entities": [{"label": entity["name"],
+                                                "text": example["text"][entity["mentions"]]}
                                                for entity in example["entities"]]}
                                  for example in vectorized_train_examples]
-    vectorized_dev_examples = [{"text": np.asarray(example["text"].sum(0)).squeeze(0),
-                                "entities": [{"label": entity["entity_label"],
-                                              "text": example["text"][entity["entity_text_ids"]]}
+    vectorized_dev_examples = [{"docid": example["docid"],
+                                "text": np.asarray(example["text"].sum(0)).squeeze(0),
+                                "entities": [{"label": entity["name"],
+                                              "text": example["text"][entity["mentions"]]}
                                              for entity in example["entities"]]}
                                for example in vectorized_dev_examples]
 

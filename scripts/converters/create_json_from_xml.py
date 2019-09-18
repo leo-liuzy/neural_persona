@@ -74,7 +74,7 @@ def convert_sentences(doc_x):
         # sent_infos = {}
 
         toks_x = sent_x.findall(".//token")
-        toks_j = [(t.findtext(".//word").lower(), t.findtext(".//POS"), t.findtext(".//NER"))for t in toks_x]
+        toks_j = [(t.findtext(".//word").lower(), t.findtext(".//POS"), t.findtext(".//NER")) for t in toks_x]
         sents.append(toks_j)  # join tokenized sentence and turn into lower-case
     return sents
 
@@ -136,6 +136,7 @@ if __name__ == "__main__":
             # entity name is defined to be one:
             # - with more than two tokens
             # - without DATE NER tag and PRP($) POS tag
+            # - whose name is partially labeled with the entities' freebase id
 
             for name in names:
                 if not any("DATE" == part[2] for part in name) and \
@@ -162,8 +163,19 @@ if __name__ == "__main__":
             continue
         num_missed_entity += len(entities) - len(slim_entities)
         num_entity += len(slim_entities)
+        text = []
+        for sentence in sentences:
+            new_sent = []
+            for token in sentence:
+                token_text = re.sub(r"(\-[lLrR])?([a-zA-Z])?([bB]\-)", "", token[0])
+                if token_text == "":
+                    continue
+                new_sent.append(token_text)
+            assert len(new_sent) > 0
+            text.append(" ".join(new_sent))
+
         processed_doc = dict(docid=docid,
-                             text=[" ".join(token[0] for token in sentence) for sentence in sentences])
+                             text=text)
         processed_doc["entities"] = slim_entities
         processed_corpus.append(processed_doc)
     print(f"""
@@ -179,14 +191,22 @@ if __name__ == "__main__":
     
     Considering included entities...
     Total Mention: {num_covered_mentions + num_uncovered_mentions}
-    Processed Mention: {num_covered_mentions}
-    Missed Mentions: {num_uncovered_mentions}
+    Covered Mention: {num_covered_mentions}
+    Uncovered Mentions: {num_uncovered_mentions}
     """)
 
     json.dump(docs, open(f"{data_home}/doc_id2char_id_map.json", "w"))
     json.dump(actors, open(f"{data_home}/char_id2actor_id.json", "w"))
-    with open(f"{data_home}/corpus.jsonl", "w") as f:
-        for datum in processed_corpus:
+    import random
+    random.shuffle(processed_corpus)
+    train = processed_corpus[:len(processed_corpus) // 10 * 8]
+    dev = processed_corpus[len(processed_corpus) // 10 * 8:]
+    with open(f"{data_home}/train.jsonl", "w") as f:
+        for datum in train:
+            json.dump(datum, f)
+            f.write("\n")
+    with open(f"{data_home}/dev.jsonl", "w") as f:
+        for datum in dev:
             json.dump(datum, f)
             f.write("\n")
 
