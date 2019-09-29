@@ -7,5 +7,7 @@ re-run experiment partial-gen.DocInfo1.lr0.001.BNonNormal1.BNonDecoder0.Stochast
 run evaluation metric on nyt-dataset
 run david's model on nyt-dataset
 get ladder vae model running on nyt-dataset     x
-improve ladder vae model
+improve ladder vae model x 
 try with david model but with more 2 hops in dependency tree
+
+use vi/purity as early stopping criterion  x

@@ -1,4 +1,6 @@
 from neural_persona.models import BasicL
+from neural_persona.common import PROJ_DIR
+from neural_persona.common.util import partition_labeling, movies_ontology, variation_of_information, purity
 from allennlp.models.archival import load_archive
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
@@ -16,9 +18,13 @@ import pickle
 import json
 import torch
 import numpy as np
+from math import log
+from itertools import chain
+from math import sqrt
+from numpy import isnan
 
 
-def infer_repr(archive_file, in_file, ontology, namespace):
+def infer_repr(archive_file, dataset, ontology, namespace):
     """
 
     :param labeled_data: [(docid, label(s), forward_output), ... ] each tuple is for one document.
@@ -29,13 +35,12 @@ def infer_repr(archive_file, in_file, ontology, namespace):
     """
     X = []
     y = []
+    # print("Inferring")
     archive = load_archive(archive_file)
     model = archive.model
-    dev = pickle.load(open(in_file, "rb"))
-
+    # dev = pickle.load(open(in_file, "rb"))
     model.eval()
-    print("Inferring")
-    for doc in tqdm(dev):
+    for doc in dataset:
         docid = doc['docid']
         entities = doc["entities"]
         if len(entities) == 0:
@@ -55,50 +60,114 @@ def infer_repr(archive_file, in_file, ontology, namespace):
     return np.array(X), np.array(y)
 
 
-def movies_ontology(table):
-    import json
-    docs = json.load(open("dataset/movies/doc_id2char_id_map.json", "r"))
+bamman_clustering = partition_labeling(lambda x: np.argmax(x, axis=1))
+gold_clustering = partition_labeling(lambda x: x)
 
-    def f(docid: str, name: str):
-        parts = name.split(" ")
-        doc = docs[docid]
-        char_fb_id = None
-        for part in parts:
-            if part in doc:
-                char_fb_id = doc[part]
-                break
-        if char_fb_id is None or char_fb_id not in table:
-            return None
-        return table[char_fb_id]
-    return f
-
-
-charid2nameidx, char_name_lst = json.load(open("dataset/movies/charid2nameidx.json", "r"))
-charid2tropeidx, trope_name_lst = json.load(open("dataset/movies/charid2tropeidx.json", "r"))
+charid2nameidx, char_name_lst = json.load(open(f"{PROJ_DIR}/dataset/movies/charid2nameidx.json", "r"))
+charid2tropeidx, trope_name_lst = json.load(open(f"{PROJ_DIR}/dataset/movies/charid2tropeidx.json", "r"))
 name_ontology = movies_ontology(charid2nameidx)
 tvtrope_ontology = movies_ontology(charid2tropeidx)
 
 
-if __name__ == "__main__":
-    X, y = infer_repr(archive_file="archives/basic_ladder/movies/model.tar.gz",
-                      in_file=f"examples/movies/entity_based/train.pk",
-                      ontology=name_ontology,
-                      namespace="e")
+def describe_string(desc, percent: bool = False):
+    mean = desc.mean * 100 if percent else desc.mean
+    std = 0 if isnan(desc.variance) else sqrt(desc.variance)
+    std = std * 100 if percent else std
 
-    print("Reducing entities with tsne")
-    tsne = TSNE(n_components=2, random_state=0)
-    X_2d = tsne.fit_transform(X)
-    target_ids = list(range(len(char_name_lst)))
-    target = char_name_lst
-    plt.figure(figsize=(6, 5))
-    for i, label in zip(target_ids, target):
-        plt.scatter(X_2d[y == i, 0], X_2d[y == i, 1], label=label)
-    plt.legend()
-    plt.show()
-    # plt.scatter(X_2d[:, 0], X_2d[:, 1])
-    plt.title("tsne_entity")
-    plt.savefig("archives/basic_ladder/movies/tsne_inferred_entity_name_cluster")
-    plt.show()
+    ret = f"{mean:.2f} +/- {std:.2f}"
+    if percent:
+        ret += " %"
+    return ret
+
+
+if __name__ == "__main__":
+    import sys
+
+    from glob import glob
+    from scipy.stats import describe
+    from pprint import pprint
+    stdout_target = lambda m: open(f"eval_output_{m}.txt", "w")
+    model_dir_name_func = lambda m: lambda k, p: f"{PROJ_DIR}/archives/basic_ladder/movies/K{k}P{p}-{m}-namefree/"
+    # train = pickle.load(open("examples/movies/entity_based_namefree/train.pk", "rb"))
+    dev = pickle.load(open(f"{PROJ_DIR}/examples/movies/entity_based_namefree/dev.pk", "rb"))
+    test = dev
+    K_vals = [25, 50, 100]
+    P_vals = [25, 50, 100]
+
+    metrics_mean = {"name": {"VI": np.zeros((len(P_vals), len(K_vals))),
+                             "Purity": np.zeros((len(P_vals), len(K_vals)))},
+                    "tvtrope": {"VI": np.zeros((len(P_vals), len(K_vals))),
+                                "Purity": np.zeros((len(P_vals), len(K_vals)))}}
+    metrics_std = {"name": {"VI": np.zeros((len(P_vals), len(K_vals))),
+                            "Purity": np.zeros((len(P_vals), len(K_vals)))},
+                   "tvtrope": {"VI": np.zeros((len(P_vals), len(K_vals))),
+                               "Purity": np.zeros((len(P_vals), len(K_vals)))}}
+
+    metrics = [("tvtrope", tvtrope_ontology), ("name", name_ontology)]
+
+    for metric in ["e_npmi", "d_npmi", "loss"]:
+        dir = model_dir_name_func(metric)
+        sys.stdout = stdout_target(metric)
+        for i, K in tqdm(list(enumerate(K_vals))):
+            for j, P in tqdm(list(enumerate(P_vals))):
+                model_dir = dir(K, P)
+                pprint(model_dir)
+                print(f"K: {K}, P: {P}")
+                for name, ontology in tqdm(metrics):
+                    VIs = []
+                    purity_scores = []
+                    for trial in tqdm(glob(f"{model_dir}/**/*.tar.gz")):
+                        # print(trial)
+
+                        X, y = infer_repr(archive_file=trial,
+                                          dataset=test,
+                                          ontology=ontology,
+                                          namespace="e")
+                        print(f"n_data: {len(y)}, gold_clustering: {name}")
+                        algo_partitions = bamman_clustering(X)
+                        gold_partitions = gold_clustering(y)
+                        VI = variation_of_information(algo_partitions, gold_partitions)
+                        purity_score = purity(algo_partitions, gold_partitions)
+                        VIs.append(VI)
+                        purity_scores.append(purity_score)
+                    VI_stats = describe(VIs)
+                    purity_scores_stats = describe(purity_scores)
+                    print(f"Metric {name}")
+                    print(f"Variation of Information: {describe_string(VI_stats, percent=False)}")
+                    print(f"Purity Score: {describe_string(purity_scores_stats, percent=True)}")
+                    print()
+
+                    metrics_mean[name]["VI"][j, i] = VI_stats.mean
+                    metrics_std[name]["VI"][j, i] = 0 if isnan(VI_stats.variance) else sqrt(VI_stats.variance)
+                    metrics_mean[name]["Purity"][j, i] = purity_scores_stats.mean * 100
+                    metrics_std[name]["Purity"][j, i] = 0 if isnan(purity_scores_stats.variance) else sqrt(purity_scores_stats.variance) * 100
+
+        pprint(f"metrics_mean: {metrics_mean}")
+        pprint(f"metrics_std: {metrics_std}")
+
+
+    visualize = False
+    if visualize:
+        print("Visualizing")
+        tsne = TSNE(n_components=2, random_state=0)
+        print("Reducing entities with tsne")
+        X_2d = tsne.fit_transform(X)
+        target_ids = list(range(len(char_name_lst)))
+        target = char_name_lst
+        plt.figure(figsize=(6, 5))
+        count = 0
+        for i, label in zip(target_ids, target):
+            detect = y == i
+            if sum(detect) > 2:
+                count += 1
+                plt.scatter(X_2d[y == i, 0], X_2d[y == i, 1], label=label)
+        plt.legend()
+        # plt.scatter(X_2d[:, 0], X_2d[:, 1])
+        plt.title(f"tsne_entity_({count})")
+        plt.savefig(f"archives/basic_ladder/movies/tsne_inferred_entity_{name}_cluster")
+        plt.show()
+
+    # name_ontology("33059372", 'preston , who harbors a mysterious connection to chromeskull')
 
     # ontology = json.load(open("archives/all.json", "r"))
     # fb_id_table = {}

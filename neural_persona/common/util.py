@@ -3,6 +3,8 @@ import json
 import os
 import pickle
 from typing import Any, Dict, List
+from itertools import chain
+from math import log
 from ipdb import set_trace as bp
 
 import numpy as np
@@ -10,7 +12,9 @@ import torch
 from allennlp.data import Vocabulary
 from scipy import sparse
 
+PROJ_DIR = "/home/lzy/proj/neural_persona"
 EPSILON = 1e-12
+
 
 def create_trainable_BatchNorm1d(num_features: int,
                                  weight_learnable: bool = False,
@@ -257,3 +261,83 @@ def load_sparse(input_filename):
     npy = np.load(input_filename)
     coo_matrix = sparse.coo_matrix((npy['data'], (npy['row'], npy['col'])), shape=npy['shape'])
     return coo_matrix.tocsc()
+
+
+def variation_of_information(X, Y):
+    """
+
+    :param X: partition made by clustering algorithm
+    :param Y: gold partition
+    :return:
+    """
+    assert len(list(chain(*X))) == len(list(chain(*Y)))
+    n = float(sum([len(x) for x in X]))
+    sigma = 0.0
+    for x in X:
+        p = len(x) / n
+        for y in Y:
+            q = len(y) / n
+            r = len(set(x) & set(y)) / n
+            if r > 0.0:
+                sigma += r * (log(r / p, 2) + log(r / q, 2))
+    return abs(sigma)
+
+
+def purity(X, Y):
+    assert len(list(chain(*X))) == len(list(chain(*Y)))
+    n = float(sum([len(x) for x in X]))
+    total = 0
+    for y in Y:
+        max_val = 0
+        for x in X:
+            intersection = set(x) & set(y)
+            if max_val < len(intersection):
+                max_val = len(intersection)
+        total += max_val
+    return total / n
+
+
+def movies_ontology(table):
+    """
+
+    :param table: <charid, cluster idx> pairs
+    :return: ontology with accord to some
+    """
+    import json
+    docs = json.load(open(f"{PROJ_DIR}/dataset/movies/doc_id2char_id_map.json", "r"))
+
+    def f(docid: str, name: str):
+        """
+
+        :param docid: doc id
+        :param name: entity name, may or may not contain " "
+        :return: None if entities names are not even partially contained in the table
+                 otherwise the index of the entity name(first match)
+        """
+        parts = name.split(" ")
+        doc = docs[docid]
+        char_fb_id = None
+        for part in parts:
+            if part in doc:
+                char_fb_id = doc[part]
+                break
+        if char_fb_id is None or char_fb_id not in table:
+            return None
+        return table[char_fb_id]
+    return f
+
+
+def partition_labeling(f):
+    def g(X):
+        labeling = f(X)
+        label_set = set(labeling)
+        partitions = []
+        for label in label_set:
+            lst = np.where(labeling == label)[0].tolist()
+            partitions.append(lst)
+        return partitions
+    return g
+
+
+bamman_clustering = partition_labeling(lambda x: np.argmax(x, axis=1))
+gold_clustering = partition_labeling(lambda x: x)

@@ -1,0 +1,168 @@
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K25P25-e_npmi-namefree/'
+K: 25, P: 25
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.67 +/- 0.13
+Purity Score: 61.80 +/- 3.70 %
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.53 +/- 0.15
+Purity Score: 67.34 +/- 2.01 %
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K25P50-e_npmi-namefree/'
+K: 25, P: 50
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.47 +/- 0.39
+Purity Score: 72.43 +/- 18.88 %
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.54 +/- 0.17
+Purity Score: 76.77 +/- 14.42 %
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K25P100-e_npmi-namefree/'
+K: 25, P: 100
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.34 +/- 0.09
+Purity Score: 72.53 +/- 4.46 %
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.44 +/- 0.01
+Purity Score: 74.00 +/- 3.40 %
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K50P25-e_npmi-namefree/'
+K: 50, P: 25
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.60 +/- 0.19
+Purity Score: 62.98 +/- 3.52 %
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.49 +/- 0.09
+Purity Score: 70.12 +/- 2.59 %
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K50P50-e_npmi-namefree/'
+K: 50, P: 50
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.43 +/- 0.16
+Purity Score: 70.74 +/- 6.20 %
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.52 +/- 0.07
+Purity Score: 72.56 +/- 4.36 %
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K50P100-e_npmi-namefree/'
+K: 50, P: 100
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.55 +/- 0.18
+Purity Score: 65.21 +/- 5.25 %
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.60 +/- 0.09
+Purity Score: 69.89 +/- 2.50 %
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K100P25-e_npmi-namefree/'
+K: 100, P: 25
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.62 +/- 0.19
+Purity Score: 64.70 +/- 9.20 %
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.55 +/- 0.08
+Purity Score: 69.40 +/- 5.37 %
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K100P50-e_npmi-namefree/'
+K: 100, P: 50
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.39 +/- 0.12
+Purity Score: 73.11 +/- 4.76 %
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.55 +/- 0.07
+Purity Score: 74.17 +/- 2.34 %
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K100P100-e_npmi-namefree/'
+K: 100, P: 100
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.48 +/- 0.15
+Purity Score: 70.35 +/- 4.17 %
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.57 +/- 0.10
+Purity Score: 72.19 +/- 2.20 %
+
+("metrics_mean: {'name': {'VI': array([[9.53068255, 9.49330948, 9.55342714],\n"
+ '       [9.53937552, 9.51941501, 9.55298492],\n'
+ "       [9.44258129, 9.59564473, 9.57307486]]), 'Purity': "
+ 'array([[67.33637314, 70.12444191, 69.40248884],\n'
+ '       [76.76926   , 72.55628384, 74.16642918],\n'
+ "       [73.9954403 , 69.88695735, 72.19055761]])}, 'tvtrope': {'VI': "
+ 'array([[6.67072588, 6.59691668, 6.61561398],\n'
+ '       [6.46638005, 6.43431892, 6.38764425],\n'
+ "       [6.3367779 , 6.54673797, 6.48316615]]), 'Purity': "
+ 'array([[61.80217744, 62.98355339, 64.69770674],\n'
+ '       [72.43456104, 70.74357192, 73.10632384],\n'
+ '       [72.52721798, 65.2073199 , 70.34977994]])}}')
+("metrics_std: {'name': {'VI': array([[0.14827951, 0.08550306, 0.08366556],\n"
+ '       [0.1719906 , 0.07091858, 0.06594044],\n'
+ "       [0.00546987, 0.08652563, 0.09872664]]), 'Purity': array([[ "
+ '2.00918678,  2.59122976,  5.36610232],\n'
+ '       [14.41595306,  4.35674607,  2.33906261],\n'
+ "       [ 3.39735094,  2.49620566,  2.20397446]])}, 'tvtrope': {'VI': "
+ 'array([[0.12834675, 0.19192953, 0.19053659],\n'
+ '       [0.39488956, 0.15749557, 0.11859573],\n'
+ "       [0.08529554, 0.17575651, 0.14707464]]), 'Purity': array([[ "
+ '3.70164176,  3.52454313,  9.19932216],\n'
+ '       [18.88007318,  6.19966836,  4.76367285],\n'
+ '       [ 4.45747528,  5.24673745,  4.16512002]])}}')

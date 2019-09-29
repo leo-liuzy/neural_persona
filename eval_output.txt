@@ -1,0 +1,111 @@
+'archives/basic_ladder/movies/K25P25/'
+K: 25, P: 25
+n_data: 240, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 5.57 +/- 0.00
+Purity Score: 62.50 +/- 0.00 %
+K: 25, P: 25
+n_data: 1157, gold_clustering: name
+Metric name
+Variation of Information: 7.75 +/- 0.00
+Purity Score: 74.50 +/- 0.00 %
+'archives/basic_ladder/movies/K25P50/'
+K: 25, P: 50
+n_data: 240, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 5.29 +/- 0.00
+Purity Score: 76.25 +/- 0.00 %
+K: 25, P: 50
+n_data: 1157, gold_clustering: name
+Metric name
+Variation of Information: 8.05 +/- 0.00
+Purity Score: 81.59 +/- 0.00 %
+'archives/basic_ladder/movies/K25P100/'
+K: 25, P: 100
+n_data: 240, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 5.08 +/- 0.00
+Purity Score: 87.92 +/- 0.00 %
+K: 25, P: 100
+n_data: 1157, gold_clustering: name
+Metric name
+Variation of Information: 7.95 +/- 0.00
+Purity Score: 88.25 +/- 0.00 %
+'archives/basic_ladder/movies/K50P25/'
+K: 50, P: 25
+n_data: 240, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 5.52 +/- 0.00
+Purity Score: 74.17 +/- 0.00 %
+K: 50, P: 25
+n_data: 1157, gold_clustering: name
+Metric name
+Variation of Information: 8.26 +/- 0.00
+Purity Score: 76.15 +/- 0.00 %
+'archives/basic_ladder/movies/K50P50/'
+K: 50, P: 50
+n_data: 240, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 5.19 +/- 0.00
+Purity Score: 78.33 +/- 0.00 %
+K: 50, P: 50
+n_data: 1157, gold_clustering: name
+Metric name
+Variation of Information: 7.75 +/- 0.00
+Purity Score: 84.01 +/- 0.00 %
+'archives/basic_ladder/movies/K50P100/'
+K: 50, P: 100
+n_data: 240, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 5.09 +/- 0.00
+Purity Score: 83.75 +/- 0.00 %
+K: 50, P: 100
+n_data: 1157, gold_clustering: name
+Metric name
+Variation of Information: 8.05 +/- 0.00
+Purity Score: 82.97 +/- 0.00 %
+'archives/basic_ladder/movies/K100P25/'
+K: 100, P: 25
+n_data: 240, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 5.18 +/- 0.00
+Purity Score: 90.42 +/- 0.00 %
+K: 100, P: 25
+n_data: 1157, gold_clustering: name
+Metric name
+Variation of Information: 8.09 +/- 0.00
+Purity Score: 89.46 +/- 0.00 %
+'archives/basic_ladder/movies/K100P50/'
+K: 100, P: 50
+n_data: 240, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 5.39 +/- 0.00
+Purity Score: 70.00 +/- 0.00 %
+K: 100, P: 50
+n_data: 1157, gold_clustering: name
+Metric name
+Variation of Information: 8.05 +/- 0.00
+Purity Score: 79.95 +/- 0.00 %
+'archives/basic_ladder/movies/K100P100/'
+K: 100, P: 100
+n_data: 240, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 5.36 +/- 0.00
+Purity Score: 57.50 +/- 0.00 %
+K: 100, P: 100
+n_data: 1157, gold_clustering: name
+Metric name
+Variation of Information: 7.46 +/- 0.00
+Purity Score: 66.46 +/- 0.00 %
+{'name': {'Purity': array([[74.50302506, 81.59031979, 88.2454624 ],
+       [76.14520311, 84.01037165, 82.97320657],
+       [89.45548833, 79.94814175, 66.46499568]]),
+          'VI': array([[7.75453037, 8.04992661, 7.95340204],
+       [8.25817642, 7.74648914, 8.04890975],
+       [8.09198259, 8.04915169, 7.46245754]])},
+ 'tvtrope': {'Purity': array([[62.5       , 76.25      , 87.91666667],
+       [74.16666667, 78.33333333, 83.75      ],
+       [90.41666667, 70.        , 57.5       ]]),
+             'VI': array([[5.56959044, 5.29298912, 5.07583267],
+       [5.5201292 , 5.1881426 , 5.08806034],
+       [5.1754555 , 5.38973361, 5.36449517]])}}

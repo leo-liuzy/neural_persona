@@ -17,6 +17,7 @@ This scripts is for creating d, d_e type of dataset
 """
 
 data_home = "/home/lzy/proj/neural_persona/dataset/movies"
+target_home = "/home/lzy/proj/neural_persona/examples/movies"
 xml_folder = f"{data_home}/corenlp_plot_summaries"
 meta_folder = f"{data_home}/MovieSummaries"
 character_meta = f"{meta_folder}/character.metadata.tsv"
@@ -48,7 +49,7 @@ def readMetadata(nameFile):
 
     file.close()
 
-readMetadata(character_meta)
+# readMetadata(character_meta)
 
 
 def corexmls_from_files(xml_docs):
@@ -195,17 +196,28 @@ if __name__ == "__main__":
     Uncovered Mentions: {num_uncovered_mentions}
     """)
 
-    json.dump(docs, open(f"{data_home}/doc_id2char_id_map.json", "w"))
-    json.dump(actors, open(f"{data_home}/char_id2actor_id.json", "w"))
+    json.dump(docs, open(f"{target_home}/doc_id2char_id_map.json", "w"))
+    json.dump(actors, open(f"{target_home}/char_id2actor_id.json", "w"))
     import random
     random.shuffle(processed_corpus)
-    train = processed_corpus[:len(processed_corpus) // 10 * 8]
-    dev = processed_corpus[len(processed_corpus) // 10 * 8:]
-    with open(f"{data_home}/train.jsonl", "w") as f:
+    train, dev = [], []
+    print("Splitting the dataset")
+    from cluster import tvtrope_ontology, name_ontology
+    for doc in processed_corpus:
+        docid = doc["docid"]
+        names = [entity["name"] for entity in doc["entities"]]
+        for ontology in [name_ontology, tvtrope_ontology]:
+            if any(ontology(docid, name) is not None for name in names):
+                dev.append(doc)
+            else:
+                train.append(doc)
+    # train = processed_corpus[:len(processed_corpus) // 10 * 8]
+    # dev = processed_corpus[len(processed_corpus) // 10 * 8:]
+    with open(f"{target_home}/train.jsonl", "w") as f:
         for datum in train:
             json.dump(datum, f)
             f.write("\n")
-    with open(f"{data_home}/dev.jsonl", "w") as f:
+    with open(f"{target_home}/dev.jsonl", "w") as f:
         for datum in dev:
             json.dump(datum, f)
             f.write("\n")

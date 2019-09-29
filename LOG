@@ -1,0 +1,18 @@
+09-24
+Re-run model on training data which exclude the document which contains evaluation peoples
+Run the nyt-parse with stanford parser which was suspended somehow
+Run the wikidata query again for the 13,000+ mid
+write visualization code
+
+09-25
+run evaluation of experiments with three different early stopping criteria -- d_npmi, e_npmi, loss
+
+09-27
+correctly split data, dev set only consists of documents having gold clustered entities. Previouisly, some of the gold clustered entities are in train set, there for dev set are not big enough. 
+Rerun the experiments on basic ladder
+
+09-28
+it shows that the previously thought good result are erroneous, since the metric -- variation of information and purity score -- we use are partially dependent on the amount of entities.
+
+09-29
+Found experiments with loss as stopping criteria are runned incorrectly, rerunning it. I was afraid that the model does not need dropout, as there may not be such need to avoid overfitting. Therefore, I rerun the experiments without dropout
