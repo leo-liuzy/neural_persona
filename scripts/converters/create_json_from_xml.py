@@ -129,6 +129,7 @@ if __name__ == "__main__":
             continue
         doc_etree = ET.fromstring(data)
         sentences = convert_sentences(doc_etree)
+        # text = " ".join([" ".join([token[0] for token in sentence]) for sentence in sentences])
         entities = convert_coref(doc_etree, sentences)
         slim_entities = []
         for entity in entities:

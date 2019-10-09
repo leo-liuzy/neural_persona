@@ -2,7 +2,7 @@ local CUDA_DEVICE = std.parseInt(std.extVar("CUDA_DEVICE"));
 
 local BASE_READER(LAZY) = {
   "lazy": LAZY == 1,
-  "type": "toy_reader"
+  "type": "entity_based_reader"
 };
 
 {
@@ -24,12 +24,18 @@ local BASE_READER(LAZY) = {
          "vocab_namespace": "entity_based",
          "ignore_oov": true
       },
-      "saturation_period": 2,
-      "period": 10,
-      "kl_weight_annealing": std.extVar("KL_ANNEALING"),
-      "sigmoid_weight_1": std.extVar("SIGMOID_WEIGHT_1"),
-      "sigmoid_weight_2": std.extVar("SIGMOID_WEIGHT_2"),
-      "linear_scaling": std.extVar("LINEAR_SCALING"),
+      "doc_saturation_period": std.extVar("DOC_SATURATION_PERIOD"),
+      "doc_period": std.extVar("DOC_PERIOD"),
+      "doc_kl_weight_annealing": std.extVar("DOC_KL_ANNEALING"),
+      "doc_sigmoid_weight_1": std.extVar("DOC_SIGMOID_WEIGHT_1"),
+      "doc_sigmoid_weight_2": std.extVar("DOC_SIGMOID_WEIGHT_2"),
+      "doc_linear_scaling": std.extVar("DOC_LINEAR_SCALING"),
+      "entity_saturation_period": std.extVar("ENTITY_SATURATION_PERIOD"),
+      "entity_period": std.extVar("ENTITY_PERIOD"),
+      "entity_kl_weight_annealing": std.extVar("ENTITY_KL_ANNEALING"),
+      "entity_sigmoid_weight_1": std.extVar("ENTITY_SIGMOID_WEIGHT_1"),
+      "entity_sigmoid_weight_2": std.extVar("ENTITY_SIGMOID_WEIGHT_2"),
+      "entity_linear_scaling": std.extVar("ENTITY_LINEAR_SCALING"),
       "reference_counts": std.extVar("REFERENCE_COUNTS"),
       "reference_vocabulary": std.extVar("REFERENCE_VOCAB"),
       "update_background_freq": std.parseInt(std.extVar("UPDATE_BACKGROUND_FREQUENCY")) == 1,

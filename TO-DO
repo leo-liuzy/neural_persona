@@ -11,3 +11,5 @@ improve ladder vae model x
 try with david model but with more 2 hops in dependency tree
 
 use vi/purity as early stopping criterion  x
+
+create and run on synthetic data

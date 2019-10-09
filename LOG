@@ -16,3 +16,15 @@ it shows that the previously thought good result are erroneous, since the metric
 
 09-29
 Found experiments with loss as stopping criteria are runned incorrectly, rerunning it. I was afraid that the model does not need dropout, as there may not be such need to avoid overfitting. Therefore, I rerun the experiments without dropout
+
+10-06
+read papers on representation learning
+
+10-07
+run basic-namefree with loss
+run basic-namefree-nodropout
+create synthetic dataset
+
+10-08
+run on synthetic dataset, but observe negative npmi
+create another penalty terms for document level divergence
