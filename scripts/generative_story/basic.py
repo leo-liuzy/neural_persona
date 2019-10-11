@@ -10,12 +10,12 @@ np.random.seed(6)
 
 alpha = 1
 persona_per_topic = 4
-K = 25
-P = persona_per_topic * K  # assumption of basic model
+K = 100
+P = K // persona_per_topic  # assumption of basic model
 num_doc = 10000
 vocab_size = 3001
-result_dir = "/home/lzy/proj/neural_persona/examples/toy/basic"
-vocabulary_fname = f"{result_dir}/vocabulary/entity_based.txt"
+result_dir = f"/home/lzy/proj/neural_persona/examples/toy/basicK{K}P{P}"
+vocabulary_fname = f"/home/lzy/proj/neural_persona/examples/toy/basicK25P100/vocabulary/entity_based.txt"
 
 vocab = open(vocabulary_fname, "r").read().split("\n")[:-1]
 idx2word = dict(enumerate(vocab))
@@ -55,7 +55,7 @@ for i in tqdm(range(num_doc)):
     doc = []
     for _ in range(E_i):
         # uniformly sample a center from [persona_per_topic * d_max_idx, persona_per_topic * (d_max_idx + 1))
-        s_max_idx = np.random.randint(persona_per_topic * d_max_idx, persona_per_topic * (d_max_idx + 1))
+        s_max_idx = d_max_idx // persona_per_topic
         # sample s_i from N(f(d), 1)
         s_j = np.random.multivariate_normal(np.eye(P)[s_max_idx], np.eye(P))
         # persona representation

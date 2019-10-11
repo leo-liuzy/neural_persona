@@ -28,3 +28,11 @@ create synthetic dataset
 10-08
 run on synthetic dataset, but observe negative npmi
 create another penalty terms for document level divergence
+run the basic-l-div models
+
+10-09
+run evalutation on toy model
+run evaluation on basic-l-nodropout model
+decide on naming convention and rename all files
+add if condition in bash script so that metric can be set automatically
+

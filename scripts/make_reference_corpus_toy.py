@@ -41,7 +41,7 @@ def main(args):
                       help='Keep tokens made of only numbers: default=%default')
     parser.add_option('--keep-alphanum', action="store_true", dest="keep_alphanum", default=False,
                       help="Keep tokens made of a mixture of letters and numbers: default=%default")
-    parser.add_option('--strip-html', action="st"learn"ore_true", dest="strip_html", default=False,
+    parser.add_option('--strip-html', action="store_true", dest="strip_html", default=False,
                       help='Strip HTML tags: default=%default')
     parser.add_option('--no-lower', action="store_true", dest="no_lower", default=False,
                       help='Do not lowercase text: default=%default')

@@ -333,8 +333,8 @@ LEO = {
         # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
         "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
         "NUM_FILTER": 3,
-        "K": 20,
-        "P": 50,
+        "K": os.environ["K"],
+        "P": os.environ["P"],
         ##############################################################
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
@@ -363,7 +363,7 @@ LEO = {
         "APPLY_BATCHNORM": 1,
         "APPLY_BATCHNORM_1": 0,
         "BATCH_SIZE": 64,
-        "VALIDATION_METRIC": "+npmi"
+        "VALIDATION_METRIC": os.environ["METRIC"]
 }
 
 
@@ -381,13 +381,13 @@ LEO_DIV = {
         # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
         "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
         "NUM_FILTER": 3,
-        "K": 20,
-        "P": 50,
+        "K": os.environ["K"],
+        "P": os.environ["P"],
         ##############################################################
         "DOC_KL_ANNEALING": "linear",
         "DOC_SIGMOID_WEIGHT_1": 0.25,
         "DOC_SIGMOID_WEIGHT_2": 15,
-        "DOC_LINEAR_SCALING": 1000,
+        "DOC_LINEAR_SCALING": os.environ["DOC_LINEAR_SCALING"],
         "DOC_SATURATION_PERIOD": 10,
         "DOC_PERIOD": 2,
         "ENTITY_KL_ANNEALING": "linear",
@@ -420,7 +420,7 @@ LEO_DIV = {
         "APPLY_BATCHNORM": 1,
         "APPLY_BATCHNORM_1": 0,
         "BATCH_SIZE": 64,
-        "VALIDATION_METRIC": "+npmi"
+        "VALIDATION_METRIC": os.environ["METRIC"]
 }
 
 

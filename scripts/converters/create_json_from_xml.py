@@ -203,7 +203,7 @@ if __name__ == "__main__":
     random.shuffle(processed_corpus)
     train, dev = [], []
     print("Splitting the dataset")
-    from cluster import tvtrope_ontology, name_ontology
+    from cluster_movies import tvtrope_ontology, name_ontology
     for doc in processed_corpus:
         docid = doc["docid"]
         names = [entity["name"] for entity in doc["entities"]]

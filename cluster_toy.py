@@ -40,13 +40,14 @@ def infer_repr(archive_file, dataset, ontology, namespace):
     model = archive.model
     # dev = pickle.load(open(in_file, "rb"))
     model.eval()
+    print(f"K: {model.vae._decoder_topic.in_features}, P: {model.vae._decoder_topic.out_features}")
     for doc in dataset:
-        docid = doc['docid']
+        true_e = doc["e"]
         entities = doc["entities"]
         if len(entities) == 0:
             continue
-        idxs = [ontology(docid, entity["label"]) for entity in entities]
-        entities_text = np.asarray(np.stack([entity["text"].sum(0) for entity in entities]))
+        idxs = ontology(true_e)
+        entities_text = entities
 
         tensor_input = torch.from_numpy(entities_text)
         # turn input into float tensor of size (batch_size=1, num_entity, vocab_size)
@@ -57,16 +58,14 @@ def infer_repr(archive_file, dataset, ontology, namespace):
             if idxs[i] is not None:
                 X.append(tensor_output[i])
                 y.append(idxs[i])
-    return np.array(X), np.array(y)
+    X = np.array(X)
+    y = np.array(y)
 
+    return X, y
 
-bamman_clustering = partition_labeling(lambda x: np.argmax(x, axis=1))
+argmax_ontology = lambda x: np.argmax(x, axis=1)
+argmax_clustering = partition_labeling(lambda x: np.argmax(x, axis=1))
 gold_clustering = partition_labeling(lambda x: x)
-
-charid2nameidx, char_name_lst = json.load(open(f"{PROJ_DIR}/dataset/movies/charid2nameidx.json", "r"))
-charid2tropeidx, trope_name_lst = json.load(open(f"{PROJ_DIR}/dataset/movies/charid2tropeidx.json", "r"))
-name_ontology = movies_ontology(charid2nameidx)
-tvtrope_ontology = movies_ontology(charid2tropeidx)
 
 
 def describe_string(desc, percent: bool = False):
@@ -86,24 +85,22 @@ if __name__ == "__main__":
     from glob import glob
     from scipy.stats import describe
     from pprint import pprint
-    stdout_target = lambda m: open(f"eval_output_{m}.txt", "w")
-    model_dir_name_func = lambda m: lambda k, p: f"{PROJ_DIR}/archives/basic_ladder/movies/K{k}P{p}-{m}-namefree/"
+    stdout_target = lambda m: open(f"eval_output_toy_{m}.txt", "w")
+    model_dir_name_func = lambda m: lambda k, p: f"{PROJ_DIR}/archives/basic_ladder/toy/K{k}P{p}-{m}/"
     # train = pickle.load(open("examples/movies/entity_based_namefree/train.pk", "rb"))
-    dev = pickle.load(open(f"{PROJ_DIR}/examples/movies/entity_based_namefree/dev.pk", "rb"))
+    dev = pickle.load(open(f"{PROJ_DIR}/examples/toy/basic/dev.pk", "rb"))
     test = dev
     K_vals = [25, 50, 100]
     P_vals = [25, 50, 100]
 
-    metrics_mean = {"name": {"VI": np.zeros((len(P_vals), len(K_vals))),
-                             "Purity": np.zeros((len(P_vals), len(K_vals)))},
-                    "tvtrope": {"VI": np.zeros((len(P_vals), len(K_vals))),
-                                "Purity": np.zeros((len(P_vals), len(K_vals)))}}
-    metrics_std = {"name": {"VI": np.zeros((len(P_vals), len(K_vals))),
-                            "Purity": np.zeros((len(P_vals), len(K_vals)))},
-                   "tvtrope": {"VI": np.zeros((len(P_vals), len(K_vals))),
-                               "Purity": np.zeros((len(P_vals), len(K_vals)))}}
-
-    metrics = [("tvtrope", tvtrope_ontology), ("name", name_ontology)]
+    metrics_mean = {"VI": np.zeros((len(P_vals), len(K_vals))),
+                    "Purity": np.zeros((len(P_vals), len(K_vals)))}
+    metrics_std = {"VI": np.zeros((len(P_vals), len(K_vals))),
+                   "Purity": np.zeros((len(P_vals), len(K_vals)))}
+    max_size_mean = np.zeros((len(P_vals), len(K_vals)))
+    max_size_std = np.zeros((len(P_vals), len(K_vals)))
+    import matplotlib
+    metrics = [("argmax", argmax_ontology)]
 
     for metric in ["e_npmi", "d_npmi", "loss"]:
         dir = model_dir_name_func(metric)
@@ -116,35 +113,59 @@ if __name__ == "__main__":
                 for name, ontology in tqdm(metrics):
                     VIs = []
                     purity_scores = []
+                    max_sizes = []
                     for trial in tqdm(glob(f"{model_dir}/**/*.tar.gz")):
                         # print(trial)
-
+                        type_of_model = model_dir.split("/")[-2]
+                        dirname = os.path.dirname(trial)
+                        num_trial = dirname.split("/")[-1]
+                        fig, ax = plt.subplots()
+                        figname = f"{type_of_model}-{num_trial}-pca.png"
                         X, y = infer_repr(archive_file=trial,
                                           dataset=test,
                                           ontology=ontology,
                                           namespace="e")
+                        num_class = len(set(y))
+                        pca = PCA(n_components=2)
+                        X_r = pca.fit(X).transform(X)
+                        #
+                        colors = list(matplotlib.cm.colors.get_named_colors_mapping().values())[:num_class]
+                        for k, c in zip(range(num_class), colors):
+                            plt.scatter(X_r[y == k, 0], X_r[y == k, 1], c=c, label=str(k), s=5, alpha=.5)
+
+                        plt.xlabel('PCA1'), plt.ylabel('PCA2'), ax.grid('on')
+                        # plt.ylim([-4,4])
+                        plt.title("PCA"), plt.legend(bbox_to_anchor=(1.05, 1))
+                        plt.savefig(f"{dirname}/{figname}"), plt.close()
+
                         print(f"n_data: {len(y)}, gold_clustering: {name}")
-                        algo_partitions = bamman_clustering(X)
+                        algo_partitions = argmax_clustering(X)
+                        max_sizes.append(max(len(lst) for lst in algo_partitions))
+                        print(f"biggest partition size: {max(len(lst) for lst in algo_partitions)}")
                         gold_partitions = gold_clustering(y)
                         VI = variation_of_information(algo_partitions, gold_partitions)
                         purity_score = purity(algo_partitions, gold_partitions)
                         VIs.append(VI)
                         purity_scores.append(purity_score)
+                    max_sizes_stats = describe(max_sizes)
                     VI_stats = describe(VIs)
                     purity_scores_stats = describe(purity_scores)
                     print(f"Metric {name}")
                     print(f"Variation of Information: {describe_string(VI_stats, percent=False)}")
                     print(f"Purity Score: {describe_string(purity_scores_stats, percent=True)}")
-                    print()
+                    print(f"Max Sizes: {describe_string(max_sizes_stats, percent=True)}")
 
-                    metrics_mean[name]["VI"][j, i] = VI_stats.mean
-                    metrics_std[name]["VI"][j, i] = 0 if isnan(VI_stats.variance) else sqrt(VI_stats.variance)
-                    metrics_mean[name]["Purity"][j, i] = purity_scores_stats.mean * 100
-                    metrics_std[name]["Purity"][j, i] = 0 if isnan(purity_scores_stats.variance) else sqrt(purity_scores_stats.variance) * 100
+                    max_size_mean[j, i] = max_sizes_stats.mean
+                    max_size_std[j, i] = 0 if isnan(max_sizes_stats.variance) else sqrt(max_sizes_stats.variance)
+                    metrics_mean["VI"][j, i] = VI_stats.mean
+                    metrics_std["VI"][j, i] = 0 if isnan(VI_stats.variance) else sqrt(VI_stats.variance)
+                    metrics_mean["Purity"][j, i] = purity_scores_stats.mean * 100
+                    metrics_std["Purity"][j, i] = 0 if isnan(purity_scores_stats.variance) else sqrt(purity_scores_stats.variance) * 100
 
         pprint(f"metrics_mean: {metrics_mean}")
         pprint(f"metrics_std: {metrics_std}")
-
+        pprint(f"max_size_mean: {max_size_mean}")
+        pprint(f"max_size_std: {max_size_std}")
 
     visualize = False
     if visualize:

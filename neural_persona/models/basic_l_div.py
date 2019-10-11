@@ -539,6 +539,29 @@ class BasicL(Model):
         for item in model_parameters:
             model_parameters[item].requires_grad = False
 
+    # @staticmethod
+    # def plotPCA(outfolder, name, z, target=None):
+    #     import matplotlib
+    #     import matplotlib.pyplot as plt
+    #     from sklearn.decomposition import PCA
+    #     fig, ax = plt.subplots()
+    #     pca = PCA(n_components=2)
+    #     X_r = pca.fit(z).transform(z)
+    #     num_class = z.shape[-1]
+    #     plt.figure()
+    #     if target is not None:
+    #         colors = matplotlib.cm.rainbow(np.linspace(0, 1, num_class))
+    #         for i, c in zip(range(num_class), colors):
+    #             plt.scatter(X_r[target == i, 0], X_r[target == i, 1], c=c, label=str(i), s=5, alpha=.5)
+    #     else:
+    #         plt.scatter(X_r[:, 0], X_r[:, 1], s=5)
+    #     plt.xlabel('PCA1'), plt.ylabel('PCA2'), ax.grid('on')
+    #     # plt.ylim([-4,4])
+    #     plt.title(name), plt.legend(bbox_to_anchor=(1.05, 1))
+    #     plt.savefig(outfolder + '/' + name + '.png'), plt.close()
+
+
+
     @overrides
     def forward(self,  # pylint: disable=arguments-differ
                 entities: Union[Dict[str, torch.IntTensor], torch.IntTensor],
