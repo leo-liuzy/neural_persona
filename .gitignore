@@ -14,3 +14,4 @@ dataset/
 examples/
 s3/
 .hyperparameter_search_results
+*.pyc
