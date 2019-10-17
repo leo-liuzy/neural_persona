@@ -17,7 +17,7 @@ from tqdm import tqdm
 from neural_persona.common.util import read_text, save_sparse, write_to_json, save_named_sparse
 
 
-def load_data(data_path: str, tokenize: bool = False, tokenizer_type: str = "just_spaces", entity: bool = True,
+def load_data(data_path: str, tokenize: bool = False, tokenizer_type: str = "just_spaces", entity_as_doc: bool = True,
               remove_entity_name: bool = True) -> List[Dict[str, Any]]:
     if tokenizer_type == "just_spaces":
         tokenizer = SpacyWordSplitter()
@@ -44,44 +44,40 @@ def load_data(data_path: str, tokenize: bool = False, tokenizer_type: str = "jus
                     elif tokenizer_type == 'spacy':
                         tokens = list(map(str, tokenizer(sentence)))
                     sentence = ' '.join(token for token in tokens if token not in labeled_entity_parts)
+                else:
+                    sentence = ' '.join(token for token in sentence.split(" ") if token not in labeled_entity_parts)
                 text.append(sentence)
-
-            if entity:
-                assert "entities" in example
-                entities = example["entities"]
-                # new_entities = [{"label": entity["entity_label"], "text": text[entity["entity_text_ids"]]} for entity in entities]
-                texts.append({"docid": example["docid"], "text": text, "entities": entities})
+            assert "entities" in example
+            entities = example["entities"]
+            if entity_as_doc:
+                for e in entities:
+                    sentences = [text[idx] for idx in e["mentions"]]
+                    texts.append({"docid": example["docid"], "text": " ".join(sentences), "entity_name": e["name"]})
             else:
-                texts.append({"docid": example["docid"], "text": text})
+                texts.append({"docid": example["docid"], "text": text, "entities": entities})
 
     return texts
 
 
-def create_text(examples: List[Dict[str, Any]], unique_sentence: bool = False, only_mentions: bool = True):
+def create_text(examples: List[Dict[str, Any]], unique_sentence: bool = False, only_mentions: bool = True,
+                entity_as_doc: bool = True):
     result = []
     for example in examples:
-        entities = example["entities"]
-        if only_mentions:
-            all_mentions_idx = chain(*[entity["mentions"] for entity in entities])
-            if unique_sentence:
-                all_mentions_idx = set(all_mentions_idx)
-            all_mentions_idx = list(all_mentions_idx)
-            result.append(" ".join([example["text"][i] for i in all_mentions_idx]))
+        if entity_as_doc:
+            for txt in example["text"]:
+                result.append(txt)
         else:
-            result.append(" ".join(example["text"]))
-
-    return result
-
-
-def collapse_entities(data_set):
-    result = []
-    for example in data_set:
-        mat = example["text"]
-        entities_idx = [entity["mentions"] for entity in example["entities"]]
-        if len(entities_idx) == 0:
-            continue
-        entities = np.stack([mat[elm].sum(0) for elm in entities_idx])
-        result.append(entities)
+            entities = example["entities"]
+            if only_mentions:
+                all_mentions_idx = chain(*[entity["mentions"] for entity in entities])
+                if unique_sentence:
+                    all_mentions_idx = set(all_mentions_idx)
+                all_mentions_idx = list(all_mentions_idx)
+                result.append(" ".join([example["text"][i] for i in all_mentions_idx]))
+            else:
+                result.append(" ".join(example["text"]))
+    if unique_sentence:
+        result = list(set(result))
     return result
 
 
@@ -93,19 +89,6 @@ def extract_entity_from_doc_as_doc(data_set):
             continue
         mat = example["text"]
         new_example = np.asarray(mat[entities_idx].sum(0)).squeeze(0)
-        result.append(new_example)
-    return result
-
-
-def extract_context_from_doc_as_doc(data_set):
-    result = []
-    for example in data_set:
-        entities_idx = list(chain(*[entity["mentions"] for entity in example["entities"]]))
-        mat = example["text"]
-        context_idx = [i for i in range(mat.shape[0]) if i not in entities_idx]
-        if len(context_idx) == 0:
-            continue
-        new_example = np.asarray(mat[context_idx].sum(0)).squeeze(0)
         result.append(new_example)
     return result
 
@@ -139,9 +122,9 @@ def main():
                         help="Whether use document level information")
     parser.add_argument("--unique-sentence", action='store_true',
                         help="Only use one sentence in document once")
-    parser.add_argument("--use-mention", action='store_true',
+    parser.add_argument("--only-mentions", action='store_true',
                         help="Only use mentions")
-    parser.add_argument("--entity", "-e", action='store_true',
+    parser.add_argument("--entity_as_doc", "-e", action='store_true',
                         help="Whether to model persona")
     parser.add_argument("--remove-entity-name", action='store_true',
                         help="Whether to remove labeled entity name from the sentences")
@@ -162,44 +145,74 @@ def main():
 
     # {token_field_name1: [ sentencen0-1, sentencen1-1, ...] ,
     #  token_field_name2: [ sentencen0-2, sentencen1-2, ...] }
-    train_examples = load_data(args.train_path, args.tokenize, args.tokenizer_type, args.entity)
-    dev_examples = load_data(args.dev_path, args.tokenize, args.tokenizer_type, args.entity)
+    train_examples = load_data(data_path=args.train_path, tokenize=args.tokenize, tokenizer_type=args.tokenizer_type,
+                               entity_as_doc=args.entity_as_doc, remove_entity_name=args.remove_entity_name)
+    dev_examples = load_data(data_path=args.dev_path, tokenize=args.tokenize, tokenizer_type=args.tokenizer_type,
+                             entity_as_doc=args.entity_as_doc, remove_entity_name=args.remove_entity_name)
 
+    with open(f"/home/lzy/proj/neural_persona/examples/movies/vampire_persona_namefree/train.jsonl", "w") as f:
+        for datum in train_examples:
+            json.dump(datum, f)
+            f.write("\n")
+    with open(f"/home/lzy/proj/neural_persona/examples/movies/vampire_persona_namefree/dev.jsonl", "w") as f:
+        for datum in dev_examples:
+            json.dump(datum, f)
+            f.write("\n")
+
+    return
     print("fitting count vectorizer...")
     count_vectorizer = CountVectorizer(stop_words='english', max_features=args.vocab_size,
                                        token_pattern=r'\b[^\d\W]{3,30}\b')
 
-    text = create_text(train_examples, args.unique_sentence, args.use_mention) + \
-           create_text(dev_examples, args.unique_sentence, args.use_mention)
+    text = create_text(train_examples, args.unique_sentence, args.only_mentions, args.entity_as_doc) + \
+           create_text(dev_examples, args.unique_sentence, args.only_mentions, args.entity_as_doc)
 
     # master is simply vectorized of the document corpus(no duplicate documents)
     master = count_vectorizer.fit_transform(text)
+    if args.entity_as_doc:
+        vectorized_train_examples = [{"docid": example["docid"],
+                                      "text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
+                                                             count_vectorizer.transform(example["text"]))).tocsc()}
+                                     for example in train_examples]
+        vectorized_dev_examples = [{"docid": example["docid"],
+                                    "text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
+                                                           count_vectorizer.transform(example["text"]))).tocsc()}
+                                   for example in dev_examples]
+    else:
+        vectorized_train_examples = [{"docid": example["docid"],
+                                      "text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
+                                                             count_vectorizer.transform(example["text"]))).tocsc(),
+                                      "entities": example["entities"],
+                                      }
+                                     for example in train_examples]
+        vectorized_dev_examples = [{"docid": example["docid"],
+                                    "text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
+                                                           count_vectorizer.transform(example["text"]))).tocsc(),
+                                    "entities": example["entities"]}
+                                   for example in dev_examples]
 
-    vectorized_train_examples = [{"docid": example["docid"],
-                                  "text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
-                                                         count_vectorizer.transform(example["text"]))).tocsc(),
-                                  "entities": example["entities"],
-                                  }
-                                 for example in train_examples]
-    vectorized_dev_examples = [{"docid": example["docid"],
-                                "text": sparse.hstack((np.array([0] * len(example["text"]))[:, None],
-                                                       count_vectorizer.transform(example["text"]))).tocsc(),
-                                "entities": example["entities"]}
-                               for example in dev_examples]
     # add @@unknown@@ token vector for both doc and entity representation
     # this decision is for code simplicity
-    vectorized_train_examples = [{"docid": example["docid"],
-                                  "text": np.asarray(example["text"].sum(0)).squeeze(0),
-                                  "entities": [{"label": entity["name"],
-                                                "text": example["text"][entity["mentions"]]}
-                                               for entity in example["entities"]]}
-                                 for example in vectorized_train_examples]
-    vectorized_dev_examples = [{"docid": example["docid"],
-                                "text": np.asarray(example["text"].sum(0)).squeeze(0),
-                                "entities": [{"label": entity["name"],
-                                              "text": example["text"][entity["mentions"]]}
-                                             for entity in example["entities"]]}
-                               for example in vectorized_dev_examples]
+    if args.entity_as_doc:
+        vectorized_train_examples = [{"docid": example["docid"],
+                                      "text": np.asarray(example["text"].sum(0)).squeeze(0)}
+                                     for example in vectorized_train_examples]
+        vectorized_dev_examples = [{"docid": example["docid"],
+                                    "text": np.asarray(example["text"].sum(0)).squeeze(0)}
+                                   for example in vectorized_dev_examples]
+    else:
+        vectorized_train_examples = [{"docid": example["docid"],
+                                      "text": np.asarray(example["text"].sum(0)).squeeze(0),
+                                      "entities": [{"label": entity["name"],
+                                                    "text": example["text"][entity["mentions"]]}
+                                                   for entity in example["entities"]]}
+                                     for example in vectorized_train_examples]
+        vectorized_dev_examples = [{"docid": example["docid"],
+                                    "text": np.asarray(example["text"].sum(0)).squeeze(0),
+                                    "entities": [{"label": entity["name"],
+                                                  "text": example["text"][entity["mentions"]]}
+                                                 for entity in example["entities"]]}
+                                   for example in vectorized_dev_examples]
 
     # vectorized_train_examples = extract_entity_from_doc_as_doc(vectorized_train_examples)
     # vectorized_dev_examples = extract_entity_from_doc_as_doc(vectorized_dev_examples)
