@@ -44,8 +44,8 @@ def print_param_for_check(model: torch.nn.Module):
     print("-" * 80)
 
 
-@Model.register("basic-l")
-class BasicL(Model):
+@Model.register("bamman")
+class Bamman(Model):
     """
     VAMPIRE is a variational document model for pretraining under low
     resource environments.
@@ -99,7 +99,6 @@ class BasicL(Model):
                  reference_vocabulary: str = None,
                  background_data_path: str = None,
                  dev_path: str = None,
-                 
                  update_background_freq: bool = False,
                  track_topics: bool = True,
                  track_npmi: bool = True,

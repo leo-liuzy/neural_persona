@@ -153,7 +153,8 @@ if __name__ == "__main__":
                     print(f"Metric {name}")
                     print(f"Variation of Information: {describe_string(VI_stats, percent=False)}")
                     print(f"Purity Score: {describe_string(purity_scores_stats, percent=True)}")
-                    print(f"Max Sizes: {describe_string(max_sizes_stats, percent=True)}")
+                    print(f"Max Sizes: {describe_string(max_sizes_stats, percent=False)}")
+                    print()
 
                     max_size_mean[j, i] = max_sizes_stats.mean
                     max_size_std[j, i] = 0 if isnan(max_sizes_stats.variance) else sqrt(max_sizes_stats.variance)

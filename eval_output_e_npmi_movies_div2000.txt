@@ -1,0 +1,200 @@
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K25P25-e_npmi-namefree-div2000/'
+K: 25, P: 25
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.48 +/- 0.14
+Purity Score: 77.23 +/- 6.42 %
+Max Sizes: 1096.00 +/- 101.43
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.72 +/- 0.10
+Purity Score: 79.37 +/- 4.87 %
+Max Sizes: 5346.00 +/- 472.07
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K25P50-e_npmi-namefree-div2000/'
+K: 25, P: 50
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.91 +/- 0.93
+Purity Score: 58.07 +/- 38.11 %
+Max Sizes: 795.00 +/- 600.01
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.57 +/- 0.24
+Purity Score: 62.95 +/- 34.02 %
+Max Sizes: 3965.00 +/- 2908.63
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K25P100-e_npmi-namefree-div2000/'
+K: 25, P: 100
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 7.35 +/- 0.16
+Purity Score: 28.79 +/- 18.30 %
+Max Sizes: 299.67 +/- 307.72
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.42 +/- 0.51
+Purity Score: 38.31 +/- 18.03 %
+Max Sizes: 1549.00 +/- 1591.67
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K50P25-e_npmi-namefree-div2000/'
+K: 50, P: 25
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 7.20 +/- 0.63
+Purity Score: 48.27 +/- 20.99 %
+Max Sizes: 597.00 +/- 319.87
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.96 +/- 0.10
+Purity Score: 55.46 +/- 18.71 %
+Max Sizes: 3000.33 +/- 1590.38
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K50P50-e_npmi-namefree-div2000/'
+K: 50, P: 50
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.75 +/- 0.91
+Purity Score: 63.61 +/- 41.05 %
+Max Sizes: 855.00 +/- 685.90
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.49 +/- 0.19
+Purity Score: 67.31 +/- 36.44 %
+Max Sizes: 4187.00 +/- 3383.52
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K50P100-e_npmi-namefree-div2000/'
+K: 50, P: 100
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 7.22 +/- 0.17
+Purity Score: 16.05 +/- 1.05 %
+Max Sizes: 71.67 +/- 17.01
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 8.95 +/- 0.20
+Purity Score: 24.83 +/- 1.06 %
+Max Sizes: 315.67 +/- 110.19
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K100P25-e_npmi-namefree-div2000/'
+K: 100, P: 25
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 6.50 +/- 0.73
+Purity Score: 78.76 +/- 25.79 %
+Max Sizes: 1121.33 +/- 391.04
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.58 +/- 0.34
+Purity Score: 81.28 +/- 22.83 %
+Max Sizes: 5504.67 +/- 1938.68
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K100P50-e_npmi-namefree-div2000/'
+K: 100, P: 50
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 7.46 +/- 0.28
+Purity Score: 34.03 +/- 11.29 %
+Max Sizes: 428.33 +/- 230.09
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 9.53 +/- 0.07
+Purity Score: 41.96 +/- 8.68 %
+Max Sizes: 2220.00 +/- 1120.02
+
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K100P100-e_npmi-namefree-div2000/'
+K: 100, P: 100
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+n_data: 1439, gold_clustering: tvtrope
+Metric tvtrope
+Variation of Information: 7.25 +/- 0.18
+Purity Score: 16.40 +/- 0.79 %
+Max Sizes: 77.33 +/- 13.32
+
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+n_data: 7018, gold_clustering: name
+Metric name
+Variation of Information: 8.92 +/- 0.25
+Purity Score: 25.28 +/- 0.36 %
+Max Sizes: 374.67 +/- 89.46
+
+("metrics_mean: {'name': {'VI': array([[9.71803916, 9.96029985, 9.5803281 ],\n"
+ '       [9.56553525, 9.49154192, 9.53410579],\n'
+ "       [9.4190416 , 8.94849201, 8.91735639]]), 'Purity': "
+ 'array([[79.37209081, 55.45739527, 81.27671701],\n'
+ '       [62.9476584 , 67.31262468, 41.96352237],\n'
+ "       [38.31100978, 24.82663627, 25.27785694]])}, 'tvtrope': {'VI': "
+ 'array([[6.48175175, 7.19588097, 6.49699569],\n'
+ '       [6.91199397, 6.75317228, 7.45682689],\n'
+ "       [7.35189116, 7.21717349, 7.25466175]]), 'Purity': "
+ 'array([[77.22955756, 48.27426454, 78.75839703],\n'
+ '       [58.0727357 , 63.60898772, 34.02826037],\n'
+ '       [28.79314339, 16.05281445, 16.40027797]])}}')
+("metrics_std: {'name': {'VI': array([[0.10174847, 0.0962132 , 0.34082374],\n"
+ '       [0.23731905, 0.19394995, 0.06694081],\n'
+ "       [0.50587945, 0.20385462, 0.24700139]]), 'Purity': array([[ "
+ '4.87412753, 18.71290778, 22.83067606],\n'
+ '       [34.02212875, 36.43606031,  8.68456209],\n'
+ "       [18.03165165,  1.05830753,  0.35963036]])}, 'tvtrope': {'VI': "
+ 'array([[0.1375403 , 0.63441878, 0.72530156],\n'
+ '       [0.9318255 , 0.9125664 , 0.28200973],\n'
+ "       [0.15800643, 0.17330844, 0.18070964]]), 'Purity': array([[ "
+ '6.41833243, 20.98775515, 25.79146888],\n'
+ '       [38.11250847, 41.04921296, 11.29472013],\n'
+ '       [18.29669547,  1.05161542,  0.78928539]])}}')
+("max_size_mean: {'name': array([[5346.        , 3000.33333333, "
+ '5504.66666667],\n'
+ '       [3965.        , 4187.        , 2220.        ],\n'
+ "       [1549.        ,  315.66666667,  374.66666667]]), 'tvtrope': "
+ 'array([[1096.        ,  597.        , 1121.33333333],\n'
+ '       [ 795.        ,  855.        ,  428.33333333],\n'
+ '       [ 299.66666667,   71.66666667,   77.33333333]])}')
+("max_size_std: {'name': array([[ 472.0720284 , 1590.37647535, "
+ '1938.68030715],\n'
+ '       [2908.63387177, 3383.52168605, 1120.01830342],\n'
+ "       [1591.67301918,  110.19225623,   89.45576188]]), 'tvtrope': "
+ 'array([[101.42977866, 319.86872307, 391.04006615],\n'
+ '       [600.01333319, 685.8950357 , 230.08766445],\n'
+ '       [307.72119416,  17.0098011 ,  13.31665624]])}')

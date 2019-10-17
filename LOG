@@ -36,3 +36,7 @@ run evaluation on basic-l-nodropout model
 decide on naming convention and rename all files
 add if condition in bash script so that metric can be set automatically
 
+10-10
+run evaluation on toy experiments
+run toy experiments with doc_div linear_annealing to be 2000
+waiting movies_div6000 to finish

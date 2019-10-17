@@ -86,8 +86,8 @@ if __name__ == "__main__":
     from glob import glob
     from scipy.stats import describe
     from pprint import pprint
-    stdout_target = lambda m: open(f"eval_output_{m}.txt", "w")
-    model_dir_name_func = lambda m: lambda k, p: f"{PROJ_DIR}/archives/basic_ladder/movies/K{k}P{p}-{m}-namefree-nodropout/"
+    stdout_target = lambda m: open(f"eval_output_{m}_movies_div4000.txt", "w")
+    model_dir_name_func = lambda m: lambda k, p: f"{PROJ_DIR}/archives/basic_ladder/movies/K{k}P{p}-{m}-namefree-div4000/"
     # train = pickle.load(open("examples/movies/entity_based_namefree/train.pk", "rb"))
     dev = pickle.load(open(f"{PROJ_DIR}/examples/movies/entity_based_namefree/dev.pk", "rb"))
     test = dev
@@ -105,9 +105,14 @@ if __name__ == "__main__":
 
     metrics = [("tvtrope", tvtrope_ontology), ("name", name_ontology)]
 
+    max_size_mean = {"name": np.zeros((len(P_vals), len(K_vals))),
+                     "tvtrope":np.zeros((len(P_vals), len(K_vals)))}
+    max_size_std = {"name": np.zeros((len(P_vals), len(K_vals))),
+                    "tvtrope": np.zeros((len(P_vals), len(K_vals)))}
+
     import matplotlib
 
-    for metric in ["e_npmi", "d_npmi", "loss"]:
+    for metric in ["e_npmi"]:
         dir = model_dir_name_func(metric)
         sys.stdout = stdout_target(metric)
         for i, K in tqdm(list(enumerate(K_vals))):
@@ -118,6 +123,7 @@ if __name__ == "__main__":
                 for name, ontology in tqdm(metrics):
                     VIs = []
                     purity_scores = []
+                    max_sizes = []
                     for trial in tqdm(glob(f"{model_dir}/**/*.tar.gz")):
                         # print(trial)
 
@@ -146,17 +152,24 @@ if __name__ == "__main__":
                         print(f"n_data: {len(y)}, gold_clustering: {name}")
                         algo_partitions = bamman_clustering(X)
                         gold_partitions = gold_clustering(y)
+                        max_sizes.append(max(len(lst) for lst in algo_partitions))
+                        # print(f"biggest partition size: {max(len(lst) for lst in algo_partitions)}")
                         VI = variation_of_information(algo_partitions, gold_partitions)
                         purity_score = purity(algo_partitions, gold_partitions)
                         VIs.append(VI)
                         purity_scores.append(purity_score)
+
+                    max_sizes_stats = describe(max_sizes)
                     VI_stats = describe(VIs)
                     purity_scores_stats = describe(purity_scores)
                     print(f"Metric {name}")
                     print(f"Variation of Information: {describe_string(VI_stats, percent=False)}")
                     print(f"Purity Score: {describe_string(purity_scores_stats, percent=True)}")
+                    print(f"Max Sizes: {describe_string(max_sizes_stats, percent=False)}")
                     print()
 
+                    max_size_mean[name][j, i] = max_sizes_stats.mean
+                    max_size_std[name][j, i] = 0 if isnan(max_sizes_stats.variance) else sqrt(max_sizes_stats.variance)
                     metrics_mean[name]["VI"][j, i] = VI_stats.mean
                     metrics_std[name]["VI"][j, i] = 0 if isnan(VI_stats.variance) else sqrt(VI_stats.variance)
                     metrics_mean[name]["Purity"][j, i] = purity_scores_stats.mean * 100
@@ -164,6 +177,8 @@ if __name__ == "__main__":
 
         pprint(f"metrics_mean: {metrics_mean}")
         pprint(f"metrics_std: {metrics_std}")
+        pprint(f"max_size_mean: {max_size_mean}")
+        pprint(f"max_size_std: {max_size_std}")
 
 
     visualize = False

@@ -141,7 +141,7 @@ PARTIALGEN = {
         "USE_BACKGROUND": 1,
         "USE_DOC_INFO": 0,
         # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
-        "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
+        "PRIOR": str({"type": "normal", "mu": 0, "var": 1}),
         ##############################################################
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
@@ -188,7 +188,7 @@ PARTIALGEN_GLOB = {
         "USE_BACKGROUND": 1,
         "USE_DOC_INFO": 1,
         # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
-        "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
+        "PRIOR": str({"type": "normal", "mu": 0, "var": 1}),
         ##############################################################
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
@@ -233,7 +233,7 @@ LADDER = {
         "USE_BACKGROUND": 1,
         "USE_DOC_INFO": 0,
         # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
-        "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
+        "PRIOR": str({"type": "normal", "mu": 0, "var": 1}),
         "NGRAM_FILTER_SIZES": "[2, 3, 4, 5]",
         "NUM_FILTER": 3,
         ##############################################################
@@ -270,7 +270,7 @@ LADDER = {
 }
 
 
-PERSONA_TOPIC = {
+VAMPIRE_PERSONA = {
         "LAZY_DATASET_READER": os.environ.get("LAZY", 0),
         "KL_ANNEALING": "linear",
         ##############################################################
@@ -281,16 +281,14 @@ PERSONA_TOPIC = {
         "APPLY_BATCHNORM_ON_DECODER": 0,
         "APPLY_BATCHNORM_ON_RECON": 1,
         "USE_BACKGROUND": 1,
-        "USE_DOC_INFO": 0,
         # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
-        "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
-        "NGRAM_FILTER_SIZES": "[2, 3, 4, 5]",
-        "NUM_FILTER": 3,
+        "PRIOR": str({"type": "normal", "mu": 0, "var": 1}),
+        "K":  25,
+        "P":  25,
         ##############################################################
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
         "LINEAR_SCALING": 1000,
-        "VAE_HIDDEN_DIM":  81,
         "ADDITIONAL_UNLABELED_DATA_PATH": None,
         "TRAIN_PATH": os.environ["DATA_DIR"] + "/train.pk",
         "DEV_PATH": os.environ["DATA_DIR"] + "/dev.pk",
@@ -331,7 +329,7 @@ LEO = {
         "USE_BACKGROUND": 1,
         "USE_DOC_INFO": 0,
         # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
-        "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
+        "PRIOR": str({"type": "normal", "mu": 0, "var": 1}),
         "NUM_FILTER": 3,
         "K": os.environ["K"],
         "P": os.environ["P"],
@@ -379,7 +377,7 @@ LEO_DIV = {
         "USE_BACKGROUND": 1,
         "USE_DOC_INFO": 0,
         # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
-        "PRIOR": '{"type": "normal", "mu": 0, "var": 1}',
+        "PRIOR": str({"type": "normal", "mu": 0, "var": 1}),
         "NUM_FILTER": 3,
         "K": os.environ["K"],
         "P": os.environ["P"],
@@ -431,7 +429,7 @@ ENVIRONMENTS = {
         'PARTIALGEN': PARTIALGEN,
         'PARTIALGEN_GLOB': PARTIALGEN_GLOB,
         'LADDER': LADDER,
-        'PERSONA_TOPIC': PERSONA_TOPIC,
+        'VAMPIRE_PERSONA': VAMPIRE_PERSONA,
         'LEO': LEO,
         'LEO_DIV': LEO_DIV
 }
