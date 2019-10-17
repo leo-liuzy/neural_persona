@@ -5,13 +5,15 @@ from tqdm import tqdm
 import os
 import numpy as np
 from scipy.special import softmax
+# from torch.nn.functional import gumbel_softmax
 
 np.random.seed(6)
 
 alpha = 1
 persona_per_topic = 4
-K = 100
-P = K // persona_per_topic  # assumption of basic model
+K = 50
+P = 100
+d_dim = P * 2
 num_doc = 10000
 vocab_size = 3001
 result_dir = f"/home/lzy/proj/neural_persona/examples/toy/basicK{K}P{P}"
@@ -30,20 +32,21 @@ json_output: List[Dict[str, str]] = []  # this is for making reference corpus
 beta = np.zeros((K, vocab_size))
 num_word_per_topic = vocab_size // K
 # only a subset of vocabularis are corresponding to
-beta = np.random.dirichlet(np.ones(vocab_size) * alpha, K)
-# persona model is a matrix that maps d_i -- a mixture of personas that we expect in document i --
-# to a logit vector which we use to sample persona representations of characters in document
-b = softmax(np.ones(vocab_size))
+for i in range(K):
+    beta[i, i * num_word_per_topic:(i + 1) * num_word_per_topic] = 1
+beta = softmax(beta, axis=-1)
+# persona model is a matrix () that maps d_i -- a mixture of personas that we expect in document i --
+# to a logit vector which we use to sample persona representations of characters in document i
+persona_models = np.random.dirichlet(np.ones(P) * alpha, d_dim)
+# b = softmax(np.ones(vocab_size))
 
 for i in tqdm(range(num_doc)):
     # sample a document representation
-    d = np.random.standard_normal(K)
+    d = np.random.standard_normal(d_dim)
     theta = softmax(d)
 
-    # persona representation is constructed with its max more likely being
-    # among [persona_per_topic * d_max_idx, persona_per_topic * (d_max_idx + 1)),
-    # this simulate the effect of give a topic, some personas are more clustered than others
-    d_max_idx = np.argmax(theta)
+    # this is the probability distribution from which we will sample entity representation
+    p_i = theta @ persona_models
 
     # sample number of entities in the document
     E_i = num_entity_func()
@@ -55,13 +58,11 @@ for i in tqdm(range(num_doc)):
     entity_repr_vectors = []
     entity_bow_vectors = []
     doc = []
+    E = np.random.multinomial(1, p_i, size=E_i)
     for _ in range(E_i):
         # uniformly sample a center from [persona_per_topic * d_max_idx, persona_per_topic * (d_max_idx + 1))
-        s_max_idx = d_max_idx // persona_per_topic
-        # sample s_i from N(f(d), 1)
-        s_j = np.random.multivariate_normal(np.eye(P)[s_max_idx], np.eye(P))
         # persona representation
-        e_j = softmax(s_j, axis=-1)
+        e_j = np.random.multinomial(1, p_i, size=1)
         entity_repr_vectors.append(e_j)
 
         # calculate the probability over vocabulary

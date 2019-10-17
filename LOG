@@ -40,3 +40,8 @@ add if condition in bash script so that metric can be set automatically
 run evaluation on toy experiments
 run toy experiments with doc_div linear_annealing to be 2000
 waiting movies_div6000 to finish
+
+10-17
+design vampire_persona model, which is just topic model trained on entity_as_doc corpus and decompose the "topic model"
+run vampire_persona model
+

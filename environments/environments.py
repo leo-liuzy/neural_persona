@@ -283,8 +283,8 @@ VAMPIRE_PERSONA = {
         "USE_BACKGROUND": 1,
         # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
         "PRIOR": str({"type": "normal", "mu": 0, "var": 1}),
-        "K":  25,
-        "P":  25,
+        "K": os.environ["K"],
+        "P": os.environ["P"],
         ##############################################################
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,

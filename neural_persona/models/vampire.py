@@ -457,16 +457,10 @@ class VAMPIRE(Model):
                                .to(device=self.device))
         else:
             embedded_tokens = tokens
-
-        if isinstance(entities, dict):
-            embedded_entities = (self._bag_of_words_embedder(entities['tokens']).to(device=self.device))
-        else:
-            embedded_entities = entities
         # embedded_tokens = embedded_tokens.sum(1)
         # Encode the text into a shared representation for both the VAE
         # and downstream classifiers to use.
         # bp()
-        embedded_tokens, _ = embedded_entities.max(1)
         encoder_output = self.vae.encoder(embedded_tokens)
 
         # Perform variational inference.

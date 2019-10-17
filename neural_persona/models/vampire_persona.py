@@ -260,6 +260,7 @@ class VAMPIRE(Model):
 
                 # save topic model
                 topics = self.extract_topics(beta, k=k)
+                self.topics = topics
                 topic_table = tabulate(topics, headers=["Topic #", "Words"])
                 topic_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "topics")
                 if not os.path.exists(topic_dir):
@@ -273,6 +274,7 @@ class VAMPIRE(Model):
 
                 # save persona to vocab matrix
                 personas = self.extract_topics(V.T, k=k)
+                self.personas = personas
                 perspna_table = tabulate(personas, headers=["Persons #", "Words"])
                 persona_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "persona")
                 if not os.path.exists(persona_dir):
@@ -430,7 +432,6 @@ class VAMPIRE(Model):
     @overrides
     def forward(self,  # pylint: disable=arguments-differ
                 tokens: Union[Dict[str, torch.IntTensor], torch.IntTensor],
-                entities: Union[Dict[str, torch.IntTensor], torch.IntTensor],
                 epoch_num: List[int] = None):
         """
         Parameters
@@ -467,15 +468,10 @@ class VAMPIRE(Model):
         else:
             embedded_tokens = tokens
 
-        if isinstance(entities, dict):
-            embedded_entities = (self._bag_of_words_embedder(entities['tokens']).to(device=self.device))
-        else:
-            embedded_entities = entities
         # embedded_tokens = embedded_tokens.sum(1)
         # Encode the text into a shared representation for both the VAE
         # and downstream classifiers to use.
         # bp()
-        embedded_tokens, _ = embedded_entities.max(1)
         encoder_output = self.vae.encoder(embedded_tokens)
 
         # Perform variational inference.
