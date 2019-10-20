@@ -104,12 +104,9 @@ class Bamman(Model):
                  reference_counts: str = None,
                  reference_vocabulary: str = None,
                  background_data_path: str = None,
-                 dev_path: str = None,
                  update_background_freq: bool = False,
                  track_topics: bool = True,
                  track_npmi: bool = True,
-                 track_vi: bool = True,
-                 track_purity: bool = True,
                  visual_topic: bool = True,
                  initializer: InitializerApplicator = InitializerApplicator(),
                  regularizer: Optional[RegularizerApplicator] = None) -> None:
@@ -121,8 +118,6 @@ class Bamman(Model):
         self.vae = vae
         self.track_topics = track_topics
         self.track_npmi = track_npmi
-        self.track_vi = track_vi
-        self.track_purity = track_purity
         self.visual_topic = visual_topic
         self.vocab_namespace = "entity_based"
         self._update_background_freq = update_background_freq
@@ -354,15 +349,14 @@ class Bamman(Model):
         """
 
         if self.track_npmi and self._ref_vocab and not self.training and not self._npmi_updated:
-            # (K - doc dim, P - persona dim)
+            # (P - persona dim, K - doc dim)
             W = torch.softmax(self.vae.get_W(), dim=-1)
-            # (P - persona dim, V)
+            # (K - doc dim, V)
             beta = torch.softmax(self.vae.get_beta(), dim=-1)
 
-            topics = self.extract_weights(W @ beta)
+            topics = self.extract_weights(beta)
             self._cur_doc_npmi = self.compute_npmi(topics[1:])
-            personas = self.extract_weights(beta)
-            self._cur_doc_npmi = self.compute_npmi(topics[1:])
+            personas = self.extract_weights(W @ beta)
             self._cur_entity_npmi = self.compute_npmi(personas[1:])
             self._npmi_updated = True
         elif self.training:

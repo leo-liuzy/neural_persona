@@ -83,7 +83,7 @@ class Bamman(VAE):
     def __init__(self,
                  vocab,
                  encoder_entity: FeedForward,
-                 encoder_entity_hidden: FeedForward,
+                 encoder_entity_global: FeedForward,
                  decoder_type: FeedForward,  # (d_dim -> P)
                  mean_projection_type: FeedForward,
                  log_var_projection_type: FeedForward,
@@ -100,7 +100,7 @@ class Bamman(VAE):
         super(Bamman, self).__init__(vocab)
 
         self.encoder_entity = encoder_entity
-        self.encoder_entity_hidden = encoder_entity_hidden
+        self.encoder_entity_global = encoder_entity_global
         self.mean_projection_type = mean_projection_type
         self.log_var_projection_type = log_var_projection_type
 
@@ -203,7 +203,7 @@ class Bamman(VAE):
         s_tilde = self.encoder_entity(entity_vector)
         e_tilde = gumbel_softmax(s_tilde)
         # g_tilde = (batch_size, P)
-        g_tilde = self.encoder_entity_hidden(self.pooling_layer(e_tilde, dim=-1))
+        g_tilde = self.encoder_entity_global(self.pooling_layer(e_tilde, dim=-1))
         type_params = self.estimate_params(g_tilde, self.mean_projection_type,
                                            self.log_var_projection_type, self.mean_bn_type,
                                            self.log_var_bn_type)
