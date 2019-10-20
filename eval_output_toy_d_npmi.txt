@@ -1,0 +1,153 @@
+'/home/lzy/proj/neural_persona/archives/basic_ladder/toy/K25P25-d_npmi/'
+K: 25, P: 25
+K: 25, P: 25
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 17837
+K: 25, P: 25
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 19415
+K: 25, P: 25
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 19421
+Metric argmax
+Variation of Information: 6.77 +/- 0.23
+Purity Score: 97.27 +/- 4.70 %
+Max Sizes: 1889100.00 +/- 91279.57 %
+'/home/lzy/proj/neural_persona/archives/basic_ladder/toy/K25P50-d_npmi/'
+K: 25, P: 50
+K: 25, P: 50
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 16304
+K: 25, P: 50
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 17736
+K: 25, P: 50
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 10343
+Metric argmax
+Variation of Information: 7.50 +/- 0.39
+Purity Score: 76.24 +/- 20.08 %
+Max Sizes: 1479433.33 +/- 392089.69 %
+'/home/lzy/proj/neural_persona/archives/basic_ladder/toy/K25P100-d_npmi/'
+K: 25, P: 100
+K: 25, P: 100
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 19270
+K: 25, P: 100
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 11106
+K: 25, P: 100
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 3992
+Metric argmax
+Variation of Information: 8.46 +/- 2.21
+Purity Score: 58.98 +/- 39.36 %
+Max Sizes: 1145600.00 +/- 764501.12 %
+'/home/lzy/proj/neural_persona/archives/basic_ladder/toy/K50P25-d_npmi/'
+K: 50, P: 25
+K: 50, P: 25
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 19422
+K: 50, P: 25
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 19422
+K: 50, P: 25
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 18189
+Metric argmax
+Variation of Information: 6.75 +/- 0.19
+Purity Score: 97.88 +/- 3.67 %
+Max Sizes: 1901100.00 +/- 71187.29 %
+'/home/lzy/proj/neural_persona/archives/basic_ladder/toy/K50P50-d_npmi/'
+K: 50, P: 50
+K: 50, P: 50
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 16472
+K: 50, P: 50
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 11738
+K: 50, P: 50
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 19257
+Metric argmax
+Variation of Information: 7.22 +/- 0.48
+Purity Score: 81.47 +/- 19.57 %
+Max Sizes: 1582233.33 +/- 380136.69 %
+'/home/lzy/proj/neural_persona/archives/basic_ladder/toy/K50P100-d_npmi/'
+K: 50, P: 100
+K: 50, P: 100
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 12130
+K: 50, P: 100
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 660
+K: 50, P: 100
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 4194
+Metric argmax
+Variation of Information: 10.07 +/- 2.00
+Purity Score: 30.26 +/- 29.42 %
+Max Sizes: 566133.33 +/- 587409.78 %
+'/home/lzy/proj/neural_persona/archives/basic_ladder/toy/K100P25-d_npmi/'
+K: 100, P: 25
+K: 100, P: 25
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 19379
+K: 100, P: 25
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 8869
+K: 100, P: 25
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 19422
+Metric argmax
+Variation of Information: 7.24 +/- 1.03
+Purity Score: 81.81 +/- 31.31 %
+Max Sizes: 1589000.00 +/- 608040.24 %
+'/home/lzy/proj/neural_persona/archives/basic_ladder/toy/K100P50-d_npmi/'
+K: 100, P: 50
+K: 100, P: 50
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 17042
+K: 100, P: 50
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 7657
+K: 100, P: 50
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 19395
+Metric argmax
+Variation of Information: 7.99 +/- 1.88
+Purity Score: 75.68 +/- 31.97 %
+Max Sizes: 1469800.00 +/- 621014.60 %
+'/home/lzy/proj/neural_persona/archives/basic_ladder/toy/K100P100-d_npmi/'
+K: 100, P: 100
+K: 100, P: 100
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 691
+K: 100, P: 100
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 8086
+K: 100, P: 100
+n_data: 19422, gold_clustering: argmax
+biggest partition size: 18029
+Metric argmax
+Variation of Information: 9.73 +/- 2.56
+Purity Score: 46.41 +/- 44.22 %
+Max Sizes: 893533.33 +/- 870014.86 %
+("metrics_mean: {'VI': array([[ 6.77427602,  6.75199561,  7.24377818],\n"
+ '       [ 7.49633453,  7.22057977,  7.98756404],\n'
+ "       [ 8.45867944, 10.06898068,  9.72784633]]), 'Purity': "
+ 'array([[97.26598703, 97.88384306, 81.81443724],\n'
+ '       [76.23828648, 81.46603508, 75.67706724],\n'
+ '       [58.98465658, 30.25949954, 46.4095699 ]])}')
+("metrics_std: {'VI': array([[0.22979324, 0.19276565, 1.03108305],\n"
+ '       [0.39285488, 0.4823455 , 1.88439711],\n'
+ "       [2.21382946, 1.99680627, 2.5579215 ]]), 'Purity': array([[ "
+ '4.69980283,  3.66529133, 31.30677773],\n'
+ '       [20.07686403, 19.57247916, 31.97480163],\n'
+ '       [39.3626361 , 29.41876591, 44.22384191]])}')
+('max_size_mean: [[18891.         19011.         15890.        ]\n'
+ ' [14794.33333333 15822.33333333 14698.        ]\n'
+ ' [11456.          5661.33333333  8935.33333333]]')
+('max_size_std: [[ 912.79570551  711.87288191 6080.40237155]\n'
+ ' [3920.89687869 3801.36690328 6210.14597252]\n'
+ ' [7645.01118377 5874.09783144 8700.14863858]]')

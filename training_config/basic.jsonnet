@@ -2,7 +2,7 @@ local CUDA_DEVICE = std.parseInt(std.extVar("CUDA_DEVICE"));
 
 local BASE_READER(LAZY) = {
   "lazy": LAZY == 1,
-  "type": "vampire_reader"
+  "type": "entity_based_reader"
 };
 
 {
@@ -18,10 +18,10 @@ local BASE_READER(LAZY) = {
       "directory_path": std.extVar("VOCABULARY_DIRECTORY")
    },
    "model": {
-      "type": "vampire",
+      "type": "basic",
       "bow_embedder": {
          "type": "bag_of_word_counts",
-         "vocab_namespace": "vampire",
+         "vocab_namespace": "entity_based",
          "ignore_oov": true
       },
       "kl_weight_annealing": std.extVar("KL_ANNEALING"),
@@ -35,37 +35,67 @@ local BASE_READER(LAZY) = {
       "background_data_path": std.extVar("BACKGROUND_DATA_PATH"),
       "vae": {
          "z_dropout": std.extVar("Z_DROPOUT"),
-         "prior": std.parseJson(std.extVar("PRIOR")),
          "apply_batchnorm_on_normal": std.parseInt(std.extVar("APPLY_BATCHNORM_ON_NORMAL")) == 1,
          "apply_batchnorm_on_decoder": std.parseInt(std.extVar("APPLY_BATCHNORM_ON_DECODER")) == 1,
          "batchnorm_weight_learnable": std.parseInt(std.extVar("BATCHNORM_WEIGHT_LEARNABLE")) == 1,
          "batchnorm_bias_learnable": std.parseInt(std.extVar("BATCHNORM_BIAS_LEARNABLE")) == 1,
          "stochastic_beta": std.parseInt(std.extVar("STOCHASTIC_BETA")) == 1,
-         "encoder": {
+         "encoder_topic": {
             "activations": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.extVar("ENCODER_ACTIVATION")),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("VAE_HIDDEN_DIM"))),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
             "input_dim": std.parseInt(std.extVar("VOCAB_SIZE")) + 1,
             "num_layers": std.parseInt(std.extVar("NUM_ENCODER_LAYERS"))
          },
-         "mean_projection": {
+         "mean_projection_p_z1": {
             "activations": std.extVar("MEAN_PROJECTION_ACTIVATION"),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("VAE_HIDDEN_DIM"))),
-            "input_dim": std.extVar("VAE_HIDDEN_DIM"),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
+            "input_dim": std.extVar("K"),
             "num_layers": std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS"))
          },
-        "log_variance_projection": {
+        "log_variance_projection_p_z1": {
             "activations": std.extVar("LOG_VAR_PROJECTION_ACTIVATION"),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("VAE_HIDDEN_DIM"))),
-            "input_dim": std.parseInt(std.extVar("VAE_HIDDEN_DIM")),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
+            "input_dim": std.parseInt(std.extVar("K")),
             "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
          },
-         "decoder": {
+         "mean_projection_topic": {
+            "activations": std.extVar("MEAN_PROJECTION_ACTIVATION"),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
+            "input_dim": std.extVar("K"),
+            "num_layers": std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS"))
+         },
+        "log_variance_projection_topic": {
+            "activations": std.extVar("LOG_VAR_PROJECTION_ACTIVATION"),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
+            "input_dim": std.parseInt(std.extVar("K")),
+            "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
+         },
+         "encoder_entity": {
+            "activations": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.extVar("ENCODER_ACTIVATION")),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
+            "input_dim": std.parseInt(std.extVar("VOCAB_SIZE")) + 1 + std.parseInt(std.extVar("K")),
+            "num_layers": std.parseInt(std.extVar("NUM_ENCODER_LAYERS"))
+         },
+         "mean_projection_entity": {
+            "activations": std.extVar("MEAN_PROJECTION_ACTIVATION"),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
+            "input_dim": std.extVar("K"),
+            "num_layers": std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS"))
+         },
+        "log_variance_projection_entity": {
+            "activations": std.extVar("LOG_VAR_PROJECTION_ACTIVATION"),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("K"))),
+            "input_dim": std.parseInt(std.extVar("K")),
+            "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
+         },
+
+         "decoder_persona": {
             "activations": "linear",
             "hidden_dims": [std.parseInt(std.extVar("VOCAB_SIZE")) + 1],
-            "input_dim": std.parseInt(std.extVar("VAE_HIDDEN_DIM")),
+            "input_dim": std.parseInt(std.extVar("K")),
             "num_layers": 1
          },
-         "type": "normal"
+         "type": "basic"
       }
    },
     "iterator": {

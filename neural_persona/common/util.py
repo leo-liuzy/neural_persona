@@ -3,12 +3,17 @@ import json
 import os
 import pickle
 from typing import Any, Dict, List
+from itertools import chain
+from math import log
 from ipdb import set_trace as bp
 
 import numpy as np
 import torch
 from allennlp.data import Vocabulary
 from scipy import sparse
+
+PROJ_DIR = "/home/lzy/proj/neural_persona"
+EPSILON = 1e-12
 
 
 def create_trainable_BatchNorm1d(num_features: int,
@@ -37,7 +42,7 @@ def create_trainable_BatchNorm1d(num_features: int,
     return bn
 
 
-def normal_kl(N0, N1, eps=1e-12):
+def normal_kl(N0, N1, eps=EPSILON):
     """
     (Roughly) A pragmatic translation of:
      https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence#Multivariate_normal_distributions
@@ -52,20 +57,36 @@ def normal_kl(N0, N1, eps=1e-12):
     mu_0, log_var_0 = N0
     var_0 = log_var_0.exp()
     mu_1, log_var_1 = N1
-    batch_size, k = mu_0.size()
+    if len(mu_0.size()) == 3:
+        _, _, k = mu_0.size()
+    else:
+        _, k = mu_0.size()
     var_1 = log_var_1.exp()
 
     d = mu_1 - mu_0
-    tmp_0 = log_var_0.sum(dim=1)
+    tmp_0 = log_var_0.sum(dim=-1)
     tmp_0[tmp_0 == 0] = eps
-    tmp_1 = log_var_1.sum(dim=1)
+    tmp_1 = log_var_1.sum(dim=-1)
 
-    first_term = torch.sum(var_0 / var_1, dim=1)
-    second_term = torch.sum(d ** 2 / var_1, dim=1)
+    first_term = torch.sum(var_0 / var_1, dim=-1)
+    second_term = torch.sum(d ** 2 / var_1, dim=-1)
     result = 0.5 * (first_term + second_term - k + tmp_1 - tmp_0)
 
     return result
 
+
+def multinomial_kl(q_logit: torch.tensor, p_logit: torch.tensor):
+    """
+    https://math.stackexchange.com/questions/485810/kl-divergence-of-multinomial-distribution
+    We make further assumption that n = 1.
+    :param p:
+    :param q:
+    :return:
+    """
+    p = torch.softmax(p_logit, dim=-1)  # each dim > 0
+    q = torch.softmax(q_logit, dim=-1)  # each dim > 0
+    log_diff = torch.log(p) - torch.log(q)
+    return torch.sum(q * log_diff, dim=-1)
 
 def compute_background_log_frequency(vocab: Vocabulary, vocab_namespace: str, precomputed_bg_file=None):
     """
@@ -89,8 +110,10 @@ def compute_background_log_frequency(vocab: Vocabulary, vocab_namespace: str, pr
             log_term_frequency[i] = 1e-12
         elif token in precomputed_bg:
             log_term_frequency[i] = precomputed_bg[token]
-    assert log_term_frequency.sum().allclose(torch.ones(1))
+    # assert log_term_frequency.sum().allclose(torch.ones(1))
     log_term_frequency = torch.log(log_term_frequency)
+
+    # return torch.zeros(vocab.get_vocab_size(vocab_namespace))
     return log_term_frequency
 
 
@@ -251,3 +274,83 @@ def load_sparse(input_filename):
     npy = np.load(input_filename)
     coo_matrix = sparse.coo_matrix((npy['data'], (npy['row'], npy['col'])), shape=npy['shape'])
     return coo_matrix.tocsc()
+
+
+def variation_of_information(X, Y):
+    """
+
+    :param X: partition made by clustering algorithm
+    :param Y: gold partition
+    :return:
+    """
+    assert len(list(chain(*X))) == len(list(chain(*Y)))
+    n = float(sum([len(x) for x in X]))
+    sigma = 0.0
+    for x in X:
+        p = len(x) / n
+        for y in Y:
+            q = len(y) / n
+            r = len(set(x) & set(y)) / n
+            if r > 0.0:
+                sigma += r * (log(r / p, 2) + log(r / q, 2))
+    return abs(sigma)
+
+
+def purity(X, Y):
+    assert len(list(chain(*X))) == len(list(chain(*Y)))
+    n = float(sum([len(x) for x in X]))
+    total = 0
+    for y in Y:
+        max_val = 0
+        for x in X:
+            intersection = set(x) & set(y)
+            if max_val < len(intersection):
+                max_val = len(intersection)
+        total += max_val
+    return total / n
+
+
+def movies_ontology(table):
+    """
+
+    :param table: <charid, cluster idx> pairs
+    :return: ontology with accord to some
+    """
+    import json
+    docs = json.load(open(f"{PROJ_DIR}/dataset/movies/doc_id2char_id_map.json", "r"))
+
+    def f(docid: str, name: str):
+        """
+
+        :param docid: doc id
+        :param name: entity name, may or may not contain " "
+        :return: None if entities names are not even partially contained in the table
+                 otherwise the index of the entity name(first match)
+        """
+        parts = name.split(" ")
+        doc = docs[docid]
+        char_fb_id = None
+        for part in parts:
+            if part in doc:
+                char_fb_id = doc[part]
+                break
+        if char_fb_id is None or char_fb_id not in table:
+            return None
+        return table[char_fb_id]
+    return f
+
+
+def partition_labeling(f):
+    def g(X):
+        labeling = f(X)
+        label_set = set(labeling)
+        partitions = []
+        for label in label_set:
+            lst = np.where(labeling == label)[0].tolist()
+            partitions.append(lst)
+        return partitions
+    return g
+
+
+bamman_clustering = partition_labeling(lambda x: np.argmax(x, axis=1))
+gold_clustering = partition_labeling(lambda x: x)

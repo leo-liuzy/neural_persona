@@ -1,0 +1,2 @@
+'/home/lzy/proj/neural_persona/archives/basic_ladder/movies/K25P25-d_npmi-namefree-div2000/'
+K: 25, P: 25

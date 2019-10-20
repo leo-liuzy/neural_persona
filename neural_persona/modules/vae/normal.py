@@ -96,10 +96,12 @@ class Normal(VAE):
         theta = output["theta"]
         # self._decoder.weight (output_dim x input_dim)
         beta = self._decoder.weight.t()
-        if self._apply_batchnorm_on_decoder:
-            beta = self.decoder_bn(beta)
         if self._stochastic_beta:
             beta = torch.nn.functional.softmax(beta, dim=1)
+            # beta = torch.nn.functional.tanh(beta)
+            # beta = torch.nn.functional.sigmoid(beta)
+        if self._apply_batchnorm_on_decoder:
+            beta = self.decoder_bn(beta)
         reconstruction = theta @ beta
         output["reconstruction"] = reconstruction
 
@@ -184,3 +186,4 @@ class Normal(VAE):
     @overrides
     def get_beta(self):
         return self._decoder._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
+

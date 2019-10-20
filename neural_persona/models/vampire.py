@@ -6,7 +6,11 @@ from operator import is_not
 from typing import Dict, List, Optional, Tuple, Union
 from ipdb import set_trace as bp
 import numpy as np
+import seaborn as sns
 import torch
+import itertools
+from collections import Counter
+import pandas
 
 from allennlp.common.checks import ConfigurationError
 from allennlp.common.file_utils import cached_path
@@ -95,6 +99,7 @@ class VAMPIRE(Model):
                  update_background_freq: bool = False,
                  track_topics: bool = True,
                  track_npmi: bool = True,
+                 visual_topic: bool = True,
                  initializer: InitializerApplicator = InitializerApplicator(),
                  regularizer: Optional[RegularizerApplicator] = None) -> None:
         super().__init__(vocab, regularizer)
@@ -105,7 +110,8 @@ class VAMPIRE(Model):
         self.vae = vae
         self.track_topics = track_topics
         self.track_npmi = track_npmi
-        self.vocab_namespace = "vampire"
+        self.visual_topic = visual_topic
+        self.vocab_namespace = "entity_based"
         self._update_background_freq = update_background_freq
         # bp()
         self._background_freq = self.initialize_bg_from_file(file_=background_data_path)
@@ -236,14 +242,46 @@ class VAMPIRE(Model):
 
             # Logs the newest set of topics.
             if self.track_topics:
-                topic_table = tabulate(self.extract_topics(self.vae.get_beta()), headers=["Topic #", "Words"])
+                k = 20
+                # (K, vocabulary size)
+                beta = torch.softmax(self.vae.get_beta(), dim=1)
+                topics = self.extract_topics(beta, k=k)
+                topic_table = tabulate(topics, headers=["Topic #", "Words"])
                 topic_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "topics")
                 if not os.path.exists(topic_dir):
                     os.mkdir(topic_dir)
                 ser_dir = os.path.dirname(self.vocab.serialization_dir)
-
+                # bp()
                 # Topics are saved for the previous epoch.
                 topic_filepath = os.path.join(ser_dir, "topics", "topics_{}.txt".format(self._metric_epoch_tracker))
+                words = list(itertools.chain(*[words for _, words in topics[1:]]))
+                if self.visual_topic:
+                    top_k = 100
+                    width = top_k // 3
+                    topic_filepath_png = os.path.join(ser_dir, "topics", "topics_{}_top_{}.png".format(self._metric_epoch_tracker, top_k))
+                    word2count = Counter(words)
+                    top_k_idx2count = dict(sorted(word2count.items(), key=lambda x: x[1], reverse=True)[:top_k])
+                    df = pandas.DataFrame.from_dict(top_k_idx2count, orient='index')
+                    ax = df.plot(kind='bar')
+                    ax.tick_params(axis="x", labelsize=6)
+                    figure = ax.get_figure()
+                    figure.set_figheight(6)
+                    figure.set_figwidth(width)
+                    figure.subplots_adjust(bottom=0.7)
+                    # figure.set_fontsize(4)
+                    figure.savefig(topic_filepath_png, dpi=300)
+                    figure.clf()
+                    # _, indices = torch.topk(beta, k=k, dim=1)
+                    # tmp = beta.scatter(1, indices, torch.zeros_like(beta))
+                    # mask = tmp == 0
+                    # result = beta * mask.float()
+                    # ax = sns.heatmap(result.cpu(), cmap="YlGn")
+                    # ax.set_xlabel("word idx")
+                    # ax.set_ylabel("topic idx")
+                    # figure = ax.get_figure()
+                    # figure.savefig(topic_filepath_png)
+                    # figure.clf()
+                    
                 with open(topic_filepath, 'w+') as file_:
                     file_.write(topic_table)
 
@@ -383,6 +421,7 @@ class VAMPIRE(Model):
     @overrides
     def forward(self,  # pylint: disable=arguments-differ
                 tokens: Union[Dict[str, torch.IntTensor], torch.IntTensor],
+                entities: Union[Dict[str, torch.IntTensor], torch.IntTensor],
                 epoch_num: List[int] = None):
         """
         Parameters
@@ -401,7 +440,7 @@ class VAMPIRE(Model):
             bp()
         # For easy transfer to the GPU.
         self.device = self.vae.get_beta().device  # pylint: disable=W0201
-
+        # bp()
         output_dict = {}
 
         self.update_npmi()
@@ -418,7 +457,7 @@ class VAMPIRE(Model):
                                .to(device=self.device))
         else:
             embedded_tokens = tokens
-
+        # embedded_tokens = embedded_tokens.sum(1)
         # Encode the text into a shared representation for both the VAE
         # and downstream classifiers to use.
         # bp()

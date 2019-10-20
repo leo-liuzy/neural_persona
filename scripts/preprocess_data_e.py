@@ -44,7 +44,7 @@ def load_data(data_path: str, tokenize: bool = False, tokenizer_type: str = "jus
 
 
 def main():
-    parser = argparse.ArgumentParser(formatter_class = argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--train-path", type=str, required=True,
                         help="Path to the train jsonl file.")
     parser.add_argument("--dev-path", type=str, required=True,
@@ -77,7 +77,7 @@ def main():
     print("Using document information" if global_repr else "Discarding document information")
     if not os.path.isdir(args.serialization_dir):
         os.mkdir(args.serialization_dir)
-    
+
     vocabulary_dir = os.path.join(args.serialization_dir, "vocabulary")
 
     if not os.path.isdir(vocabulary_dir):
@@ -95,7 +95,8 @@ def main():
     count_vectorizer = CountVectorizer(stop_words='english', max_features=args.vocab_size,
                                        token_pattern=r'\b[^\d\W]{3,30}\b')
     if global_repr:
-        text = list(set(named_tokenized_train_examples["doc_text"])) + list(set(named_tokenized_dev_examples["doc_text"]))
+        text = list(set(named_tokenized_train_examples["doc_text"])) + list(
+            set(named_tokenized_dev_examples["doc_text"]))
     else:
         train_mentions = json.load(open(args.train_mentions_path))
         dev_mentions = json.load(open(args.dev_mentions_path))
@@ -108,7 +109,7 @@ def main():
                                            count_vectorizer.transform(named_tokenized_train_examples[token_field_name])
                                        for token_field_name in token_field_names}
     named_vectorized_dev_examples = {token_field_name:
-                                           count_vectorizer.transform(named_tokenized_dev_examples[token_field_name])
+                                         count_vectorizer.transform(named_tokenized_dev_examples[token_field_name])
                                      for token_field_name in token_field_names}
     # add @@unknown@@ token vector for both doc and entity representation
     # this decision is for code simplicity
@@ -137,7 +138,7 @@ def main():
     # save_named_sparse(named_vectorized_dev_examples, os.path.join(args.serialization_dir, "dev.npz"))
 
     write_to_json(bgfreq, os.path.join(args.serialization_dir, f"{args.vocab_namespace}.bgfreq"))
-    
+
     write_list_to_file(['@@UNKNOWN@@'] + count_vectorizer.get_feature_names(),
                        os.path.join(vocabulary_dir, f"{args.vocab_namespace}.txt"))
     write_list_to_file(['*tags', '*labels', args.vocab_namespace],

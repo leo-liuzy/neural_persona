@@ -1,4 +1,7 @@
+.*
+!/.gitignore
 .mypy_cache/
+archives/
 visual/*.png
 .idea/
 .pytest_cache/
@@ -11,3 +14,4 @@ dataset/
 examples/
 s3/
 .hyperparameter_search_results
+*.pyc

@@ -94,7 +94,7 @@ class PartialGen(Model):
                  initializer: InitializerApplicator = InitializerApplicator(),
                  regularizer: Optional[RegularizerApplicator] = None) -> None:
         super().__init__(vocab, regularizer)
-        
+
         self.metrics = {'nkld': Average(), 'nll': Average(), 'perp': Average()}
 
         self.vocab = vocab
@@ -110,6 +110,8 @@ class PartialGen(Model):
         if use_doc_info:
             self.interpolation = torch.nn.Parameter(torch.zeros(2, requires_grad=True))
         self._background_freq = self.initialize_bg_from_file(file_=background_data_path) if use_background else 0
+        print(self._background_freq)
+        # bp()
         self._ref_counts = reference_counts
 
         if reference_vocabulary is not None:
@@ -171,7 +173,8 @@ class PartialGen(Model):
         ``file`` : str
             path to background frequency file
         """
-        background_freq = compute_background_log_frequency(self.vocab, self.vocab_namespace, file_)
+        # background_freq = compute_background_log_frequency(self.vocab, self.vocab_namespace, file_)
+        background_freq = torch.zeros(self.vocab.get_vocab_size(self.vocab_namespace))
         return torch.nn.Parameter(background_freq, requires_grad=self._update_background_freq)
 
     @staticmethod
@@ -210,6 +213,7 @@ class PartialGen(Model):
         else:
             _epoch_num = epoch_num[0]
             if _epoch_num != self._kl_epoch_tracker:
+                # print(self._kld_weight)
                 self._kl_epoch_tracker = _epoch_num
                 self._cur_epoch += 1
                 if self._kl_weight_annealing == "linear":
@@ -451,6 +455,13 @@ class PartialGen(Model):
         # Update metrics
         nkld = -torch.mean(negative_kl_divergence)
         nll = -torch.mean(reconstruction_loss)
+        if torch.isnan(nkld):
+            bp()
+        if torch.isnan(nll):
+            bp()
+        if torch.isnan(loss):
+            bp()
+        
         self.metrics['nkld'](nkld)
         self.metrics['nll'](nll)
         self.metrics['perp'](loss)
