@@ -48,10 +48,10 @@ def print_param_for_check(model: torch.nn.Module):
     print("-" * 80)
 
 
-charid2nameidx, char_name_lst = json.load(open(f"{PROJ_DIR}/dataset/movies/charid2nameidx.json", "r"))
-charid2tropeidx, trope_name_lst = json.load(open(f"{PROJ_DIR}/dataset/movies/charid2tropeidx.json", "r"))
-name_ontology = movies_ontology(charid2nameidx)
-tvtrope_ontology = movies_ontology(charid2tropeidx)
+# charid2nameidx, char_name_lst = json.load(open(f"{PROJ_DIR}/dataset/movies/charid2nameidx.json", "r"))
+# charid2tropeidx, trope_name_lst = json.load(open(f"{PROJ_DIR}/dataset/movies/charid2tropeidx.json", "r"))
+# name_ontology = movies_ontology(charid2nameidx)
+# tvtrope_ontology = movies_ontology(charid2tropeidx)
 
 
 @Model.register("basic-l-div")
