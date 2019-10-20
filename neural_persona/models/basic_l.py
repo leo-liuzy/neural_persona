@@ -1,5 +1,6 @@
 import logging
 import os
+import pickle
 from functools import partial
 from itertools import combinations
 from operator import is_not
@@ -11,6 +12,7 @@ import torch
 import itertools
 from collections import Counter
 import pandas
+import json
 
 from allennlp.common.checks import ConfigurationError
 from allennlp.common.file_utils import cached_path
@@ -25,10 +27,12 @@ from tabulate import tabulate
 from torch.nn.functional import log_softmax
 
 from neural_persona.common.util import (compute_background_log_frequency, load_sparse,
-                                 read_json)
+                                        read_json, PROJ_DIR, gold_clustering, bamman_clustering,
+                                        variation_of_information, purity, movies_ontology)
 from neural_persona.modules import VAE
 
 logger = logging.getLogger(__name__)
+
 
 def print_param_for_check(model: torch.nn.Module):
     for name, param in model.named_parameters():
@@ -44,8 +48,14 @@ def print_param_for_check(model: torch.nn.Module):
     print("-" * 80)
 
 
+# charid2nameidx, char_name_lst = json.load(open(f"{PROJ_DIR}/dataset/movies/charid2nameidx.json", "r"))
+# charid2tropeidx, trope_name_lst = json.load(open(f"{PROJ_DIR}/dataset/movies/charid2tropeidx.json", "r"))
+# name_ontology = movies_ontology(charid2nameidx)
+# tvtrope_ontology = movies_ontology(charid2tropeidx)
+
+
 @Model.register("basic-l")
-class Basic(Model):
+class BasicL(Model):
     """
     VAMPIRE is a variational document model for pretraining under low
     resource environments.
@@ -100,6 +110,9 @@ class Basic(Model):
                  background_data_path: str = None,
                  update_background_freq: bool = False,
                  track_topics: bool = True,
+                 dev_path: str = None,
+                 track_purity: bool = True,
+                 track_vi: bool = True,
                  track_npmi: bool = True,
                  visual_topic: bool = True,
                  initializer: InitializerApplicator = InitializerApplicator(),
@@ -112,6 +125,8 @@ class Basic(Model):
         self.vae = vae
         self.track_topics = track_topics
         self.track_npmi = track_npmi
+        self.track_purity = track_purity
+        self.track_vi = track_vi
         self.visual_topic = visual_topic
         self.vocab_namespace = "entity_based"
         self._update_background_freq = update_background_freq
@@ -120,6 +135,11 @@ class Basic(Model):
         # bp()
         self._ref_counts = reference_counts
         self._npmi_updated = False
+        self.dev = None
+
+        if dev_path is not None:
+            self.dev = pickle.load(open(dev_path, "rb"))
+            self.ontologys = {"name": name_ontology, "tvtrope": tvtrope_ontology}
 
         if reference_vocabulary is not None:
             # Compute data necessary to compute NPMI every epoch
@@ -291,6 +311,56 @@ class Basic(Model):
 
             self._metric_epoch_tracker = epoch_num[0]
 
+    def update_scores(self, epoch_num: Optional[List[int]]) -> None:
+        """
+        Update vi/purity score once per epoch
+
+        Parameters
+        ----------
+        ``epoch_num`` : List[int]
+            epoch tracker output (containing current epoch number)
+        """
+
+        if self.dev and epoch_num and epoch_num[0] != self._metric_epoch_tracker:
+            was_training = self.training
+            self.eval()
+            X = []
+            y = []
+            for name, ontology in self.ontologys:
+                for doc in self.dev:
+                    docid = doc['docid']
+                    entities = doc["entities"]
+                    if len(entities) == 0:
+                        continue
+                    idxs = [ontology(docid, entity["label"]) for entity in entities]
+                    entities_text = np.asarray(np.stack([entity["text"].sum(0) for entity in entities]))
+
+                    tensor_input = torch.from_numpy(entities_text)
+                    # turn input into float tensor of size (batch_size=1, num_entity, vocab_size)
+                    tensor_input = tensor_input.float().unsqueeze(0)
+                    output_dic = self(tensor_input)
+                    tensor_output = output_dic["e"][0].detach().numpy()
+                    for i in range(len(idxs)):
+                        if idxs[i] is not None:
+                            X.append(tensor_output[i])
+                            y.append(idxs[i])
+                X, y = np.array(X), np.array(y)
+                algo_partitions = bamman_clustering(X)
+                gold_partitions = gold_clustering(y)
+                VI = variation_of_information(algo_partitions, gold_partitions)
+                purity_score = purity(algo_partitions, gold_partitions)
+                if "vi" not in self.metrics:
+                    self.metrics[f"vi"] = 0
+                if "purity" not in self.metrics:
+                    self.metrics[f"purity"] = 0
+
+                self.metrics[f"vi"] += VI
+                self.metrics[f"purity"] += purity_score
+
+            self.metrics[f"vi"] /= len(self.ontologys)
+            self.metrics[f"purity"] /= len(self.ontologys)
+            self.train() if was_training else self.eval()
+
     def update_npmi(self) -> None:
         """
         Update topics and NPMI at the beginning of validation.
@@ -431,8 +501,8 @@ class Basic(Model):
 
     @overrides
     def forward(self,  # pylint: disable=arguments-differ
-                doc: Union[Dict[str, torch.IntTensor], torch.IntTensor],
                 entities: Union[Dict[str, torch.IntTensor], torch.IntTensor],
+                doc: Union[Dict[str, torch.IntTensor], torch.IntTensor] = None,
                 epoch_num: List[int] = None):
         """
         Parameters
@@ -456,6 +526,7 @@ class Basic(Model):
 
         self.update_npmi()
         self.update_topics_and_personas(epoch_num)
+        self.update_scores(epoch_num)
 
         if not self.training:
             self._kld_weight = 1.0  # pylint: disable=W0201
