@@ -25,7 +25,7 @@ CLASSIFIER = {
         "VAMPIRE_DIM": os.environ.get("VAMPIRE_DIM", None),
         "BATCH_SIZE": 32,
         "NUM_ENCODER_LAYERS": 1,
-        "NUM_OUTPUT_LAYERS": 2, 
+        "NUM_OUTPUT_LAYERS": 2,
         "MAX_FILTER_SIZE": RandomSearch.random_integer(3, 6),
         "NUM_FILTERS": RandomSearch.random_integer(64, 512),
         "HIDDEN_SIZE": RandomSearch.random_integer(64, 512),
@@ -283,19 +283,19 @@ VAMPIRE_PERSONA = {
         "USE_BACKGROUND": 1,
         # "PRIOR": '{"type": "laplace-approx", "alpha": 1}',
         "PRIOR": str({"type": "normal", "mu": 0, "var": 1}),
-        "K": os.environ["K"],
-        "P": os.environ["P"],
+        "K":  os.environ["K"],
+        "P":  os.environ["P"],
         ##############################################################
         "SIGMOID_WEIGHT_1": 0.25,
         "SIGMOID_WEIGHT_2": 15,
         "LINEAR_SCALING": 1000,
         "ADDITIONAL_UNLABELED_DATA_PATH": None,
-        "TRAIN_PATH": os.environ["DATA_DIR"] + "/train.pk",
-        "DEV_PATH": os.environ["DATA_DIR"] + "/dev.pk",
+        "TRAIN_PATH": os.environ["DATA_DIR"] + "/train.npz",
+        "DEV_PATH": os.environ["DATA_DIR"] + "/dev.npz",
         "REFERENCE_COUNTS": os.environ["DATA_DIR"] + "/reference/ref.npz",
         "REFERENCE_VOCAB": os.environ["DATA_DIR"] + "/reference/ref.vocab.json",
         "VOCABULARY_DIRECTORY": os.environ["DATA_DIR"] + "/vocabulary/",
-        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "/persona_based.bgfreq",
+        "BACKGROUND_DATA_PATH": os.environ["DATA_DIR"] + "/vampire_persona.bgfreq",
         "NUM_ENCODER_LAYERS": 2,
         "ENCODER_ACTIVATION": "relu",
         "MEAN_PROJECTION_ACTIVATION": "linear",
@@ -313,7 +313,7 @@ VAMPIRE_PERSONA = {
         "APPLY_BATCHNORM": 1,
         "APPLY_BATCHNORM_1": 0,
         "BATCH_SIZE": 64,
-        "VALIDATION_METRIC": "+npmi"
+        "VALIDATION_METRIC": os.environ["METRIC"],
 }
 
 LEO = {
