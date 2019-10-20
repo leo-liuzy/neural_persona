@@ -2,7 +2,7 @@ local CUDA_DEVICE = std.parseInt(std.extVar("CUDA_DEVICE"));
 
 local BASE_READER(LAZY) = {
   "lazy": LAZY == 1,
-  "type": "vampire_reader"
+  "type": "vampire_context_reader"
 };
 
 {
@@ -18,12 +18,10 @@ local BASE_READER(LAZY) = {
       "directory_path": std.extVar("VOCABULARY_DIRECTORY")
    },
    "model": {
-      "type": "vampire_persona",
-      "K": std.extVar("K"),
-      "P": std.extVar("P"),
+      "type": "vampire",
       "bow_embedder": {
          "type": "bag_of_word_counts",
-         "vocab_namespace": "vampire_namefree",
+         "vocab_namespace": "vampire",
          "ignore_oov": true
       },
       "kl_weight_annealing": std.extVar("KL_ANNEALING"),
@@ -39,26 +37,26 @@ local BASE_READER(LAZY) = {
          "z_dropout": std.extVar("Z_DROPOUT"),
          "encoder": {
             "activations": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.extVar("ENCODER_ACTIVATION")),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("VAE_HIDDEN_DIM"))),
             "input_dim": std.parseInt(std.extVar("VOCAB_SIZE")) + 1,
             "num_layers": std.parseInt(std.extVar("NUM_ENCODER_LAYERS"))
          },
          "mean_projection": {
             "activations": std.extVar("MEAN_PROJECTION_ACTIVATION"),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
-            "input_dim": std.extVar("P"),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("VAE_HIDDEN_DIM"))),
+            "input_dim": std.extVar("VAE_HIDDEN_DIM"),
             "num_layers": std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS"))
          },
         "log_variance_projection": {
             "activations": std.extVar("LOG_VAR_PROJECTION_ACTIVATION"),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
-            "input_dim": std.parseInt(std.extVar("P")),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("VAE_HIDDEN_DIM"))),
+            "input_dim": std.parseInt(std.extVar("VAE_HIDDEN_DIM")),
             "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
          },
          "decoder": {
             "activations": "linear",
             "hidden_dims": [std.parseInt(std.extVar("VOCAB_SIZE")) + 1],
-            "input_dim": std.parseInt(std.extVar("P")),
+            "input_dim": std.parseInt(std.extVar("VAE_HIDDEN_DIM")),
             "num_layers": 1
          },
          "type": "logistic_normal"
@@ -75,7 +73,7 @@ local BASE_READER(LAZY) = {
       "num_epochs": 100,
       "patience": 10,
       "optimizer": {
-         "lr": std.extVar("LEARNING_RATE"),
+         "lr": 0.00021,
          "type": "adam"
       },
       "validation_metric": std.extVar("VALIDATION_METRIC")
