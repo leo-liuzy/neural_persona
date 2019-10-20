@@ -58,10 +58,7 @@ def main():
     #     else:
     #         os.environ["DATA_DIR"] = data_dir
     for i in range(num_repeat):
-        serialization_dir = f"{args.serialization_dir}." \
-            f"DocInfo{env['USE_DOC_INFO']}.lr{env['LEARNING_RATE']}." \
-            f"BNonNormal{env['APPLY_BATCHNORM_ON_NORMAL']}.BNonDecoder{env['APPLY_BATCHNORM_ON_DECODER']}/" \
-            f"NoRepeat{i}"
+        serialization_dir = f"{args.serialization_dir}/NumRepeat{i}"
 
         if args.seed:
             os.environ['SEED'] = str(int(args.seed) + i)
