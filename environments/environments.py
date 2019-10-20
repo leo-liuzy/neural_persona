@@ -437,7 +437,7 @@ BAMMAN = {
         "NUM_FILTER": 3,
         "K": os.environ["K"],
         "P": os.environ["P"],
-        "T": os.environ["P"] // 2,  # TODO: tune this
+        "T": int(os.environ["P"]) // 2,  # TODO: tune this
         ##############################################################
         "DOC_KL_ANNEALING": "linear",
         "DOC_SIGMOID_WEIGHT_1": 0.25,
