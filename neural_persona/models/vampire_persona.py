@@ -46,7 +46,7 @@ def print_param_for_check(model: torch.nn.Module):
 
 
 @Model.register("vampire_persona")
-class VAMPIRE(Model):
+class VAMPIREPersona(Model):
     """
     VAMPIRE is a variational document model for pretraining under low
     resource environments.
@@ -114,7 +114,7 @@ class VAMPIRE(Model):
         self.track_topics = track_topics
         self.track_npmi = track_npmi
         self.visual_topic = visual_topic
-        self.vocab_namespace = "entity_based"
+        self.vocab_namespace = "vampire_persona"
         self._update_background_freq = update_background_freq
         # bp()
         self._background_freq = self.initialize_bg_from_file(file_=background_data_path)
@@ -185,6 +185,7 @@ class VAMPIRE(Model):
         ``file`` : str
             path to background frequency file
         """
+        # bp()
         background_freq = compute_background_log_frequency(self.vocab, self.vocab_namespace, file_)
         return torch.nn.Parameter(background_freq, requires_grad=self._update_background_freq)
 
@@ -252,15 +253,17 @@ class VAMPIRE(Model):
             if self.track_topics:
                 k = 20
                 # (vocabulary size, P)
-                V = self.vae.get_beta().T.numpy()
-
+                # bp()
+                V = self.vae.get_beta().cpu().t()
+                V = torch.softmax(V, dim=0).numpy()
+                # bp()
                 model = NMF(n_components=self.K, init='random', random_state=0)
                 beta = model.fit_transform(V).T  # (K, vocab size)
                 topic2persona = model.components_  # (K, P)
-
+                # bp()
                 # save topic model
                 topics = self.extract_topics(beta, k=k)
-                self.topics = topics
+                self.topics = beta
                 topic_table = tabulate(topics, headers=["Topic #", "Words"])
                 topic_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "topics")
                 if not os.path.exists(topic_dir):
@@ -274,9 +277,9 @@ class VAMPIRE(Model):
 
                 # save persona to vocab matrix
                 personas = self.extract_topics(V.T, k=k)
-                self.personas = personas
+                self.personas = V.T
                 perspna_table = tabulate(personas, headers=["Persons #", "Words"])
-                persona_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "persona")
+                persona_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "personas")
                 if not os.path.exists(persona_dir):
                     os.mkdir(persona_dir)
                 ser_dir = os.path.dirname(self.vocab.serialization_dir)
@@ -294,7 +297,7 @@ class VAMPIRE(Model):
                 topic2persona_filepath = os.path.join(ser_dir, "topic2persona", "topic2persona_{}.txt".format(self._metric_epoch_tracker))
                 with open(topic2persona_filepath, 'wb') as file_:
                     pickle.dump(topic2persona, file_)
-
+                self.update_npmi()
             self._metric_epoch_tracker = epoch_num[0]
 
     def update_npmi(self) -> None:
@@ -308,7 +311,9 @@ class VAMPIRE(Model):
         """
 
         if self.track_npmi and self._ref_vocab and not self.training and not self._npmi_updated:
-            assert self.personas is not None and self.topics is not None
+            # bp()
+            if self.personas is None or self.topics is None:
+                return
             personas = self.extract_topics(self.personas)
             topics = self.extract_topics(self.topics)
             self._cur_topic_npmi = self.compute_npmi(topics[1:])
@@ -317,7 +322,7 @@ class VAMPIRE(Model):
         elif self.training:
             self._npmi_updated = False
 
-    def extract_topics(self, weights: torch.Tensor, k: int = 20) -> List[Tuple[str, List[int]]]:
+    def extract_topics(self, weights: np.ndarray, k: int = 20) -> List[Tuple[str, List[int]]]:
         """
         Given the learned (K, vocabulary size) weights, print the
         top k words from each row as a topic.
@@ -335,7 +340,7 @@ class VAMPIRE(Model):
             collection of learned topics
         """
 
-        words = list(range(weights.size(1)))
+        words = list(range(weights.shape[1]))
         words = [self.vocab.get_token_from_index(i, self.vocab_namespace) for i in words]
 
         topics = []
