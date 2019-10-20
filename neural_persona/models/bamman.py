@@ -89,12 +89,18 @@ class Bamman(Model):
                  vocab: Vocabulary,
                  bow_embedder: TokenEmbedder,
                  vae: VAE,
-                 kl_weight_annealing: str = "constant",
-                 linear_scaling: float = 1000.0,
-                 sigmoid_weight_1: float = 0.25,
-                 sigmoid_weight_2: float = 15,
-                 saturation_period: int = 2,
-                 period: int = 10,
+                 doc_kl_weight_annealing: str = "constant",
+                 doc_linear_scaling: float = 1000.0,
+                 doc_sigmoid_weight_1: float = 0.25,
+                 doc_sigmoid_weight_2: float = 15,
+                 doc_saturation_period: int = 2,
+                 doc_period: int = 10,
+                 entity_kl_weight_annealing: str = "constant",
+                 entity_linear_scaling: float = 1000.0,
+                 entity_sigmoid_weight_1: float = 0.25,
+                 entity_sigmoid_weight_2: float = 15,
+                 entity_saturation_period: int = 2,
+                 entity_period: int = 10,
                  reference_counts: str = None,
                  reference_vocabulary: str = None,
                  background_data_path: str = None,
@@ -126,8 +132,8 @@ class Bamman(Model):
         self._ref_counts = reference_counts
         self._npmi_updated = False
         import pickle
-        if dev_path is not None:
-            self.dev_set = pickle.load(open(dev_path, "rb"))
+        # if dev_path is not None:
+        #     self.dev_set = pickle.load(open(dev_path, "rb"))
 
         if reference_vocabulary is not None:
             # Compute data necessary to compute NPMI every epoch
@@ -149,24 +155,43 @@ class Bamman(Model):
         vocab_size = self.vocab.get_vocab_size(self.vocab_namespace)
         self._bag_of_words_embedder = bow_embedder
 
-        self._kl_weight_annealing = kl_weight_annealing
+        self._doc_kl_weight_annealing = doc_kl_weight_annealing
 
-        self._linear_scaling = float(linear_scaling)
-        self._sigmoid_weight_1 = float(sigmoid_weight_1)
-        self._sigmoid_weight_2 = float(sigmoid_weight_2)
-        if kl_weight_annealing == "linear":
-            self._kld_weight = min(1, 1 / self._linear_scaling)
-        elif kl_weight_annealing == "sigmoid":
-            self._kld_weight = float(1/(1 + np.exp(-self._sigmoid_weight_1 * (1 - self._sigmoid_weight_2))))
-        elif kl_weight_annealing == "constant":
-            self._kld_weight = 1.0
-        elif kl_weight_annealing == "cyclic-linear":
-            self.period = period
-            self.saturation_period = saturation_period
-            self.cyclic_kl_anneal_tracker = 0
-            self._kld_weight = 1/self.period
+        self._doc_linear_scaling = float(doc_linear_scaling)
+        self._doc_sigmoid_weight_1 = float(doc_sigmoid_weight_1)
+        self._doc_sigmoid_weight_2 = float(doc_sigmoid_weight_2)
+        if doc_kl_weight_annealing == "linear":
+            self._doc_kld_weight = min(1, 1 / self._doc_linear_scaling)
+        elif doc_kl_weight_annealing == "sigmoid":
+            self._doc_kld_weight = float(
+                1 / (1 + np.exp(-self._doc_sigmoid_weight_1 * (1 - self._doc_sigmoid_weight_2))))
+        elif doc_kl_weight_annealing == "constant":
+            self._doc_kld_weight = 1.0
+        elif doc_kl_weight_annealing == "cyclic-linear":
+            self._doc_period = doc_period
+            self._doc_saturation_period = doc_saturation_period
+            self._doc_cyclic_kl_anneal_tracker = 0
+            self._doc_kld_weight = 1 / self._doc_period
         else:
-            raise ConfigurationError("anneal type {} not found".format(kl_weight_annealing))
+            raise ConfigurationError("anneal type(doc) {} not found".format(doc_kl_weight_annealing))
+
+        self._entity_linear_scaling = float(entity_linear_scaling)
+        self._entity_sigmoid_weight_1 = float(entity_sigmoid_weight_1)
+        self._entity_sigmoid_weight_2 = float(entity_sigmoid_weight_2)
+        if entity_kl_weight_annealing == "linear":
+            self._entity_kld_weight = min(1, 1 / self._entity_linear_scaling)
+        elif entity_kl_weight_annealing == "sigmoid":
+            self._entity_kld_weight = float(
+                1 / (1 + np.exp(-self._entity_sigmoid_weight_1 * (1 - self._entity_sigmoid_weight_2))))
+        elif entity_kl_weight_annealing == "constant":
+            self._entity_kld_weight = 1.0
+        elif entity_kl_weight_annealing == "cyclic-linear":
+            self._entity_period = entity_period
+            self._entity_saturation_period = entity_saturation_period
+            self._entity_cyclic_kl_anneal_tracker = 0
+            self._entity_kld_weight = 1 / self._entity_period
+        else:
+            raise ConfigurationError("anneal type(entity) {} not found".format(entity_kl_weight_annealing))
 
         # setup batchnorm
         self.doc_bow_bn = torch.nn.BatchNorm1d(vocab_size, eps=0.001, momentum=0.001, affine=True)
@@ -231,29 +256,48 @@ class Bamman(Model):
             epoch tracker output (containing current epoch number)
         """
         if not epoch_num:
-            self._kld_weight = 1.0
+            self._doc_kld_weight = 1.0
         else:
             _epoch_num = epoch_num[0]
             if _epoch_num != self._kl_epoch_tracker:
-                print(self._kld_weight)
+                print(self._doc_kld_weight)
                 self._kl_epoch_tracker = _epoch_num
                 self._cur_epoch += 1
-                if self._kl_weight_annealing == "linear":
-                    self._kld_weight = min(1, self._cur_epoch / self._linear_scaling)
-                elif self._kl_weight_annealing == "sigmoid":
-                    self._kld_weight = float(1 / (1 + np.exp(- self._sigmoid_weight_1 * (self._cur_epoch - self._sigmoid_weight_2))))
-                elif self._kl_weight_annealing == "constant":
-                    self._kld_weight = 1.0
-                elif self._kl_weight_annealing == "cyclic-linear":
-                    self._kld_weight += 1/self.period
-                    if self._kld_weight > 1:
-                        self.cyclic_kl_anneal_tracker += 1
-                        self._kld_weight = 1
-                    if self.cyclic_kl_anneal_tracker > self.saturation_period:
-                        self.cyclic_kl_anneal_tracker = 0
-                        self._kld_weight = 1/self.period
+                if self._doc_kl_weight_annealing == "linear":
+                    self._doc_kld_weight = min(1, self._cur_epoch / self._doc_linear_scaling)
+                elif self._doc_kl_weight_annealing == "sigmoid":
+                    self._doc_kld_weight = float(
+                        1 / (1 + np.exp(- self._doc_sigmoid_weight_1 * (self._cur_epoch - self._doc_sigmoid_weight_2))))
+                elif self._doc_kl_weight_annealing == "constant":
+                    self._doc_kld_weight = 1.0
+                elif self._doc_kl_weight_annealing == "cyclic-linear":
+                    self._doc_kld_weight += 1 / self._doc_period
+                    if self._doc_kld_weight > 1:
+                        self._doc_cyclic_kl_anneal_tracker += 1
+                        self._doc_kld_weight = 1
+                    if self._doc_cyclic_kl_anneal_tracker > self._doc_saturation_period:
+                        self._doc_cyclic_kl_anneal_tracker = 0
+                        self._doc_kld_weight = 1 / self._doc_period
                 else:
-                    raise ConfigurationError("anneal type {} not found".format(self._kl_weight_annealing))
+                    raise ConfigurationError("anneal type {} not found".format(self._doc_kl_weight_annealing))
+
+                if self._entity_kl_weight_annealing == "linear":
+                    self._entity_kld_weight = min(1, self._cur_epoch / self._entity_linear_scaling)
+                elif self._entity_kl_weight_annealing == "sigmoid":
+                    self._entity_kld_weight = float(1 / (1 + np.exp(
+                        - self._entity_sigmoid_weight_1 * (self._cur_epoch - self._entity_sigmoid_weight_2))))
+                elif self._entity_kl_weight_annealing == "constant":
+                    self._entity_kld_weight = 1.0
+                elif self._entity_kl_weight_annealing == "cyclic-linear":
+                    self._doc_kld_weight += 1 / self._doc_period
+                    if self._doc_kld_weight > 1:
+                        self._doc_cyclic_kl_anneal_tracker += 1
+                        self._doc_kld_weight = 1
+                    if self._doc_cyclic_kl_anneal_tracker > self._doc_saturation_period:
+                        self._doc_cyclic_kl_anneal_tracker = 0
+                        self._doc_kld_weight = 1 / self._doc_period
+                else:
+                    raise ConfigurationError("anneal type {} not found".format(self._doc_kl_weight_annealing))
 
     def update_topics_and_personas(self, epoch_num: Optional[List[int]]) -> None:
         """
@@ -270,14 +314,14 @@ class Bamman(Model):
             # Logs the newest set of topics.
             if self.track_topics:
                 k = 20
-                # (K - doc dim, P - persona dim)
+                # (P - persona dim, K -topic dim)
                 W = torch.softmax(self.vae.get_W(), dim=-1)
-                # (P - persona dim, V)
+                # (K, V)
                 beta = torch.softmax(self.vae.get_beta(), dim=-1)
                 ser_dir = os.path.dirname(self.vocab.serialization_dir)
 
                 # Personas are saved for the previous epoch.
-                personas = self.extract_weights(beta, k=k)
+                personas = self.extract_weights(W @ beta, k=k)
                 persona_table = tabulate(personas, headers=["Persona #", "Words"])
                 persona_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "personas")
                 if not os.path.exists(persona_dir):
@@ -287,7 +331,7 @@ class Bamman(Model):
                     file_.write(persona_table)
 
                 # Topics are saved for the previous epoch.
-                topics = self.extract_weights(W @ beta, k=k)
+                topics = self.extract_weights(beta, k=k)
                 topic_table = tabulate(topics, headers=["Topic #", "Words"])
                 topic_dir = os.path.join(os.path.dirname(self.vocab.serialization_dir), "topics")
                 if not os.path.exists(topic_dir):
@@ -484,7 +528,7 @@ class Bamman(Model):
         # bp()
         # Reconstructed bag-of-words from the VAE with background bias.
         # doc_reconstructed_bow = variational_output['doc_reconstruction'] + self._background_freq
-        entity_reconstructed_bow = variational_output['e_reconstruction'] + self._background_freq
+        entity_reconstructed_bow = variational_output['bow_reconstruction'] + self._background_freq
 
         # Apply batchnorm to the reconstructed bag of words.
         # Helps with word variety in topic space.
@@ -497,16 +541,16 @@ class Bamman(Model):
         reconstruction_loss = (self.bow_reconstruction_loss(entity_reconstructed_bow, embedded_entities) * entities_mask).sum(1)
 
         # KL-divergence that is returned is the mean of the batch by default.
-        doc_negative_kl_divergence = variational_output['d_negative_kl_divergence']
+        doc_negative_kl_divergence = variational_output['type_negative_kl_divergence']
         # masked sum of entity KL-divergence since there are some paddings
-        entity_negative_kl_divergence = torch.sum(variational_output["s_negative_kl_divergence"] * entities_mask, dim=-1)
+        entity_negative_kl_divergence = torch.sum(variational_output["persona_negative_kl_divergence"] * entities_mask, dim=-1)
         # total KL-divergence is the sum of doc's KL and entities' KL
-        negative_kl_divergence = doc_negative_kl_divergence + entity_negative_kl_divergence
+        negative_kl_divergence = doc_negative_kl_divergence * self._doc_kld_weight \
+                                 + entity_negative_kl_divergence * self._entity_kld_weight
         # Compute ELBO
         elbo = negative_kl_divergence * self._kld_weight + reconstruction_loss
 
         loss = -torch.mean(elbo)
-        open(f"{self.vae._get_name()}_loss.txt", "a+").write(f"{loss} \n")
         if torch.isnan(loss):
             bp()
         output_dict['loss'] = loss

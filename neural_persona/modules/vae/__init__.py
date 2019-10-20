@@ -5,3 +5,4 @@ from neural_persona.modules.vae.ladder import LadderVAE
 from neural_persona.modules.vae.basic_l import BasicLVAE
 from neural_persona.modules.vae.basic_h import BasicHVAE
 from neural_persona.modules.vae.basic_m import BasicModifiedVAE
+from neural_persona.modules.vae.bamman import Bamman

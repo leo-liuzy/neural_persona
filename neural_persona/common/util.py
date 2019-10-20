@@ -75,6 +75,19 @@ def normal_kl(N0, N1, eps=EPSILON):
     return result
 
 
+def multinomial_kl(q_logit: torch.tensor, p_logit: torch.tensor):
+    """
+    https://math.stackexchange.com/questions/485810/kl-divergence-of-multinomial-distribution
+    We make further assumption that n = 1.
+    :param p:
+    :param q:
+    :return:
+    """
+    p = torch.softmax(p_logit, dim=-1)  # each dim > 0
+    q = torch.softmax(q_logit, dim=-1)  # each dim > 0
+    log_diff = torch.log(p) - torch.log(q)
+    return torch.sum(q * log_diff, dim=-1)
+
 def compute_background_log_frequency(vocab: Vocabulary, vocab_namespace: str, precomputed_bg_file=None):
     """
     Load in the word counts from the JSON file and compute the

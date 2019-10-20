@@ -7,7 +7,7 @@ from allennlp.modules.seq2vec_encoders import Seq2VecEncoder
 from ipdb import set_trace as bp
 from overrides import overrides
 
-from neural_persona.common.util import normal_kl, create_trainable_BatchNorm1d, EPSILON
+from neural_persona.common.util import normal_kl, create_trainable_BatchNorm1d, EPSILON, multinomial_kl
 from allennlp.models import Model
 from neural_persona.modules.vae.vae import VAE
 
@@ -82,77 +82,77 @@ class Bamman(VAE):
     """
     def __init__(self,
                  vocab,
-                 encoder_topic: FeedForward,
-                 mean_projection_topic: FeedForward,
-                 log_variance_projection_topic: FeedForward,
                  encoder_entity: FeedForward,
-                 mean_projection_entity: FeedForward,
-                 log_variance_projection_entity: FeedForward,
-                 decoder_topic: FeedForward,
-                 decoder_persona: FeedForward,
-                 mean_projection_p_z1: FeedForward,
-                 log_variance_projection_p_z1: FeedForward,
+                 encoder_entity_hidden: FeedForward,
+                 decoder_type: FeedForward,  # (d_dim -> P)
+                 mean_projection_type: FeedForward,
+                 log_var_projection_type: FeedForward,
+                 decoder_topic: FeedForward,  # (K -> V)
+                 decoder_persona: FeedForward,  # (P -> K)
                  prior: Dict = {"type": "normal", "mu": 0, "var": 1},
+                 pooling_layer: str = "max",
                  apply_batchnorm_on_normal: bool = False,
                  apply_batchnorm_on_decoder: bool = False,
                  batchnorm_weight_learnable: bool = False,
                  batchnorm_bias_learnable: bool = True,
-                 stochastic_beta: bool = False,
+                 stochastic_weight: bool = False,
                  z_dropout: float = 0.2) -> None:
         super(Bamman, self).__init__(vocab)
 
-        self.encoder_topic = encoder_topic
-        self.mean_projection_topic = mean_projection_topic
-        self.log_variance_projection_topic = log_variance_projection_topic
         self.encoder_entity = encoder_entity
-        self.mean_projection_entity = mean_projection_entity
-        self.log_variance_projection_entity = log_variance_projection_entity
-        self.mean_projection_p_z1 = mean_projection_p_z1
-        self.log_variance_projection_p_z1 = log_variance_projection_p_z1
+        self.encoder_entity_hidden = encoder_entity_hidden
+        self.mean_projection_type = mean_projection_type
+        self.log_var_projection_type = log_var_projection_type
 
+        self._decoder_type = torch.nn.Linear(decoder_type.get_input_dim(),
+                                             decoder_type.get_output_dim(), bias=False)
         self._decoder_topic = torch.nn.Linear(decoder_topic.get_input_dim(), decoder_topic.get_output_dim(),
                                               bias=False)
         self._decoder_persona = torch.nn.Linear(decoder_persona.get_input_dim(), decoder_persona.get_output_dim(),
                                                 bias=False)
         self._z_dropout = torch.nn.Dropout(z_dropout)
 
-        self.num_topic = encoder_topic.get_output_dim()
-        self.num_persona = self.num_topic
+        self.num_type = decoder_type.get_input_dim()
+        self.num_topic = decoder_persona.get_output_dim()
+        self.num_persona = decoder_persona.get_input_dim()
 
         self.prior = prior
+        self.pooling_layer = getattr(torch, pooling_layer)
         self.p_params = None
         # self.p_mu, self.p_sigma, self.p_log_var = None, None, None
         self.initialize_prior(prior)
 
         # If specified, established batchnorm for both mean and log variance.
         self._apply_batchnorm_on_normal = apply_batchnorm_on_normal
-        self.mean_bn_entity, self.log_var_bn_entity = None, None
-        self.mean_bn_topic, self.log_var_bn_topic = None, None
-        self.mean_bn_p_z1, self.log_var_bn_p_z1 = None, None
+        self.mean_bn_type, self.log_var_bn_type = None, None
         if apply_batchnorm_on_normal:
-            self.mean_bn_topic = create_trainable_BatchNorm1d(self.num_topic,
-                                                              weight_learnable=batchnorm_weight_learnable,
-                                                              bias_learnable=batchnorm_bias_learnable,
-                                                              eps=0.001, momentum=0.001, affine=True)
-            self.log_var_bn_topic = create_trainable_BatchNorm1d(self.num_topic,
-                                                                 weight_learnable=batchnorm_weight_learnable,
-                                                                 bias_learnable=batchnorm_bias_learnable,
-                                                                 eps=0.001, momentum=0.001, affine=True)
+            self.mean_bn_type = create_trainable_BatchNorm1d(self.num_type,
+                                                             weight_learnable=batchnorm_weight_learnable,
+                                                             bias_learnable=batchnorm_bias_learnable,
+                                                             eps=0.001, momentum=0.001, affine=True)
+            self.log_var_bn_type = create_trainable_BatchNorm1d(self.num_type,
+                                                                weight_learnable=batchnorm_weight_learnable,
+                                                                bias_learnable=batchnorm_bias_learnable,
+                                                                eps=0.001, momentum=0.001, affine=True)
 
         # If specified, established batchnorm for reconstruction matrix, applying batch norm across vocabulary
         self._apply_batchnorm_on_decoder = apply_batchnorm_on_decoder
         if apply_batchnorm_on_decoder:
+            self.decoder_bn_type = create_trainable_BatchNorm1d(decoder_type.get_output_dim(),
+                                                                weight_learnable=batchnorm_weight_learnable,
+                                                                bias_learnable=batchnorm_bias_learnable,
+                                                                eps=0.001, momentum=0.001, affine=True)
             self.decoder_bn_topic = create_trainable_BatchNorm1d(decoder_topic.get_output_dim(),
                                                                  weight_learnable=batchnorm_weight_learnable,
                                                                  bias_learnable=batchnorm_bias_learnable,
                                                                  eps=0.001, momentum=0.001, affine=True)
 
             self.decoder_bn_persona = create_trainable_BatchNorm1d(decoder_persona.get_output_dim(),
-                                                                 weight_learnable=batchnorm_weight_learnable,
-                                                                 bias_learnable=batchnorm_bias_learnable,
-                                                                 eps=0.001, momentum=0.001, affine=True)
+                                                                   weight_learnable=batchnorm_weight_learnable,
+                                                                   bias_learnable=batchnorm_bias_learnable,
+                                                                   eps=0.001, momentum=0.001, affine=True)
         # If specified, constrain each topic to be a distribution over vocabulary
-        self._stochastic_beta = stochastic_beta
+        self._stochastic_weight = stochastic_weight
 
     def initialize_prior(self, prior: Dict):
         if prior['type'] == "normal":
@@ -183,7 +183,7 @@ class Bamman(VAE):
         # }
 
     @overrides
-    def forward(self, doc_vector: torch.FloatTensor, entity_vector: torch.FloatTensor):  # pylint: disable = W0221
+    def forward(self, entity_vector: torch.FloatTensor):  # pylint: disable = W0221
         """
         Given the input representation, produces the reconstruction from theta
         as well as the negative KL-divergence, theta itself, and the parameters
@@ -191,71 +191,78 @@ class Bamman(VAE):
         """
         output = {}
         # bp()
-        # calculate the mask for later use
+        # get shape dim for later use
         batch_size, max_num_entity, _ = entity_vector.shape
         # prior -- N(0, 1)
         p_params = {"mean": self.p_mu.repeat(batch_size, 1),
                     "sigma": self.p_sigma.repeat(batch_size, 1),
                     "log_variance": self.p_log_var.repeat(batch_size, 1)
                     }
-
-        # encode the document representation
-        doc_repr = self.encoder_topic(doc_vector)
-        # bp()
+        
+        # estimate persona in bottom-up direction
+        s_tilde = self.encoder_entity(entity_vector)
+        e_tilde = gumbel_softmax(s_tilde)
+        # g_tilde = (batch_size, P)
+        g_tilde = self.encoder_entity_hidden(self.pooling_layer(e_tilde, dim=-1))
+        type_params = self.estimate_params(g_tilde, self.mean_projection_type,
+                                           self.log_var_projection_type, self.mean_bn_type,
+                                           self.log_var_bn_type)
         # calculate for the distribution for document representation
-        doc_params = self.estimate_params(doc_repr, self.mean_projection_topic, self.log_variance_projection_topic,
-                                          self.mean_bn_topic, self.log_var_bn_topic)
         # estimate the intermediate document representation
-        q_z2 = self.reparameterize(doc_params)
-        theta = self._z_dropout(q_z2)
+        d = self.reparameterize(type_params)
+        theta = self._z_dropout(d)
         theta = torch.softmax(theta, dim=-1)
         output.update({"theta": theta,
-                       "doc_params": doc_params,
-                       "doc_negative_kl_divergence": self.compute_negative_kld(q_params=doc_params,
-                                                                               p_params=p_params)
+                       "type_params": type_params,
+                       "type_negative_kl_divergence": self.compute_negative_kld(q_params=type_params,
+                                                                                p_params=p_params)
                        })
-        beta = self._decoder_topic.weight.t()
-        if self._stochastic_beta:
-            beta = torch.nn.functional.softmax(beta, dim=1)
-            # beta = torch.nn.functional.tanh(beta)
-            # beta = torch.nn.functional.sigmoid(beta)
+
+        f = self._decoder_type.weight.t()
+        if self._stochastic_weight:
+            f = torch.nn.functional.softmax(f, dim=1)
         if self._apply_batchnorm_on_decoder:
-            beta = self.decoder_bn_topic(beta)
-        doc_reconstruction = theta @ beta
-        output["doc_reconstruction"] = doc_reconstruction
+            f = self.decoder_bn_topic(f)
 
-        # decode topic representation to input to calculate persona representation
-        # TODO: bn on entity are not used. wonder: should we run a batch on all global entity representation
-        theta = theta.unsqueeze(-2).repeat(1, max_num_entity, 1)
-        entity_theta_merged = torch.cat([entity_vector.float(), theta], dim=-1)
-        entity_repr = self.encoder_entity(entity_theta_merged)
-        entity_params = self.estimate_params(entity_repr, self.mean_projection_entity,
-                                             self.log_variance_projection_entity, self.mean_bn_entity,
-                                             self.log_var_bn_entity)
+        # (batch_size, num_type) -> (batch_size, P) = global persona representation
+        g = theta @ f
+        output["global_persona"] = g
+        g = g.unsqueeze(1).repeat(1, max_num_entity, 1)
+        # decode type representation to persona representation
+        # (batch_size, max_num_entity, P) -- equivalent to sampling from multinomial(n=1, p_1, ... p_P)
+        persona_proportion = gumbel_softmax(g)
 
         # bp()
-        p_z1_params = {"mean": theta,
-                       "sigma": torch.ones_like(theta),
-                       "log_variance": torch.zeros_like(theta)}
-        q_z1 = self.reparameterize(entity_params)
-        q_z1 = self._z_dropout(q_z1)
+        q_persona_params = {"logit": g_tilde}
+        p_persona_params = {"logit": g}
+        persona_proportion = self._z_dropout(persona_proportion)
         # bp()
-        persona = gumbel_softmax(q_z1, dim=-1)  # torch.softmax(q_z1, dim=-1)
-        output.update({"persona": persona,
-                       "entity_params": entity_params,
-                       "entity_negative_kl_divergence": self.compute_negative_kld(q_params=entity_params,
-                                                                                  p_params=p_z1_params)
-                       })
+        output.update({"persona": persona_proportion,
+                       "persona_params": q_persona_params,
+                       "persona_negative_kl_divergence": self.compute_negative_kld(q_params=q_persona_params,
+                                                                                  p_params=p_persona_params,
+                                                                                  type="multinomial")})
         # bp()
-        # decode persona representation to word reconstruction
+        # decode persona representation to topic representation
         W = self._decoder_persona.weight.t()
         if self._apply_batchnorm_on_decoder:
             W = self.decoder_bn_persona(W)
-        if self._stochastic_beta:
+        if self._stochastic_weight:
             W = torch.nn.functional.softmax(W, dim=1)
         # bp()
-        entity_reconstruction = gumbel_softmax(persona @ W, dim=-1)  @ beta
-        output["entity_reconstruction"] = entity_reconstruction
+        # persona_reconstruction = topic_proportion calculated from persona proportion
+        persona_reconstruction = torch.softmax(persona_proportion @ W, dim=-1)
+        output["persona_reconstruction"] = persona_reconstruction
+
+        # decode topic representation(proportion) to distribution over word(unnormalized)
+        beta = self._decoder_topic.weight.t()
+        if self._apply_batchnorm_on_decoder:
+            beta = self.decoder_bn_topic(beta)
+        if self._stochastic_weight:
+            beta = torch.nn.functional.softmax(beta, dim=1)
+        # bp()
+        bow_reconstruction = persona_reconstruction @ beta
+        output["bow_reconstruction"] = bow_reconstruction
 
         return output
 
@@ -267,7 +274,7 @@ class Bamman(VAE):
                         mean_bn: torch.nn.BatchNorm1d = None,
                         log_var_bn: torch.nn.BatchNorm1d = None):
         """
-        Estimate the parameters for the logistic normal.
+        Estimate the parameters for the normal.
         """
         mean = mean_projection(input_repr)  # pylint: disable=C0103
         log_var = log_variance_projection(input_repr)
@@ -289,14 +296,22 @@ class Bamman(VAE):
                 }
 
     @overrides
-    def compute_negative_kld(self, q_params: Dict, p_params: Dict):
+    def compute_negative_kld(self, q_params: Dict, p_params: Dict, type: str = "normal"):
         """
         Compute the closed-form solution for negative KL-divergence for Gaussians.
+        Not averaged across batch
         """
-        mu, log_var = q_params["mean"], q_params["log_variance"]  # pylint: disable=C0103
-        # bp()
-        negative_kl_divergence = -normal_kl((mu, log_var), (p_params["mean"], p_params["log_variance"]))
-        # bp()
+        if type == "normal":
+            mu, log_var = q_params["mean"], q_params["log_variance"]  # pylint: disable=C0103
+            # bp()
+            negative_kl_divergence = -normal_kl((mu, log_var), (p_params["mean"], p_params["log_variance"]))
+            # bp()
+        elif type == "multinomial":
+            q_logit = q_params["logit"]
+            p_logit = p_params["logit"]
+            negative_kl_divergence = -multinomial_kl(q_logit, p_logit)
+        else:
+            raise Exception("Undefined distribution")
         return negative_kl_divergence
 
     def reparameterize(self, params):
@@ -326,9 +341,9 @@ class Bamman(VAE):
 
     @overrides
     def get_beta(self):
-        return self._decoder_persona._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
+        return self._decoder_topic._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
 
     def get_W(self):
         persona = self._decoder_persona._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
-        topic = self._decoder_topic._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
-        return persona @ topic
+        # topic = self._decoder_topic._parameters['weight'].data.transpose(0, 1)  # pylint: disable=W0212
+        return persona  # @ topic
