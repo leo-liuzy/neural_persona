@@ -45,3 +45,12 @@ waiting movies_div6000 to finish
 design vampire_persona model, which is just topic model trained on entity_as_doc corpus and decompose the "topic model"
 run vampire_persona model
 
+10-20
+finish and run the gumbel VAE to model "bamman generative model"
+expectedly the result won't look good
+re-run vampire_persona model in that models were not saved due to insufficient storage space.
+change to sync data with github, this is a trivial/obvious choice that's overlooked before. From now on, only data transmition will go through scp.
+
+10-21
+run clustering method on the vampire_persona  and gumbel-VAE model
+
