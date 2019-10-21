@@ -206,6 +206,7 @@ class Bamman(Model):
         self.batch_num = 0
 
         initializer(self)
+        # bp()
 
     def initialize_bg_from_file(self, file_: Optional[str] = None) -> torch.Tensor:
         """
@@ -493,6 +494,7 @@ class Bamman(Model):
         epoch_num: ``List[int]``
             Output of epoch tracker
         """
+        # bp()
         if self.batch_num in []:
             bp()
         # For easy transfer to the GPU.

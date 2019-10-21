@@ -153,6 +153,7 @@ class Bamman(VAE):
                                                                    eps=0.001, momentum=0.001, affine=True)
         # If specified, constrain each topic to be a distribution over vocabulary
         self._stochastic_weight = stochastic_weight
+        ##  bp()
 
     def initialize_prior(self, prior: Dict):
         if prior['type'] == "normal":
@@ -203,6 +204,7 @@ class Bamman(VAE):
         s_tilde = self.encoder_entity(entity_vector)
         e_tilde = gumbel_softmax(s_tilde)
         # g_tilde = (batch_size, P)
+        bp()
         g_tilde = self.encoder_entity_global(self.pooling_layer(e_tilde, dim=-1))
         type_params = self.estimate_params(g_tilde, self.mean_projection_type,
                                            self.log_var_projection_type, self.mean_bn_type,
