@@ -117,6 +117,9 @@ class Bamman(VAE):
         self.num_persona = decoder_persona.get_input_dim()
 
         self.prior = prior
+        if pooling_layer not in ["max", "sum", "mean"]:
+            raise Exception("Undefined pooling function")
+        self.pooling_func = pooling_layer
         self.pooling_layer = getattr(torch, pooling_layer)
         self.p_params = None
         # self.p_mu, self.p_sigma, self.p_log_var = None, None, None
@@ -159,15 +162,15 @@ class Bamman(VAE):
         if prior['type'] == "normal":
             if 'mu' not in prior or 'var' not in prior:
                 raise Exception("MU, VAR undefined for normal")
-            mu = torch.zeros(1, self.num_topic).fill_(prior['mu'])
-            var = torch.zeros(1, self.num_topic).fill_(prior['var'])
+            mu = torch.zeros(1, self.num_type).fill_(prior['mu'])
+            var = torch.zeros(1, self.num_type).fill_(prior['var'])
             sigma = torch.sqrt(var)
             log_var = var.log()
 
         elif prior['type'] == "laplace-approx":
-            a = torch.zeros(1, self.num_topic).fill_(prior['alpha'])
+            a = torch.zeros(1, self.num_type).fill_(prior['alpha'])
             mu = a.log() - torch.mean(a.log(), 1)
-            var = 1.0 / a * (1 - 2.0 / self.num_topic) + 1.0 / self.num_topic * torch.mean(1 / a)
+            var = 1.0 / a * (1 - 2.0 / self.num_type) + 1.0 / self.num_type * torch.mean(1 / a)
             sigma = torch.sqrt(var)
             log_var = var.log()
         else:
@@ -203,9 +206,11 @@ class Bamman(VAE):
         # estimate persona in bottom-up direction
         s_tilde = self.encoder_entity(entity_vector)
         e_tilde = gumbel_softmax(s_tilde)
+        g_tilde = self.pooling_layer(e_tilde, dim=-1)
         # g_tilde = (batch_size, P)
-        bp()
-        g_tilde = self.encoder_entity_global(self.pooling_layer(e_tilde, dim=-1))
+        if self.pooling_func == "max":
+            g_tilde = g_tilde[0]
+        g_tilde = self.encoder_entity_global(g_tilde)
         type_params = self.estimate_params(g_tilde, self.mean_projection_type,
                                            self.log_var_projection_type, self.mean_bn_type,
                                            self.log_var_bn_type)
@@ -238,7 +243,7 @@ class Bamman(VAE):
         q_persona_params = {"logit": g_tilde}
         p_persona_params = {"logit": g}
         persona_proportion = self._z_dropout(persona_proportion)
-        # bp()
+        bp()
         output.update({"persona": persona_proportion,
                        "persona_params": q_persona_params,
                        "persona_negative_kl_divergence": self.compute_negative_kld(q_params=q_persona_params,

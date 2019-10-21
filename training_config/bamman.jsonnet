@@ -68,14 +68,14 @@ local BASE_READER(LAZY) = {
          },
          "mean_projection_type": {
             "activations": std.extVar("MEAN_PROJECTION_ACTIVATION"),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
-            "input_dim": std.parseInt(std.extVar("P")),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("T"))),
+            "input_dim": std.parseInt(std.extVar("T")),
             "num_layers": std.parseInt(std.extVar("NUM_MEAN_PROJECTION_LAYERS"))
          },
          "log_var_projection_type": {
             "activations": std.extVar("LOG_VAR_PROJECTION_ACTIVATION"),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
-            "input_dim": std.parseInt(std.extVar("P")),
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS")), function(i) std.parseInt(std.extVar("T"))),
+            "input_dim": std.parseInt(std.extVar("T")),
             "num_layers": std.parseInt(std.extVar("NUM_LOG_VAR_PROJECTION_LAYERS"))
          },
          "decoder_topic": {
