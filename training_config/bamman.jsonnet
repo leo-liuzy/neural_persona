@@ -56,14 +56,14 @@ local BASE_READER(LAZY) = {
          },
          "encoder_entity_global": {
             "activations": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.extVar("ENCODER_ACTIVATION")),
-            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("P"))),
-            "input_dim": std.parseInt(std.extVar("VOCAB_SIZE")) + 1 ,
+            "hidden_dims": std.makeArray(std.parseInt(std.extVar("NUM_ENCODER_LAYERS")), function(i) std.parseInt(std.extVar("T"))),
+            "input_dim": std.parseInt(std.extVar("P")) ,
             "num_layers": std.parseInt(std.extVar("NUM_ENCODER_LAYERS"))
          },
          "decoder_type": {
             "activations": "linear",
             "hidden_dims": [std.parseInt(std.extVar("P"))],
-            "input_dim": std.parseInt(std.extVar("K")),
+            "input_dim": std.parseInt(std.extVar("T")),
             "num_layers": 1
          },
          "mean_projection_type": {
@@ -81,12 +81,12 @@ local BASE_READER(LAZY) = {
          "decoder_topic": {
             "activations": "linear",
             "hidden_dims": [std.parseInt(std.extVar("VOCAB_SIZE")) + 1 ],
-            "input_dim": std.parseInt(std.extVar("P")),
+            "input_dim": std.parseInt(std.extVar("K")),
             "num_layers": 1
          },
          "decoder_persona": {
             "activations": "linear",
-            "hidden_dims": [std.parseInt(std.extVar("VOCAB_SIZE")) + 1 ],
+            "hidden_dims": [std.parseInt(std.extVar("K"))],
             "input_dim": std.parseInt(std.extVar("P")),
             "num_layers": 1
          },
