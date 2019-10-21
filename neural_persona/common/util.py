@@ -87,7 +87,7 @@ def multinomial_kl(q_logit: torch.tensor, p_logit: torch.tensor):
     p = torch.softmax(p_logit, dim=-1)  # each dim > 0
     q = torch.softmax(q_logit, dim=-1)  # each dim > 0
     log_diff = torch.log(p) - torch.log(q)
-    return torch.sum(q * log_diff, dim=-1)
+    return -torch.sum(q * log_diff, dim=-1)
 
 def compute_background_log_frequency(vocab: Vocabulary, vocab_namespace: str, precomputed_bg_file=None):
     """

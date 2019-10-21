@@ -170,6 +170,7 @@ class Bamman(Model):
         else:
             raise ConfigurationError("anneal type(doc) {} not found".format(doc_kl_weight_annealing))
 
+        self._entity_kl_weight_annealing = entity_kl_weight_annealing
         self._entity_linear_scaling = float(entity_linear_scaling)
         self._entity_sigmoid_weight_1 = float(entity_sigmoid_weight_1)
         self._entity_sigmoid_weight_2 = float(entity_sigmoid_weight_2)

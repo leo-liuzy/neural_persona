@@ -206,10 +206,12 @@ class Bamman(VAE):
         # estimate persona in bottom-up direction
         s_tilde = self.encoder_entity(entity_vector)
         e_tilde = gumbel_softmax(s_tilde)
-        g_tilde = self.pooling_layer(e_tilde, dim=-1)
+        g_tilde = self.pooling_layer(e_tilde, dim=1)
         # g_tilde = (batch_size, P)
         if self.pooling_func == "max":
             g_tilde = g_tilde[0]
+        if g_tilde.shape[1] != self.encoder_entity_global.get_input_dim():
+            bp()
         g_tilde_hidden = self.encoder_entity_global(g_tilde)
         type_params = self.estimate_params(g_tilde_hidden, self.mean_projection_type,
                                            self.log_var_projection_type, self.mean_bn_type,
@@ -315,6 +317,7 @@ class Bamman(VAE):
         elif type == "multinomial":
             q_logit = q_params["logit"]
             p_logit = p_params["logit"]
+            # bp()
             negative_kl_divergence = -multinomial_kl(q_logit, p_logit)
         else:
             raise Exception("Undefined distribution")

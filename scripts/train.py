@@ -49,7 +49,7 @@ def main():
     data_dir = os.environ["DATA_DIR"]
     fail_message = ""
     # priors = {0: '{"type": "normal", "mu": 0, "var": 1}', 1: '{"type": "laplace-approx", "alpha": 1}'}
-    num_repeat = 3
+    num_repeat = 1
 
     # for use_doc_info in [0, 1]:
     #     env["USE_DOC_INFO"] = use_doc_info
