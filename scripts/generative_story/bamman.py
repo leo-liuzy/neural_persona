@@ -13,10 +13,10 @@ alpha = 1
 persona_per_topic = 4
 K = 50
 P = 100
-d_dim = P * 2
+T = P // 2
 num_doc = 10000
 vocab_size = 3001
-result_dir = f"/home/lzy/proj/neural_persona/examples/toy/basicK{K}P{P}"
+result_dir = f"/home/lzy/proj/neural_persona/examples/toy/bammanK{K}P{P}"
 vocabulary_fname = f"/home/lzy/proj/neural_persona/examples/toy/basic/vocabulary/entity_based.txt"
 
 vocab = open(vocabulary_fname, "r").read().split("\n")[:-1]
@@ -37,16 +37,19 @@ for i in range(K):
 beta = softmax(beta, axis=-1)
 # persona model is a matrix () that maps d_i -- a mixture of personas that we expect in document i --
 # to a logit vector which we use to sample persona representations of characters in document i
-persona_models = np.random.dirichlet(np.ones(P) * alpha, d_dim)
-# b = softmax(np.ones(vocab_size))
+# (T, P)
+type2persona = np.random.dirichlet(np.ones(P) * alpha, T)
+# (P, K)
+persona_models = np.random.dirichlet(np.ones(K) * alpha, P)
+b = softmax(np.ones(vocab_size))
 
 for i in tqdm(range(num_doc)):
     # sample a document representation
-    d = np.random.standard_normal(d_dim)
+    d = np.random.standard_normal(T)
     theta = softmax(d)
 
     # this is the probability distribution from which we will sample entity representation
-    p_i = theta @ persona_models
+    p_i = theta @ type2persona
 
     # sample number of entities in the document
     E_i = num_entity_func()
@@ -58,15 +61,13 @@ for i in tqdm(range(num_doc)):
     entity_repr_vectors = []
     entity_bow_vectors = []
     doc = []
-    E = np.random.multinomial(1, p_i, size=E_i)
-    for _ in range(E_i):
-        # uniformly sample a center from [persona_per_topic * d_max_idx, persona_per_topic * (d_max_idx + 1))
-        # persona representation
-        e_j = np.random.multinomial(1, p_i, size=1)
-        entity_repr_vectors.append(e_j)
 
+    entity_repr_vectors = entity_repr_vectors
+    for _ in range(E_i):
+        e_ij = np.random.multinomial(1, p_i, size=1)[0]
         # calculate the probability over vocabulary
-        p_s_j = softmax(e_j @ beta + b, axis=-1)
+        entity_repr_vectors.append(e_ij)
+        p_s_j = softmax(softmax(e_ij @ persona_models) @ beta + b, axis=-1)
         bow_vector = np.random.multinomial(C_ij, p_s_j)
         sentence = []
         for idx in np.nonzero(bow_vector)[0]:
@@ -76,6 +77,7 @@ for i in tqdm(range(num_doc)):
 
         assert np.sum(bow_vector) != 0
         entity_bow_vectors.append(bow_vector)
+
     entity_repr_vectors = np.array(entity_repr_vectors)
     entity_bow_vectors = np.array(entity_bow_vectors)
 
