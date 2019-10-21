@@ -16,7 +16,7 @@ P = 100
 T = P // 2
 num_doc = 10000
 vocab_size = 3001
-result_dir = f"/home/lzy/proj/neural_persona/examples/toy/basicK{K}P{P}"
+result_dir = f"/home/lzy/proj/neural_persona/examples/toy/bammanK{K}P{P}"
 vocabulary_fname = f"/home/lzy/proj/neural_persona/examples/toy/basic/vocabulary/entity_based.txt"
 
 vocab = open(vocabulary_fname, "r").read().split("\n")[:-1]
