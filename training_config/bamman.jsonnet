@@ -21,7 +21,7 @@ local BASE_READER(LAZY) = {
       "type": "bamman",
       "bow_embedder": {
          "type": "bag_of_word_counts",
-         "vocab_namespace": "vampire_namefree",
+         "vocab_namespace": "entity_based",
          "ignore_oov": true
       },
       "doc_saturation_period": std.extVar("DOC_SATURATION_PERIOD"),

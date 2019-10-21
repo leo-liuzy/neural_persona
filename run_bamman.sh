@@ -23,7 +23,7 @@ do
         
     esac
 
-    for doc_kl in 2000 4000 6000
+    for doc_kl in 1000 # 4000 6000
     do
         export DOC_LINEAR_SCALING=$doc_kl
         for k in 25 50 100
