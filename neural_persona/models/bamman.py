@@ -539,13 +539,14 @@ class Bamman(Model):
         # KL-divergence that is returned is the mean of the batch by default.
         doc_negative_kl_divergence = variational_output['type_negative_kl_divergence']
         # masked sum of entity KL-divergence since there are some paddings
-        entity_negative_kl_divergence = torch.sum(variational_output["persona_negative_kl_divergence"] * entities_mask, dim=-1)
+        # bp()
+        entity_negative_kl_divergence = variational_output["persona_negative_kl_divergence"] * entities_mask.sum(1)
         # total KL-divergence is the sum of doc's KL and entities' KL
         negative_kl_divergence = doc_negative_kl_divergence * self._doc_kld_weight \
                                  + entity_negative_kl_divergence * self._entity_kld_weight
         # Compute ELBO
-        elbo = negative_kl_divergence * self._kld_weight + reconstruction_loss
-
+        elbo = negative_kl_divergence + reconstruction_loss
+        # bp()
         loss = -torch.mean(elbo)
         if torch.isnan(loss):
             bp()

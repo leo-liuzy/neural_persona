@@ -210,8 +210,8 @@ class Bamman(VAE):
         # g_tilde = (batch_size, P)
         if self.pooling_func == "max":
             g_tilde = g_tilde[0]
-        g_tilde = self.encoder_entity_global(g_tilde)
-        type_params = self.estimate_params(g_tilde, self.mean_projection_type,
+        g_tilde_hidden = self.encoder_entity_global(g_tilde)
+        type_params = self.estimate_params(g_tilde_hidden, self.mean_projection_type,
                                            self.log_var_projection_type, self.mean_bn_type,
                                            self.log_var_bn_type)
         # calculate for the distribution for document representation
@@ -234,16 +234,15 @@ class Bamman(VAE):
         # (batch_size, num_type) -> (batch_size, P) = global persona representation
         g = theta @ f
         output["global_persona"] = g
-        g = g.unsqueeze(1).repeat(1, max_num_entity, 1)
         # decode type representation to persona representation
         # (batch_size, max_num_entity, P) -- equivalent to sampling from multinomial(n=1, p_1, ... p_P)
-        persona_proportion = gumbel_softmax(g)
+        persona_proportion = gumbel_softmax(g.unsqueeze(1).repeat(1, max_num_entity, 1))
 
-        # bp()
         q_persona_params = {"logit": g_tilde}
         p_persona_params = {"logit": g}
+        
         persona_proportion = self._z_dropout(persona_proportion)
-        bp()
+        # bp()
         output.update({"persona": persona_proportion,
                        "persona_params": q_persona_params,
                        "persona_negative_kl_divergence": self.compute_negative_kld(q_params=q_persona_params,

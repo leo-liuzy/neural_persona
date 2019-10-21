@@ -83,6 +83,7 @@ def multinomial_kl(q_logit: torch.tensor, p_logit: torch.tensor):
     :param q:
     :return:
     """
+    # bp()
     p = torch.softmax(p_logit, dim=-1)  # each dim > 0
     q = torch.softmax(q_logit, dim=-1)  # each dim > 0
     log_diff = torch.log(p) - torch.log(q)
