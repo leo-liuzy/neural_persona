@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 from typing import List, Dict, Any
-import pickle
+import picklef
 import nltk
 import numpy as np
 from itertools import chain

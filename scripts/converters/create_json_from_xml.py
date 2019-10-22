@@ -4,12 +4,8 @@ import itertools
 import os
 import re
 import sys
-import numpy as np
-import csv
-from typing import List
 from glob import glob
 import xml.etree.ElementTree as ET
-from pprint import pprint
 import gzip  # not strictly necessary
 
 """
@@ -203,7 +199,7 @@ if __name__ == "__main__":
     random.shuffle(processed_corpus)
     train, dev = [], []
     print("Splitting the dataset")
-    from cluster_movies import tvtrope_ontology, name_ontology
+    from cluster.basic.cluster_movies import tvtrope_ontology, name_ontology
     for doc in processed_corpus:
         docid = doc["docid"]
         names = [entity["name"] for entity in doc["entities"]]
